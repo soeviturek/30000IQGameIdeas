@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>大雷问道 · 企划案 v3</title>
+<style>
+  body{font-family:"Microsoft YaHei",sans-serif;background:#151022;color:#eee0c8;margin:0;padding:0}
+  header{padding:40px 20px;text-align:center;background:linear-gradient(135deg,#2b1f4a,#4a2f5a);border-bottom:2px solid #d4af37}
+  header h1{color:#f0d98c;font-size:2.2em;margin:0}
+  header p{color:#c9b8e8;margin-top:8px}
+  main{max-width:1000px;margin:0 auto;padding:20px}
+  section{margin:36px 0;background:#1e1830;border-radius:12px;padding:24px;border:1px solid #4a3a6a}
+  h2{color:#f0d98c;border-left:5px solid #d4af37;padding-left:12px}
+  h3{color:#c9a9e8}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+  .card{background:#2a2145;border-radius:10px;padding:16px;border:1px solid #6a4a8a}
+  .card h3{margin-top:0;color:#f0d98c}
+  .tag{display:inline-block;background:#4a2f5a;color:#f0d98c;padding:2px 10px;border-radius:12px;font-size:0.8em;margin-right:6px}
+  .tag.removed{background:#5a2a2a;color:#e89c9c;text-decoration:line-through}
+  .tag.new{background:#2a5a3a;color:#9ce8b0}
+  table{width:100%;border-collapse:collapse;margin-top:12px;font-size:0.92em}
+  th,td{border:1px solid #4a3a6a;padding:8px 12px;text-align:left}
+  th{background:#2a2145;color:#f0d98c}
+  ul{line-height:1.8}
+  .note{background:#3a2020;border-left:4px solid #d46a4a;padding:12px 16px;border-radius:6px;color:#e8c8b8}
+  .fix{background:#1a3a2a;border-left:4px solid #4ad46a;padding:12px 16px;border-radius:6px;color:#c8e8d0;margin-bottom:16px}
+  pre{background:#0f0c1a;border:1px solid #4a3a6a;border-radius:8px;padding:16px;overflow-x:auto;color:#a8f0c8;font-size:0.85em}
+  footer{text-align:center;padding:24px;color:#8a7aa8}
+</style>
+</head>
+<body>
+<header>
+  <h1>大雷问道</h1>
+  <p>美少女仙侠割草游戏 · 企划案 v3</p>
+  <p style="font-size:0.85em;color:#a89ac8">商业模式定位变更：买断制 + DLC，单机/最多4人联机，不做抽卡</p>
+</header>
+
+<main>
+
+<section>
+  <h2>v3 核心变更</h2>
+  <div class="fix">✅ 商业模式确定为<b>买断制（一次性定价）+ DLC剧情章节付费</b>，产品形态为<b>单机或最多4人联机</b>，<span class="tag removed">不做抽卡</span></div>
+  <ul>
+    <li>角色获取：<span class="tag removed">随机抽卡</span> → <span class="tag new">剧情推进/成就解锁</span></li>
+    <li>局内秒境割草+局外门派养成分层结构保留，且优先级进一步提升（买断制下唯一护城河）</li>
+    <li><span class="tag new">新增</span> 4人联机设计一节</li>
+    <li>v2抽卡保底公式溢出bug：<span class="tag removed">整节删除</span>，改用局内三选一随机词条承接随机奖励体验</li>
+    <li><span class="tag new">v4新增</span> 解决"联机×暧昧剧情共存"结构冲突 + DLC角色边界说明 + 验证指标基准值</li>
+  </ul>
+</section>
+
+<section>
+  <h2>局内/局外玩法结构</h2>
+  <div class="cards">
+    <div class="card">
+      <h3>局内 · 秒境割草 <span class="tag">最高优先级</span></h3>
+      <p>8-15分钟单局，自动攻击+走位躲Boss，三选一随机词条升级法宝——这是买断制下承接"抽卡不确定性快感"的核心随机奖励钩子，且不涉及付费。章节式内容结构，而非无限刷赛季制。</p>
+    </div>
+    <div class="card">
+      <h3>局外 · 门派养成</h3>
+      <p>弟子历练产出资源，种灵草炼丹。角色<b>通过剧情章节推进解锁</b>（取代抽卡），养成结果反哺局内初始强度。</p>
+    </div>
+  </div>
+
+  <h3>武器/技能基座 + 进化组合（建议优先扩到20+条）</h3>
+  <table>
+    <tr><th>基座法宝</th><th>基础效果</th><th>进化条件</th><th>进化后效果</th></tr>
+    <tr><td>惊鸿剑气</td><td>前方扇形范围伤害</td><td>+符箓术满级</td><td>剑气化虹，360°环绕+击退</td></tr>
+    <tr><td>五雷符</td><td>随机落雷单体伤害</td><td>+惊鸿剑气满级</td><td>雷剑真解，落雷AOE+感电连锁</td></tr>
+    <tr><td>灵狐印</td><td>召唤灵宠自动索敌</td><td>+饲育丹×3</td><td>九尾化身，灵宠×3+吸血</td></tr>
+    <tr><td>定风珠</td><td>减速范围敌人</td><td>+冰魄玉</td><td>凝霜领域，持续冻结+范围扩大</td></tr>
+    <tr><td>蛊虫囊</td><td>中毒持续伤害</td><td>+毒龙丹</td><td>万蛊噬心，中毒跨怪传染</td></tr>
+    <tr><td>太极扇</td><td>反弹弹幕</td><td>+定风珠满级</td><td>太虚幻境，反弹×2+无敌帧</td></tr>
+    <tr><td>桃木剑阵</td><td>环绕护体+格挡</td><td>+惊鸿剑气</td><td>剑阵化山，剑刃翻倍+突进斩</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>上瘾/参与感机制（去抽卡化调整）</h2>
+  <div class="cards">
+    <div class="card"><h3>1. 随机奖励钩子</h3><p>局内三选一随机词条承接"开箱感"，章节Boss掉落稀有词条书。完全不涉及付费，合规且有效。</p></div>
+    <div class="card"><h3>2. 沉没成本钩子</h3><p><span class="tag removed">赛季通行证</span> → 章节/DLC发布节奏 + 图鉴/成就全收集系统</p></div>
+    <div class="card"><h3>3. 社交/传播</h3><p><span class="tag removed">排行榜PVP氪金驱动</span> → 晒养成截图分享（不绑资源奖励）+ 4人组队开黑邀请传播</p></div>
+    <div class="card"><h3>4. 三层目标</h3><p>单局(击杀/存活) → 章节目标(Boss通关/图鉴进度) → 长线目标(全成就/DLC剧情线)</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>多人联机设计 <span class="tag new">v3新增</span></h2>
+  <ul>
+    <li><b>联机形式：</b>局内共享同屏联机（4人对抗同一波怪，对标暗黑地牢/元气骑士），局外门派养成各自独立，避免进度绑定摩擦</li>
+    <li><b>掉落分配：</b>独立结算，各自获得法宝/资源，减少资源竞争摩擦</li>
+    <li><b>联机专属内容：</b>分工站位/触发机关式联机Boss，制造"必须组队"的设计动机</li>
+  </ul>
+  <div class="fix">
+    <b>v4新增 · 联机×暧昧剧情共存方案（场景隔离+数据隔离）：</b>
+    亲密度/荤招剧情只在单人局外门派场景触发，联机战斗场景完全不呈现关系剧情；每个玩家的角色养成/亲密度进度完全独立存档、互不可见（类似"动物森友会各玩各的岛"）；联机中只共享战斗层面的形象/技能，剥离剧情叙事层，从场景和数据两层杜绝"同屏尴尬"风险。
+  </div>
+</section>
+
+<section>
+  <h2>数值曲线示例（已删除抽卡保底公式）</h2>
+  <div class="note">v2的抽卡保底公式在88抽即溢出概率100%，属于数值bug。v3已删除该设计，改用天然0-1封顶的局内随机词条权重系统。</div>
+  <pre>
+# 角色基础伤害成长
+base_damage(level) = 10 * (1.08 ^ level) + level * 2
+
+# 章节难度曲线（替代无限刷图节奏）
+enemy_hp(chapter, wave) = 50 * (1.12 ^ chapter) * (1.05 ^ wave)
+
+# 局内随机词条池权重（三选一，天然不会溢出）
+def weapon_choice_weights(rarity_pool):
+    return normalize([w.base_weight * w.rarity_modifier for w in rarity_pool])
+
+# 联机同屏难度补偿
+enemy_hp_coop(base_hp, player_count) = base_hp * (1 + 0.6 * (player_count - 1))
+  </pre>
+  <p>备注：所有公式写入正式配置前必须做边界值验算——上一版保底公式溢出就是活生生的反例。</p>
+</section>
+
+<section>
+  <h2>商业化设计：买断制 + DLC</h2>
+  <table>
+    <tr><th>内容层级</th><th>获取方式</th><th>定价</th></tr>
+    <tr><td>基础版游戏</td><td>一次性买断</td><td>¥68-118（对标杀戮尖塔/死亡细胞定价带）</td></tr>
+    <tr><td>亲密度Lv1-10</td><td>免费，剧情自然解锁</td><td>包含在基础版内</td></tr>
+    <tr><td>角色关系DLC</td><td>付费剧情包（新关系线/立绘/语音）</td><td>¥18-30</td></tr>
+    <tr><td>新章节/新Boss DLC</td><td>付费内容扩展包</td><td>¥30-50</td></tr>
+    <tr><td>荤招小剧场15条</td><td>基础免费线+深度差分归入角色DLC</td><td>定位为"内容卖点"而非"付费转化点"</td></tr>
+  </table>
+  <div class="fix"><b>v4新增 · DLC边界原则：</b>基础版包含全部核心角色本体（每人均有Lv1-10基础关系线），DLC不锁角色本体，只做角色深度剧情（Lv11+）和新章节/新Boss内容，附带的彩蛋角色需明确标注"额外增补"，避免"买断制却要另付费玩全部角色"的缩水观感。</div>
+  <h3>荤招15条（人设分组，内容不变）</h3>
+  <div class="cards">
+    <div class="card"><h3>① 温柔师姐系</h3><p>递茶扇扇解暑 / 病中照顾 / 包扎伤口</p></div>
+    <div class="card"><h3>② 高岭之花系</h3><p>纠正姿势 / 雨天共伞 / 手作信物</p></div>
+    <div class="card"><h3>③ 青梅竹马系</h3><p>回忆杀 / 下棋惩罚 / 换季晒衣</p></div>
+    <div class="card"><h3>④ 病娇小师妹系</h3><p>掏耳朵ASMR / 撒娇带飞 / 悄悄话语音</p></div>
+    <div class="card"><h3>⑤ 关系仪式系</h3><p>称呼变化 / 结契仪式 / 节日剧情</p></div>
+  </div>
+  <div class="note"><b>红线保留：</b>不做裸露/性暗示直白描写，走"擦边+文字留白"路线。</div>
+</section>
+
+<section>
+  <h2>验证指标与平台建议（适配买断制）</h2>
+  <ul>
+    <li><b>Steam Demo：</b>愿望单转化率、Demo完成率、单局时长是否落在8-15分钟设计区间</li>
+    <li><b>正式发售：</b>好评率≥85%目标、主线完成率、DLC购买转化率</li>
+    <li><b>联机专项：</b>4人联机场次占比</li>
+    <li><b>平台顺序：</b>Steam首发 → 后续评估主机联机认证 → 国内平台需版号（买断无抽卡复杂度远低于抽卡产品，一句话提示，非当前瓶颈）</li>
+  </ul>
+  <h3>v4新增 · 初步基准值</h3>
+  <table>
+    <tr><th>指标</th><th>初步基准</th><th>说明</th></tr>
+    <tr><td>Demo→愿望单转化率</td><td>≥10%</td><td>参考Steam Next Fest常见及格线</td></tr>
+    <tr><td>Demo完成率</td><td>≥30%</td><td>过低需检视难度曲线/前期节奏</td></tr>
+    <tr><td>好评率</td><td>≥85%</td><td>"特别好评"档</td></tr>
+    <tr><td>DLC购买转化率</td><td>15-25%</td><td>参考同体量买断制游戏DLC attach rate</td></tr>
+    <tr><td>4人联机场次占比</td><td>≥20%</td><td>判断联机是否真实被使用而非噱头</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>竞品对标（v3调整）</h2>
+  <table>
+    <tr><th>竞品</th><th>验证了什么</th><th>抄的具体机制</th></tr>
+    <tr><td>Vampire Survivors</td><td>低成本单局割草病毒传播力</td><td>武器组合进化、屏幕铺满特效、8-15分钟节奏</td></tr>
+    <tr><td>杀戮尖塔 / 黑帝斯</td><td>买断制Roguelite章节节奏+随机词条重复可玩性</td><td>三选一随机词条、章节难度曲线、免费更新+付费DLC节奏</td></tr>
+    <tr><td>暗黑地牢 / 元气骑士</td><td>局内同屏联机协作设计</td><td>联机同屏机制、独立结算掉落、分工联机Boss</td></tr>
+    <tr><td>公主连结 / 碧蓝档案</td><td>羁绊剧情设计手法（不参考抽卡付费模式）</td><td>亲密度小剧场人设标签分层思路</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>下一步待办</h2>
+  <ul>
+    <li>武器基座表7条→20+条，做进化组合平衡性测试（最高优先级）</li>
+    <li>设计1个可用于Demo验证的联机专属Boss</li>
+    <li>89提供美术素材清单，优先覆盖15条互动人设标签</li>
+    <li>搭建最小可玩Demo：1秒境关卡(支持1-4人)+1门派解锁流程+1套武器进化+1角色3条小剧场</li>
+    <li>规划Steam Demo上线与愿望单转化率追踪计划</li>
+  </ul>
+</section>
+
+</main>
+<footer>企划案 v3 · 商业模式定位变更修订 · 详见同目录 README.md</footer>
+</body>
+</html>
