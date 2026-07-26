@@ -22,6 +22,20 @@ const UPGRADES := [
 	{"id": "heal", "name": "回春术", "rarity": "精良", "desc": "立即回复全部气血"},
 ]
 
+# 升级弹窗角色台词（阶段4）：随机角色 + 台词，强化"角色在教你变强"的陪伴感
+const LEVELUP_LINES := {
+	"baiyi": [
+		"挑一样趁手的，为姐看好你。",
+		"稳扎稳打，招招要打实。",
+		"这几路都不俗，看你悟性了。",
+	],
+	"qingshan": [
+		"哟，又精进啦？可别骄傲~",
+		"选个狠的，姐带你杀穿这片林子！",
+		"磨蹭啥呢，妖都要笑你啦！",
+	],
+}
+
 var _root: Control
 var _timer_lbl: Label
 var _kills_lbl: Label
@@ -36,6 +50,8 @@ var _boss_name: Label
 var _banner_lbl: Label
 var _banner_time: float = 0.0
 var _pending_levelups: int = 0
+var _levelup_avatar: TextureRect
+var _levelup_line: Label
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -168,6 +184,23 @@ func _build_levelup_panel() -> void:
 	vbox.add_child(title)
 	var sub := _make_label("— 道行提升 · 三选其一 —", 16, Color("c9b8e8"), HORIZONTAL_ALIGNMENT_CENTER)
 	vbox.add_child(sub)
+
+	var speaker_box := HBoxContainer.new()
+	speaker_box.alignment = BoxContainer.ALIGNMENT_CENTER
+	speaker_box.add_theme_constant_override("separation", 14)
+	vbox.add_child(speaker_box)
+
+	_levelup_avatar = TextureRect.new()
+	_levelup_avatar.custom_minimum_size = Vector2(88, 88)
+	_levelup_avatar.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_levelup_avatar.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_levelup_avatar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	speaker_box.add_child(_levelup_avatar)
+
+	_levelup_line = _make_label("", 18, Color("e9dcff"), HORIZONTAL_ALIGNMENT_LEFT)
+	_levelup_line.custom_minimum_size = Vector2(320, 0)
+	_levelup_line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	speaker_box.add_child(_levelup_line)
 
 	_cards_box = HBoxContainer.new()
 	_cards_box.add_theme_constant_override("separation", 24)
@@ -334,10 +367,37 @@ func _show_next_choice() -> void:
 		c.queue_free()
 	var pool := UPGRADES.duplicate()
 	pool.shuffle()
+	var shown := []
 	for i in range(min(3, pool.size())):
+		shown.append(pool[i])
 		_cards_box.add_child(_make_card(pool[i], i + 1))
+	_set_levelup_speaker(shown)
 	_levelup_root.visible = true
 	get_tree().paused = true
+
+func _avatar_tex(who: String) -> Texture2D:
+	var p := "res://portraits/avatar_%s.png" % who
+	return load(p) if ResourceLoader.exists(p) else null
+
+func _set_levelup_speaker(shown: Array) -> void:
+	var who := ""
+	var line := ""
+	# 若本次三选一里出现"雷剑真解(进化)"，白衣仙子专属点评（呼应 review7 示例）
+	var has_big := false
+	for d in shown:
+		if d.id == "atk_big":
+			has_big = true
+	if has_big:
+		who = "baiyi"
+		line = "雷剑真解…这招是为姐压箱底的，接住了。"
+	else:
+		who = ["baiyi", "qingshan"][randi() % 2]
+		var arr: Array = LEVELUP_LINES[who]
+		line = arr[randi() % arr.size()]
+	if _levelup_avatar:
+		_levelup_avatar.texture = _avatar_tex(who)
+	if _levelup_line:
+		_levelup_line.text = "「%s」" % line
 
 func _make_card(data: Dictionary, index: int) -> Control:
 	var rarity_col: Color = RARITY_COLORS.get(data.rarity, COL_GOLD)
