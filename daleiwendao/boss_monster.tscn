@@ -1,0 +1,166 @@
+[gd_scene load_steps=23 format=3]
+
+[ext_resource type="Script" path="res://boss_monster.gd" id="1_boss"]
+[ext_resource type="Texture2D" path="res://Necromancer_creativekind-Sheet.png" id="2_sheet"]
+[ext_resource type="PackedScene" path="res://healthBar.tscn" id="3_health"]
+[ext_resource type="PackedScene" path="res://character_stats.tscn" id="4_stats"]
+
+[sub_resource type="AtlasTexture" id="idle_0"]
+atlas = ExtResource("2_sheet")
+region = Rect2(0, 0, 160, 128)
+
+[sub_resource type="AtlasTexture" id="idle_1"]
+atlas = ExtResource("2_sheet")
+region = Rect2(160, 0, 160, 128)
+
+[sub_resource type="AtlasTexture" id="idle_2"]
+atlas = ExtResource("2_sheet")
+region = Rect2(320, 0, 160, 128)
+
+[sub_resource type="AtlasTexture" id="idle_3"]
+atlas = ExtResource("2_sheet")
+region = Rect2(480, 0, 160, 128)
+
+[sub_resource type="AtlasTexture" id="idle_4"]
+atlas = ExtResource("2_sheet")
+region = Rect2(640, 0, 160, 128)
+
+[sub_resource type="AtlasTexture" id="idle_5"]
+atlas = ExtResource("2_sheet")
+region = Rect2(800, 0, 160, 128)
+
+[sub_resource type="AtlasTexture" id="idle_6"]
+atlas = ExtResource("2_sheet")
+region = Rect2(960, 0, 160, 128)
+
+[sub_resource type="AtlasTexture" id="idle_7"]
+atlas = ExtResource("2_sheet")
+region = Rect2(1120, 0, 160, 128)
+
+[sub_resource type="AtlasTexture" id="walk_0"]
+atlas = ExtResource("2_sheet")
+region = Rect2(0, 128, 160, 128)
+
+[sub_resource type="AtlasTexture" id="walk_1"]
+atlas = ExtResource("2_sheet")
+region = Rect2(160, 128, 160, 128)
+
+[sub_resource type="AtlasTexture" id="walk_2"]
+atlas = ExtResource("2_sheet")
+region = Rect2(320, 128, 160, 128)
+
+[sub_resource type="AtlasTexture" id="walk_3"]
+atlas = ExtResource("2_sheet")
+region = Rect2(480, 128, 160, 128)
+
+[sub_resource type="AtlasTexture" id="walk_4"]
+atlas = ExtResource("2_sheet")
+region = Rect2(640, 128, 160, 128)
+
+[sub_resource type="AtlasTexture" id="walk_5"]
+atlas = ExtResource("2_sheet")
+region = Rect2(800, 128, 160, 128)
+
+[sub_resource type="AtlasTexture" id="walk_6"]
+atlas = ExtResource("2_sheet")
+region = Rect2(960, 128, 160, 128)
+
+[sub_resource type="AtlasTexture" id="walk_7"]
+atlas = ExtResource("2_sheet")
+region = Rect2(1120, 128, 160, 128)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_boss"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("idle_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("idle_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("idle_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("idle_3")
+}, {
+"duration": 1.0,
+"texture": SubResource("idle_4")
+}, {
+"duration": 1.0,
+"texture": SubResource("idle_5")
+}, {
+"duration": 1.0,
+"texture": SubResource("idle_6")
+}, {
+"duration": 1.0,
+"texture": SubResource("idle_7")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 9.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("walk_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("walk_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("walk_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("walk_3")
+}, {
+"duration": 1.0,
+"texture": SubResource("walk_4")
+}, {
+"duration": 1.0,
+"texture": SubResource("walk_5")
+}, {
+"duration": 1.0,
+"texture": SubResource("walk_6")
+}, {
+"duration": 1.0,
+"texture": SubResource("walk_7")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 10.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_boss"]
+size = Vector2(110, 150)
+
+[node name="BossMonster" type="CharacterBody2D" groups=["Boss", "Enemy"]]
+collision_layer = 2
+collision_mask = 2
+script = ExtResource("1_boss")
+
+[node name="HealthBar" parent="." instance=ExtResource("3_health")]
+offset_left = -70.0
+offset_top = -120.0
+offset_right = 70.0
+offset_bottom = -112.0
+scale = Vector2(1.0, 1.2)
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+scale = Vector2(1.5, 1.5)
+sprite_frames = SubResource("SpriteFrames_boss")
+animation = &"idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_boss")
+disabled = true
+
+[node name="CharacterStats" parent="." instance=ExtResource("4_stats")]
+
+[node name="Area2D" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("RectangleShape2D_boss")
+
+[node name="MovingTimer" type="Timer" parent="."]
+
+[connection signal="timeout" from="MovingTimer" to="." method="_on_moving_timer_timeout"]

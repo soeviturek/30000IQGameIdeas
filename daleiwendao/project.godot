@@ -1,0 +1,32 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="大雷问道 · 试玩Demo"
+run/main_scene="uid://dw3raqho2blae"
+config/features=PackedStringArray("4.5", "Forward Plus")
+config/icon="res://icon.svg"
+
+[autoload]
+
+GameState="*res://game_state.gd"
+Sfx="*res://audio_manager.gd"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+
+[global_group]
+
+Enemy="all monsters"
+Player=""
+Projectile=""

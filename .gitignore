@@ -1,0 +1,13 @@
+# Godot 4 editor cache (regenerated automatically on open)
+.godot/
+
+# Exported game builds (large binaries — rebuild via --export-release)
+build/
+daleiwendao/build/
+
+# Smoke-test logs
+_smoke_log*.txt
+
+# OS / editor cruft
+Thumbs.db
+.DS_Store

@@ -1,0 +1,24 @@
+[gd_scene load_steps=4 format=3 uid="uid://dmfwdcs0yd6tk"]
+
+[ext_resource type="Script" uid="uid://3wr6i0rw18nx" path="res://wand.gd" id="1_jqpkh"]
+[ext_resource type="PackedScene" uid="uid://bio6gc0728iik" path="res://bullet.tscn" id="2_5jft5"]
+[ext_resource type="Texture2D" uid="uid://cqiglrb4kw22q" path="res://RavenmoreIconPack2023/64/WandT2.png" id="2_tqelj"]
+
+[node name="Wand" type="Node2D"]
+script = ExtResource("1_jqpkh")
+projectile_scene = ExtResource("2_5jft5")
+
+[node name="Timer" type="Timer" parent="."]
+one_shot = true
+
+[node name="Marker2D" type="Marker2D" parent="."]
+position = Vector2(-16, 19)
+
+[node name="Sprite2D" type="Sprite2D" parent="Marker2D"]
+position = Vector2(16, -19)
+rotation = 0.7819075
+texture = ExtResource("2_tqelj")
+
+[node name="ShootingPoint" type="Marker2D" parent="Marker2D/Sprite2D"]
+position = Vector2(23.881062, -19.99237)
+
