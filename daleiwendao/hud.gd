@@ -188,15 +188,26 @@ func _build_gameover_panel() -> void:
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_gameover_root.add_child(center)
 
+	var hbox := HBoxContainer.new()
+	hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	hbox.add_theme_constant_override("separation", 40)
+	center.add_child(hbox)
+
+	hbox.add_child(_make_portrait("res://portraits/baiyi_gameover.png"))
+
 	var vbox := VBoxContainer.new()
 	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
 	vbox.add_theme_constant_override("separation", 16)
-	center.add_child(vbox)
+	hbox.add_child(vbox)
 
 	var title := _make_label("道 陨", 56, Color("ff5c5c"), HORIZONTAL_ALIGNMENT_CENTER)
 	vbox.add_child(title)
 	_gameover_root.set_meta("summary", _make_label("", 22, COL_TEXT, HORIZONTAL_ALIGNMENT_CENTER))
 	vbox.add_child(_gameover_root.get_meta("summary"))
+	var flavor := _make_label("“莫怕，回来歇口气，再战便是。”", 20, Color("ffd0d0"), HORIZONTAL_ALIGNMENT_CENTER)
+	flavor.custom_minimum_size = Vector2(340, 0)
+	flavor.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	vbox.add_child(flavor)
 	var again := _make_label("按 R 重入秘境", 20, COL_GOLD, HORIZONTAL_ALIGNMENT_CENTER)
 	vbox.add_child(again)
 
@@ -215,10 +226,17 @@ func _build_victory_panel() -> void:
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_victory_root.add_child(center)
 
+	var hbox := HBoxContainer.new()
+	hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	hbox.add_theme_constant_override("separation", 40)
+	center.add_child(hbox)
+
+	hbox.add_child(_make_portrait("res://portraits/baiyi_victory.png"))
+
 	var vbox := VBoxContainer.new()
 	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
 	vbox.add_theme_constant_override("separation", 16)
-	center.add_child(vbox)
+	hbox.add_child(vbox)
 
 	var title := _make_label("道 成 · 出 关", 56, Color("7be0a0"), HORIZONTAL_ALIGNMENT_CENTER)
 	vbox.add_child(title)
@@ -226,6 +244,10 @@ func _build_victory_panel() -> void:
 	vbox.add_child(sub)
 	_victory_root.set_meta("summary", _make_label("", 24, COL_TEXT, HORIZONTAL_ALIGNMENT_CENTER))
 	vbox.add_child(_victory_root.get_meta("summary"))
+	var flavor := _make_label("“做得好，为姐没白教你。”", 20, Color("ffe9a8"), HORIZONTAL_ALIGNMENT_CENTER)
+	flavor.custom_minimum_size = Vector2(340, 0)
+	flavor.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	vbox.add_child(flavor)
 	var again := _make_label("按 R 再入秘境", 20, COL_GOLD, HORIZONTAL_ALIGNMENT_CENTER)
 	vbox.add_child(again)
 
@@ -423,6 +445,16 @@ func _restart() -> void:
 	get_tree().reload_current_scene()
 
 # ---------- 小工具 ----------
+
+func _make_portrait(res_path: String) -> TextureRect:
+	var tr := TextureRect.new()
+	if ResourceLoader.exists(res_path):
+		tr.texture = load(res_path)
+	tr.custom_minimum_size = Vector2(300, 440)
+	tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return tr
 
 func _make_label(text: String, size: int, col: Color, align: int) -> Label:
 	var l := Label.new()
