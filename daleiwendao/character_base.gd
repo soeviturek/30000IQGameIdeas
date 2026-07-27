@@ -17,7 +17,7 @@ func _init_health() -> void:
 	health_bar.set_max_health(stats.get_max_health())
 	health_bar.set_health(stats.get_max_health())
 
-func take_damage(damage: int, _attacker_position: Vector2) -> void:
+func take_damage(damage: int, _attacker_position: Vector2, _is_crit: bool = false) -> void:
 	health_bar.take_damage(damage)
 	if health_bar.check_death():
 		die()

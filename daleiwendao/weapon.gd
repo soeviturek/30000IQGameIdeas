@@ -92,3 +92,13 @@ func _sort_by_distance(a: Node2D, b: Node2D) -> bool:
 
 func _on_cooldown_timeout() -> void:
 	can_attack = true
+
+# 掷暴击并算最终伤害。返回 {"damage": int, "crit": bool}。非玩家武器(无 roll_crit)则不暴击。
+func _roll_damage(base_dmg: int) -> Dictionary:
+	var crit := false
+	var mult := 1.0
+	if _char_stats and _char_stats.has_method("roll_crit"):
+		var r: Dictionary = _char_stats.roll_crit()
+		crit = r.get("crit", false)
+		mult = r.get("mult", 1.0)
+	return {"damage": int(round(base_dmg * mult)), "crit": crit}

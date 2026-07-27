@@ -7,6 +7,7 @@ class_name Projectile
 
 var velocity: Vector2 = Vector2.ZERO
 var tag: String = ""
+var is_crit: bool = false
 var _lifetime: float = 5.0
 
 # Called by weapon: shoot towards a target node
@@ -44,7 +45,7 @@ func _on_area_2d_area_entered(area: Area2D) -> void:
 		obj.take_damage(damage, position)
 		queue_free()
 	elif tag == "Player" and obj.is_in_group("Enemy"):
-		obj.take_damage(damage, position)
+		obj.take_damage(damage, global_position - velocity, is_crit)
 		queue_free()
 	#print(obj.get_groups())
 	#print("obj not in player or enemy group")

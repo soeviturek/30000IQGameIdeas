@@ -9,6 +9,8 @@ class_name CharacterStats
 @export var attackSpeed: float = 0
 @export var attackDamage: int = 0
 @export var lootDrop: int = 0
+@export var critChance: float = 0.0      # 暴击率 0..1
+@export var critMultiplier: float = 2.0  # 暴击伤害倍率
 
 var modifiers: Array[Modifier] = []
 
@@ -71,3 +73,14 @@ func get_attack_speed() -> float:
 
 func get_loot_drop() -> int:
 	return int(_compute_stat(Modifier.StatType.LOOT_DROP, lootDrop))
+
+func get_crit_chance() -> float:
+	return clampf(_compute_stat(Modifier.StatType.CRIT_CHANCE, critChance), 0.0, 1.0)
+
+func get_crit_multiplier() -> float:
+	return maxf(1.0, _compute_stat(Modifier.StatType.CRIT_DAMAGE, critMultiplier))
+
+# 掷一次暴击判定：返回 {"crit": bool, "mult": float}
+func roll_crit() -> Dictionary:
+	var is_crit := randf() < get_crit_chance()
+	return {"crit": is_crit, "mult": (get_crit_multiplier() if is_crit else 1.0)}

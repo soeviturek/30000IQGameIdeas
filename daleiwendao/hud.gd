@@ -27,6 +27,8 @@ const UPGRADES := [
 	{"id": "hp", "name": "罡气护体", "rarity": "精良", "desc": "气血上限 +40\n并立即回复"},
 	{"id": "range", "name": "千里追魂", "rarity": "精良", "desc": "攻击范围 +60"},
 	{"id": "heal", "name": "回春术", "rarity": "精良", "desc": "立即回复全部气血"},
+	{"id": "crit", "name": "杀机毕现", "rarity": "稀有", "desc": "暴击率 +8%"},
+	{"id": "crit_dmg", "name": "血溅七步", "rarity": "进化", "desc": "暴击伤害 +50%"},
 ]
 
 # 升级弹窗角色台词（阶段4）：随机角色 + 台词，强化"角色在教你变强"的陪伴感
@@ -593,6 +595,8 @@ func _apply_upgrade(id: String) -> void:
 			_heal(40)
 		"heal": _heal(-1)
 		"aspd": _add_mod(Modifier.StatType.ATTACK_SPEED, Modifier.ModType.MUL, 0.12)
+		"crit": _add_mod(Modifier.StatType.CRIT_CHANCE, Modifier.ModType.ADD, 0.08)
+		"crit_dmg": _add_mod(Modifier.StatType.CRIT_DAMAGE, Modifier.ModType.ADD, 0.5)
 
 func _restart() -> void:
 	get_tree().paused = false

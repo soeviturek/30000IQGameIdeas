@@ -28,4 +28,6 @@ func _start_attack(attack_data: Dictionary, target: Node2D) -> void:
 	get_tree().current_scene.add_child(projectile)
 	projectile.global_position = shooting_point.global_position
 	projectile.set_tag(owner_tag)
-	projectile.init_with_target(target, stats.projectile_speed, attack_data.damage)
+	var roll := _roll_damage(attack_data.damage)
+	projectile.init_with_target(target, stats.projectile_speed, roll.damage)
+	projectile.is_crit = roll.crit

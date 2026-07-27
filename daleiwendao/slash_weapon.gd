@@ -35,7 +35,8 @@ func _start_attack(attack_data: Dictionary, _target: Node2D) -> void:
 	for enemy in enemies:
 		var dist = (enemy.global_position - global_position).length()
 		if dist <= final_range and enemy.has_method("take_damage"):
-			enemy.take_damage(attack_data.damage, global_position)
+			var roll := _roll_damage(attack_data.damage)
+			enemy.take_damage(roll.damage, global_position, roll.crit)
 
 func _on_animation_player_animation_finished(_anim_name: StringName) -> void:
 	slashing = false

@@ -30,6 +30,8 @@ func _ready() -> void:
 		0        # 掉落
 	)
 	_init_health()
+	stats.critChance = 0.10
+	stats.critMultiplier = 2.0
 	weapon1.init_weapon(stats)
 	slash_weapon.init_weapon(stats)
 
@@ -87,7 +89,7 @@ func _start_dash(input_vec: Vector2) -> void:
 	GameState.shake(0.1, 3.0)
 	Sfx.play("dash")
 
-func take_damage(damage: int, attacker_position: Vector2) -> void:
+func take_damage(damage: int, attacker_position: Vector2, is_crit: bool = false) -> void:
 	if _iframe_left > 0.0:
 		return
 	# 受击闪红 → 0.15s tween 回白
@@ -103,7 +105,7 @@ func take_damage(damage: int, attacker_position: Vector2) -> void:
 	# 震屏 + 音效
 	GameState.shake(0.18, 7.0)
 	Sfx.play("hurt")
-	super.take_damage(damage, attacker_position)
+	super.take_damage(damage, attacker_position, is_crit)
 
 func die() -> void:
 	GameState.game_over = true

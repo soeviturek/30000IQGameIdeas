@@ -62,13 +62,14 @@ func _wander(delta: float) -> void:
 func _attack() -> void:
 	pass
 
-func take_damage(damage: int, attacker_position: Vector2) -> void:
+func take_damage(damage: int, attacker_position: Vector2, is_crit: bool = false) -> void:
 	can_move = false
 	var knockback_dir := (global_position - attacker_position).normalized()
-	velocity = knockback_dir * knockback_strength
+	velocity = knockback_dir * (knockback_strength * (1.6 if is_crit else 1.0))
 	moving_timer.start(knockback_time)
 	flash_red()
-	super.take_damage(damage, attacker_position)
+	BloodBurst.spawn(get_tree().current_scene, global_position, knockback_dir, is_crit, damage)
+	super.take_damage(damage, attacker_position, is_crit)
 
 func die() -> void:
 	if not GameState.game_over:

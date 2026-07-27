@@ -8,6 +8,8 @@ enum StatType {
 	ATTACK_RANGE,
 	ATTACK_SPEED,
 	LOOT_DROP,
+	CRIT_CHANCE,
+	CRIT_DAMAGE,
 }
 
 enum ModType {

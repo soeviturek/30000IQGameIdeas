@@ -44,7 +44,8 @@ func _on_area_2d_area_entered(area: Area2D) -> void:
 	if obj in enemies_hit_this_swing:
 		return
 	enemies_hit_this_swing[obj] = true
-	obj.take_damage(stats.get_final_damage(_char_stats), global_position)
+	var roll := _roll_damage(stats.get_final_damage(_char_stats))
+	obj.take_damage(roll.damage, global_position, roll.crit)
 
 func _on_animation_player_animation_finished(_anim_name: StringName) -> void:
 	swinging = false
