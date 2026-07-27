@@ -42,7 +42,7 @@ var _kills_lbl: Label
 var _level_lbl: Label
 var _xp_bar: ProgressBar
 var _levelup_root: Control
-var _cards_box: HBoxContainer
+var _cards_box: BoxContainer
 var _gameover_root: Control
 var _victory_root: Control
 var _boss_bar: ProgressBar
@@ -167,52 +167,78 @@ func _build_levelup_panel() -> void:
 	_root.add_child(_levelup_root)
 
 	var dim := ColorRect.new()
-	dim.color = Color(0.03, 0.02, 0.06, 0.66)
+	dim.color = Color(0.03, 0.02, 0.06, 0.70)
 	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_levelup_root.add_child(dim)
 
-	var center := CenterContainer.new()
-	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_levelup_root.add_child(center)
-
-	# 左右分栏：左＝放大立绘 + 台词，右＝标题 + 三选一（强化角色曝光）
-	var main_hbox := HBoxContainer.new()
-	main_hbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	main_hbox.add_theme_constant_override("separation", 30)
-	center.add_child(main_hbox)
-
-	# —— 左栏：放大立绘 + 台词 ——
-	var left_col := VBoxContainer.new()
-	left_col.alignment = BoxContainer.ALIGNMENT_CENTER
-	left_col.add_theme_constant_override("separation", 10)
-	main_hbox.add_child(left_col)
-
+	# —— 左半屏：顶天立地大立绘（占据半边屏幕，突出美少女）——
 	_levelup_avatar = TextureRect.new()
-	_levelup_avatar.custom_minimum_size = Vector2(240, 340)
+	_levelup_avatar.anchor_left = 0.0
+	_levelup_avatar.anchor_top = 0.0
+	_levelup_avatar.anchor_right = 0.52
+	_levelup_avatar.anchor_bottom = 1.0
+	_levelup_avatar.offset_left = 8
+	_levelup_avatar.offset_top = 6
+	_levelup_avatar.offset_right = 0
+	_levelup_avatar.offset_bottom = 70
 	_levelup_avatar.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_levelup_avatar.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_levelup_avatar.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	left_col.add_child(_levelup_avatar)
+	_levelup_root.add_child(_levelup_avatar)
 
-	_levelup_line = _make_label("", 18, Color("e9dcff"), HORIZONTAL_ALIGNMENT_CENTER)
-	_levelup_line.custom_minimum_size = Vector2(240, 0)
+	# 立绘底部台词框（骚气点评）
+	var quote_wrap := PanelContainer.new()
+	quote_wrap.anchor_left = 0.0
+	quote_wrap.anchor_right = 0.52
+	quote_wrap.anchor_top = 1.0
+	quote_wrap.anchor_bottom = 1.0
+	quote_wrap.offset_left = 34
+	quote_wrap.offset_right = -22
+	quote_wrap.offset_top = -104
+	quote_wrap.offset_bottom = -22
+	quote_wrap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var qsb := StyleBoxFlat.new()
+	qsb.bg_color = Color(0.06, 0.03, 0.10, 0.72)
+	qsb.set_corner_radius_all(12)
+	qsb.set_content_margin_all(12)
+	qsb.set_border_width_all(2)
+	qsb.border_color = Color("d59bff")
+	quote_wrap.add_theme_stylebox_override("panel", qsb)
+	_levelup_root.add_child(quote_wrap)
+
+	_levelup_line = _make_label("", 20, Color("ffe0f0"), HORIZONTAL_ALIGNMENT_CENTER)
 	_levelup_line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	left_col.add_child(_levelup_line)
+	_levelup_line.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	quote_wrap.add_child(_levelup_line)
 
-	# —— 右栏：标题 + 三选一 ——
-	var right_col := VBoxContainer.new()
-	right_col.alignment = BoxContainer.ALIGNMENT_CENTER
-	right_col.add_theme_constant_override("separation", 16)
-	main_hbox.add_child(right_col)
+	# —— 右半屏：标题 + 三选一（纵向卡片，给立绘让出半屏）——
+	var right := VBoxContainer.new()
+	right.anchor_left = 0.52
+	right.anchor_right = 1.0
+	right.anchor_top = 0.0
+	right.anchor_bottom = 1.0
+	right.offset_left = 24
+	right.offset_right = -44
+	right.offset_top = 40
+	right.offset_bottom = -40
+	right.alignment = BoxContainer.ALIGNMENT_CENTER
+	right.add_theme_constant_override("separation", 12)
+	_levelup_root.add_child(right)
 
 	var title := _make_label("选 择 造 化", 40, COL_GOLD, HORIZONTAL_ALIGNMENT_CENTER)
-	right_col.add_child(title)
+	right.add_child(title)
 	var sub := _make_label("— 道行提升 · 三选其一 —", 16, Color("c9b8e8"), HORIZONTAL_ALIGNMENT_CENTER)
-	right_col.add_child(sub)
+	right.add_child(sub)
+	var gap := Control.new()
+	gap.custom_minimum_size = Vector2(0, 6)
+	right.add_child(gap)
 
-	_cards_box = HBoxContainer.new()
-	_cards_box.add_theme_constant_override("separation", 24)
-	right_col.add_child(_cards_box)
+	_cards_box = VBoxContainer.new()
+	_cards_box.alignment = BoxContainer.ALIGNMENT_CENTER
+	_cards_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_cards_box.add_theme_constant_override("separation", 14)
+	right.add_child(_cards_box)
 
 func _build_gameover_panel() -> void:
 	_gameover_root = Control.new()
@@ -414,37 +440,46 @@ func _set_levelup_speaker(shown: Array) -> void:
 func _make_card(data: Dictionary, index: int) -> Control:
 	var rarity_col: Color = RARITY_COLORS.get(data.rarity, COL_GOLD)
 	var panel := PanelContainer.new()
-	panel.custom_minimum_size = Vector2(280, 330)
+	panel.custom_minimum_size = Vector2(0, 122)
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color("18122b")
 	sb.set_border_width_all(3)
 	sb.border_color = rarity_col
 	sb.set_corner_radius_all(14)
-	sb.set_content_margin_all(16)
+	sb.set_content_margin_all(14)
 	panel.add_theme_stylebox_override("panel", sb)
+
+	var hb := HBoxContainer.new()
+	hb.add_theme_constant_override("separation", 14)
+	panel.add_child(hb)
 
 	var vb := VBoxContainer.new()
 	vb.alignment = BoxContainer.ALIGNMENT_CENTER
-	vb.add_theme_constant_override("separation", 12)
-	panel.add_child(vb)
+	vb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	vb.add_theme_constant_override("separation", 4)
+	hb.add_child(vb)
 
-	var rarity := _make_label("【%s】" % data.rarity, 16, rarity_col, HORIZONTAL_ALIGNMENT_CENTER)
-	vb.add_child(rarity)
-	var name_lbl := _make_label(data.name, 28, Color.WHITE, HORIZONTAL_ALIGNMENT_CENTER)
-	vb.add_child(name_lbl)
-	var spacer := Control.new()
-	spacer.custom_minimum_size = Vector2(0, 8)
-	vb.add_child(spacer)
-	var desc := _make_label(data.desc, 18, Color("c9bcd8"), HORIZONTAL_ALIGNMENT_CENTER)
+	var head := HBoxContainer.new()
+	head.add_theme_constant_override("separation", 10)
+	vb.add_child(head)
+	var rarity := _make_label("【%s】" % data.rarity, 15, rarity_col, HORIZONTAL_ALIGNMENT_LEFT)
+	head.add_child(rarity)
+	var name_lbl := _make_label(data.name, 24, Color.WHITE, HORIZONTAL_ALIGNMENT_LEFT)
+	head.add_child(name_lbl)
+
+	var desc := _make_label(data.desc, 16, Color("c9bcd8"), HORIZONTAL_ALIGNMENT_LEFT)
 	desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	desc.custom_minimum_size = Vector2(240, 60)
+	desc.custom_minimum_size = Vector2(300, 0)
+	desc.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	vb.add_child(desc)
 
 	var btn := Button.new()
-	btn.text = "选择 [%d]" % index
-	btn.custom_minimum_size = Vector2(0, 44)
+	btn.text = "选择\n[%d]" % index
+	btn.custom_minimum_size = Vector2(100, 0)
+	btn.size_flags_vertical = Control.SIZE_FILL
 	btn.pressed.connect(_on_pick.bind(data.id))
-	vb.add_child(btn)
+	hb.add_child(btn)
 	return panel
 
 func _input(event: InputEvent) -> void:
@@ -522,7 +557,7 @@ func _make_portrait(res_path: String) -> TextureRect:
 	var tr := TextureRect.new()
 	if ResourceLoader.exists(res_path):
 		tr.texture = load(res_path)
-	tr.custom_minimum_size = Vector2(300, 440)
+	tr.custom_minimum_size = Vector2(420, 680)
 	tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	tr.mouse_filter = Control.MOUSE_FILTER_IGNORE
