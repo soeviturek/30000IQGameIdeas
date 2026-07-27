@@ -175,36 +175,44 @@ func _build_levelup_panel() -> void:
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_levelup_root.add_child(center)
 
-	var vbox := VBoxContainer.new()
-	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	vbox.add_theme_constant_override("separation", 18)
-	center.add_child(vbox)
+	# 左右分栏：左＝放大立绘 + 台词，右＝标题 + 三选一（强化角色曝光）
+	var main_hbox := HBoxContainer.new()
+	main_hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	main_hbox.add_theme_constant_override("separation", 30)
+	center.add_child(main_hbox)
 
-	var title := _make_label("选 择 造 化", 40, COL_GOLD, HORIZONTAL_ALIGNMENT_CENTER)
-	vbox.add_child(title)
-	var sub := _make_label("— 道行提升 · 三选其一 —", 16, Color("c9b8e8"), HORIZONTAL_ALIGNMENT_CENTER)
-	vbox.add_child(sub)
-
-	var speaker_box := HBoxContainer.new()
-	speaker_box.alignment = BoxContainer.ALIGNMENT_CENTER
-	speaker_box.add_theme_constant_override("separation", 14)
-	vbox.add_child(speaker_box)
+	# —— 左栏：放大立绘 + 台词 ——
+	var left_col := VBoxContainer.new()
+	left_col.alignment = BoxContainer.ALIGNMENT_CENTER
+	left_col.add_theme_constant_override("separation", 10)
+	main_hbox.add_child(left_col)
 
 	_levelup_avatar = TextureRect.new()
-	_levelup_avatar.custom_minimum_size = Vector2(88, 88)
+	_levelup_avatar.custom_minimum_size = Vector2(240, 340)
 	_levelup_avatar.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_levelup_avatar.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_levelup_avatar.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	speaker_box.add_child(_levelup_avatar)
+	left_col.add_child(_levelup_avatar)
 
-	_levelup_line = _make_label("", 18, Color("e9dcff"), HORIZONTAL_ALIGNMENT_LEFT)
-	_levelup_line.custom_minimum_size = Vector2(320, 0)
+	_levelup_line = _make_label("", 18, Color("e9dcff"), HORIZONTAL_ALIGNMENT_CENTER)
+	_levelup_line.custom_minimum_size = Vector2(240, 0)
 	_levelup_line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	speaker_box.add_child(_levelup_line)
+	left_col.add_child(_levelup_line)
+
+	# —— 右栏：标题 + 三选一 ——
+	var right_col := VBoxContainer.new()
+	right_col.alignment = BoxContainer.ALIGNMENT_CENTER
+	right_col.add_theme_constant_override("separation", 16)
+	main_hbox.add_child(right_col)
+
+	var title := _make_label("选 择 造 化", 40, COL_GOLD, HORIZONTAL_ALIGNMENT_CENTER)
+	right_col.add_child(title)
+	var sub := _make_label("— 道行提升 · 三选其一 —", 16, Color("c9b8e8"), HORIZONTAL_ALIGNMENT_CENTER)
+	right_col.add_child(sub)
 
 	_cards_box = HBoxContainer.new()
 	_cards_box.add_theme_constant_override("separation", 24)
-	vbox.add_child(_cards_box)
+	right_col.add_child(_cards_box)
 
 func _build_gameover_panel() -> void:
 	_gameover_root = Control.new()
@@ -376,8 +384,12 @@ func _show_next_choice() -> void:
 	get_tree().paused = true
 
 func _avatar_tex(who: String) -> Texture2D:
-	var p := "res://portraits/avatar_%s.png" % who
-	return load(p) if ResourceLoader.exists(p) else null
+	# 优先放大半身立绘（升级面板左栏），无则回退头肩像
+	var candidates := ["res://portraits/levelup_%s.png" % who, "res://portraits/avatar_%s.png" % who]
+	for p in candidates:
+		if ResourceLoader.exists(p):
+			return load(p)
+	return null
 
 func _set_levelup_speaker(shown: Array) -> void:
 	var who := ""
