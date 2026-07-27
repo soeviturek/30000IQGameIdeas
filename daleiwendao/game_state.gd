@@ -29,7 +29,6 @@ var xp: int = 0
 var level: int = 1
 var xp_to_next: int = 20
 var elapsed: float = 0.0
-var _hitstop_busy: bool = false
 
 func _ready() -> void:
 	# 运行时补充按键映射：WASD 移动 + R 重开（方向键为引擎默认映射，天然可用）
@@ -49,16 +48,6 @@ func shake(dur: float, strength: float) -> void:
 	var s = get_tree().get_first_node_in_group("shaker")
 	if s and s.has_method("shake"):
 		s.shake(dur, strength)
-
-# 命中顿帧：暴击瞬间极短近乎定帧，强化打击感。用忽略时间缩放的计时器按真实时间恢复。
-func hitstop(duration: float = 0.06, scale: float = 0.05) -> void:
-	if _hitstop_busy or game_over or victory or get_tree().paused:
-		return
-	_hitstop_busy = true
-	Engine.time_scale = scale
-	await get_tree().create_timer(duration, true, false, true).timeout
-	Engine.time_scale = 1.0
-	_hitstop_busy = false
 
 func _add_key(action: String, keycode: int) -> void:
 	if not InputMap.has_action(action):
@@ -101,8 +90,6 @@ func add_xp(amount: int) -> void:
 	xp_changed.emit(xp, xp_to_next, level)
 
 func reset() -> void:
-	Engine.time_scale = 1.0
-	_hitstop_busy = false
 	kills = 0
 	xp = 0
 	level = 1

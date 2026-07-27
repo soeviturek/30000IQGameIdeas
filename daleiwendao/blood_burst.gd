@@ -62,7 +62,6 @@ func _ready() -> void:
 		_spawn_gib_burst()
 		_spawn_puddle()
 		GameState.shake(0.18, 7.0)
-		GameState.hitstop(0.09, 0.04)
 		await get_tree().create_timer(11.0).timeout
 		queue_free()
 		return
@@ -72,7 +71,6 @@ func _ready() -> void:
 		_spawn_decals()
 		_spawn_crit_number()
 		GameState.shake(0.12, 4.0)
-		GameState.hitstop()
 		ttl = 8.5
 	await get_tree().create_timer(ttl).timeout
 	queue_free()
