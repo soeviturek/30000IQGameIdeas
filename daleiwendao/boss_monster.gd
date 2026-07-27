@@ -11,9 +11,10 @@ const BULLET := preload("res://fire_bullet.tscn")
 enum BossState { IDLE, TELEGRAPH, FIRE, SPIRAL, DASH_TELEGRAPH, DASH, DASH_PAUSE, RECOVER }
 enum Attack { RING, FAN, SPIRAL, HAZARD }
 
-# 竞技场边界（地火落点，略内缩于刷怪边界 560/300）
-const ARENA_X := 540.0
-const ARENA_Y := 280.0
+# 竞技场边界（地火落点 clamp，略内缩于墙体 1120/600）
+const ARENA_X := 1080.0
+const ARENA_Y := 560.0
+const HAZARD_SPREAD := 380.0   # 地火围绕玩家散布半径
 
 # —— 节奏时长（秒） ——
 const TELEGRAPH_TIME := 0.42
@@ -265,6 +266,7 @@ func _spawn_hazards() -> void:
 		n = 4
 	if _phase >= 3:
 		n = 5
+	var base: Vector2 = _player.global_position if is_instance_valid(_player) else global_position
 	for i in n:
 		var pos: Vector2
 		if i == 0 and is_instance_valid(_player):
@@ -273,7 +275,8 @@ func _spawn_hazards() -> void:
 			if _player is CharacterBody2D:
 				pos += _player.velocity * 0.25
 		else:
-			pos = Vector2(randf_range(-ARENA_X, ARENA_X), randf_range(-ARENA_Y, ARENA_Y))
+			# 其余围绕玩家散布（大地图下才追得到人）
+			pos = base + Vector2(randf_range(-HAZARD_SPREAD, HAZARD_SPREAD), randf_range(-HAZARD_SPREAD, HAZARD_SPREAD))
 		pos.x = clampf(pos.x, -ARENA_X, ARENA_X)
 		pos.y = clampf(pos.y, -ARENA_Y, ARENA_Y)
 		var h := HazardZone.new()

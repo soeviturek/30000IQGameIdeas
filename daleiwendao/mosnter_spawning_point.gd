@@ -90,7 +90,7 @@ func _pick_spawn_pos() -> Vector2:
 	# 在竞技场范围内随机取点，且与玩家保持一定距离，避免糊脸
 	var pos: Vector2 = global_position
 	for i in 10:
-		pos = Vector2(randf_range(-560, 560), randf_range(-300, 300))
+		pos = Vector2(randf_range(-ArenaBounds.HALF_WIDTH + ArenaBounds.MARGIN, ArenaBounds.HALF_WIDTH - ArenaBounds.MARGIN), randf_range(-ArenaBounds.HALF_HEIGHT + ArenaBounds.MARGIN, ArenaBounds.HALF_HEIGHT - ArenaBounds.MARGIN))
 		if pos.distance_to(center) > 320.0:
 			break
 	return pos

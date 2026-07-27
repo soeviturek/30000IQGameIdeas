@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://dw3raqho2blae"]
+[gd_scene load_steps=9 format=3 uid="uid://dw3raqho2blae"]
 
 [ext_resource type="PackedScene" uid="uid://bp1kbo22ll26d" path="res://character_body_2d.tscn" id="1_wtdyi"]
 [ext_resource type="PackedScene" uid="uid://gwyi0vx8rpl4" path="res://kobolt_monster.tscn" id="2_xtb1e"]
@@ -6,43 +6,44 @@
 [ext_resource type="PackedScene" path="res://ranged_monster.tscn" id="4_ranged"]
 [ext_resource type="Script" path="res://hud.gd" id="5_hud"]
 [ext_resource type="Script" path="res://camera_shake.gd" id="6_shake"]
+[ext_resource type="Script" path="res://camera_follow.gd" id="7_follow"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_xtb1e"]
-size = Vector2(1196.9982, 11.014893)
+[sub_resource type="RectangleShape2D" id="HWall"]
+size = Vector2(2264, 24)
+
+[sub_resource type="RectangleShape2D" id="VWall"]
+size = Vector2(24, 1200)
 
 [node name="Main" type="Node2D"]
 
 [node name="Player" parent="." instance=ExtResource("1_wtdyi")]
 
 [node name="Camera2D" type="Camera2D" parent="."]
+script = ExtResource("7_follow")
 
 [node name="CameraShake" type="Node" parent="Camera2D"]
 script = ExtResource("6_shake")
 camera_path = NodePath("..")
 
-[node name="StaticBody2D" type="StaticBody2D" parent="Camera2D"]
+[node name="Walls" type="StaticBody2D" parent="."]
+collision_layer = 4
+collision_mask = 0
 
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="Camera2D/StaticBody2D"]
-position = Vector2(-1.000003, 329.99994)
-rotation = 0.000297763
-shape = SubResource("RectangleShape2D_xtb1e")
+[node name="WallTop" type="CollisionShape2D" parent="Walls"]
+position = Vector2(0, -612)
+shape = SubResource("HWall")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Camera2D/StaticBody2D"]
-position = Vector2(-2, -332)
-rotation = 0.0001488815
-shape = SubResource("RectangleShape2D_xtb1e")
+[node name="WallBottom" type="CollisionShape2D" parent="Walls"]
+position = Vector2(0, 612)
+shape = SubResource("HWall")
 
-[node name="CollisionShape2D3" type="CollisionShape2D" parent="Camera2D/StaticBody2D"]
-position = Vector2(-584.99994, -30)
-rotation = 1.5737042
-scale = Vector2(0.99999994, 0.99999994)
-shape = SubResource("RectangleShape2D_xtb1e")
+[node name="WallLeft" type="CollisionShape2D" parent="Walls"]
+position = Vector2(-1132, 0)
+shape = SubResource("VWall")
 
-[node name="CollisionShape2D4" type="CollisionShape2D" parent="Camera2D/StaticBody2D"]
-position = Vector2(584, -1.9999999)
-rotation = 1.568518
-scale = Vector2(0.99999994, 0.99999994)
-shape = SubResource("RectangleShape2D_xtb1e")
+[node name="WallRight" type="CollisionShape2D" parent="Walls"]
+position = Vector2(1132, 0)
+shape = SubResource("VWall")
 
 [node name="MosnterSpawningPoint" parent="." instance=ExtResource("3_dn5c8")]
 position = Vector2(-498, 26)
