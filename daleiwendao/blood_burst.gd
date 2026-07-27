@@ -14,6 +14,7 @@ const DECAL_CRIT := Color(0.66, 0.05, 0.02, 0.9) # 地面血迹
 var _dir := Vector2.RIGHT
 var _crit := false
 var _amount := 0
+var _gib := false
 
 static func _dot_tex() -> GradientTexture2D:
 	if _dot == null:
@@ -45,13 +46,33 @@ static func spawn(world: Node, at: Vector2, dir: Vector2, crit: bool, amount: in
 	b.position = at
 	world.add_child(b)
 
+# 暴击斩杀：全向大爆血 + 地面血泊（爆成一滩血）
+static func spawn_gib(world: Node, at: Vector2, dir: Vector2) -> void:
+	if world == null:
+		return
+	var b := BloodBurst.new()
+	b._dir = dir.normalized() if dir.length() > 0.01 else Vector2.RIGHT
+	b._crit = true
+	b._gib = true
+	b.position = at
+	world.add_child(b)
+
 func _ready() -> void:
+	if _gib:
+		_spawn_gib_burst()
+		_spawn_puddle()
+		GameState.shake(0.18, 7.0)
+		GameState.hitstop(0.09, 0.04)
+		await get_tree().create_timer(11.0).timeout
+		queue_free()
+		return
 	_spawn_spray()
 	var ttl := 1.2
 	if _crit:
 		_spawn_decals()
 		_spawn_crit_number()
 		GameState.shake(0.12, 4.0)
+		GameState.hitstop()
 		ttl = 8.5
 	await get_tree().create_timer(ttl).timeout
 	queue_free()
@@ -114,3 +135,45 @@ func _spawn_crit_number() -> void:
 	tw.set_parallel(true)
 	tw.tween_property(l, "position:y", -128.0, 0.75).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	tw.tween_property(l, "modulate:a", 0.0, 0.75).set_delay(0.28)
+
+# 暴击斩杀专用：全向大爆血
+func _spawn_gib_burst() -> void:
+	var p := GPUParticles2D.new()
+	p.texture = _dot_tex()
+	p.one_shot = true
+	p.explosiveness = 1.0
+	p.local_coords = false
+	p.z_index = 6
+	p.amount = 64
+	p.lifetime = 0.9
+	p.modulate = CRIT_TINT
+	var mat := ParticleProcessMaterial.new()
+	mat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_POINT
+	mat.direction = Vector3(0, -1, 0)
+	mat.spread = 180.0                        # 2D 下 ±180 = 全向喷射
+	mat.initial_velocity_min = 120.0
+	mat.initial_velocity_max = 480.0
+	mat.gravity = Vector3(0, 520, 0)
+	mat.damping_min = 40.0
+	mat.damping_max = 110.0
+	mat.scale_min = 0.7
+	mat.scale_max = 2.4
+	p.process_material = mat
+	add_child(p)
+	p.emitting = true
+
+# 地面血泊：一摊较大的暗红血迹，长时间残留后淡出
+func _spawn_puddle() -> void:
+	for i in 10:
+		var s := Sprite2D.new()
+		s.texture = _dot_tex()
+		s.z_index = -2
+		s.modulate = Color(0.5, 0.03, 0.03, 0.92)
+		s.position = Vector2(randf_range(-48, 48), randf_range(-32, 36))
+		s.rotation = randf() * TAU
+		var sc := randf_range(1.1, 2.7)
+		s.scale = Vector2(sc, sc * randf_range(0.55, 0.9))
+		add_child(s)
+		var tw := create_tween()
+		tw.tween_interval(6.5)
+		tw.tween_property(s, "modulate:a", 0.0, 4.5)

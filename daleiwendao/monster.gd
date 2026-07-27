@@ -11,6 +11,8 @@ class_name MonsterBase
 
 var can_move: bool = true
 var _player: Node2D = null
+var _last_hit_was_crit := false
+var _last_hit_dir := Vector2.RIGHT
 
 # Wander state
 var _wander_direction := Vector2.ZERO
@@ -65,6 +67,8 @@ func _attack() -> void:
 func take_damage(damage: int, attacker_position: Vector2, is_crit: bool = false) -> void:
 	can_move = false
 	var knockback_dir := (global_position - attacker_position).normalized()
+	_last_hit_was_crit = is_crit
+	_last_hit_dir = knockback_dir
 	velocity = knockback_dir * (knockback_strength * (1.6 if is_crit else 1.0))
 	moving_timer.start(knockback_time)
 	flash_red()
@@ -75,6 +79,8 @@ func die() -> void:
 	if not GameState.game_over:
 		GameState.add_kill(stats.get_loot_drop())
 	Sfx.play("kill", -8.0)
+	if _last_hit_was_crit:
+		BloodBurst.spawn_gib(get_tree().current_scene, global_position, _last_hit_dir)
 	super.die()
 
 func flash_red() -> void:
