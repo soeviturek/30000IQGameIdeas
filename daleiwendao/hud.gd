@@ -5,6 +5,13 @@ const COL_BG := Color(0, 0, 0, 0.38)
 const COL_GOLD := Color("f0d98c")
 const COL_TEXT := Color("eee0c8")
 
+# 升级立绘基准偏移（呼吸浮动/划入在此基础上叠加）
+const AVA_L := 8.0
+const AVA_R := 0.0
+const AVA_T := 6.0
+const AVA_B := 70.0
+const AVA_SLIDE_PX := 240.0      # 划入距离（从左侧滑入）
+
 # 造化（升级）池：id / 名称 / 稀有度 / 描述
 const RARITY_COLORS := {
 	"精良": Color("4a9cf0"),
@@ -52,6 +59,10 @@ var _banner_time: float = 0.0
 var _pending_levelups: int = 0
 var _levelup_avatar: TextureRect
 var _levelup_line: Label
+var _levelup_quote: PanelContainer
+var _ava_slide: float = 0.0      # 1=完全滑出屏幕左侧，0=归位
+var _ava_bob_t: float = 0.0      # 呼吸浮动计时
+var _ava_tween: Tween
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -178,10 +189,10 @@ func _build_levelup_panel() -> void:
 	_levelup_avatar.anchor_top = 0.0
 	_levelup_avatar.anchor_right = 0.52
 	_levelup_avatar.anchor_bottom = 1.0
-	_levelup_avatar.offset_left = 8
-	_levelup_avatar.offset_top = 6
-	_levelup_avatar.offset_right = 0
-	_levelup_avatar.offset_bottom = 70
+	_levelup_avatar.offset_left = AVA_L
+	_levelup_avatar.offset_top = AVA_T
+	_levelup_avatar.offset_right = AVA_R
+	_levelup_avatar.offset_bottom = AVA_B
 	_levelup_avatar.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_levelup_avatar.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	_levelup_avatar.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -206,6 +217,7 @@ func _build_levelup_panel() -> void:
 	qsb.border_color = Color("d59bff")
 	quote_wrap.add_theme_stylebox_override("panel", qsb)
 	_levelup_root.add_child(quote_wrap)
+	_levelup_quote = quote_wrap
 
 	_levelup_line = _make_label("", 20, Color("ffe0f0"), HORIZONTAL_ALIGNMENT_CENTER)
 	_levelup_line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -324,6 +336,9 @@ func _process(delta: float) -> void:
 	var total := int(GameState.elapsed)
 	_timer_lbl.text = "%02d:%02d" % [total / 60, total % 60]
 	_update_boss_bar()
+	if _levelup_root and _levelup_root.visible:
+		_ava_bob_t += delta
+		_apply_avatar_transform()
 	if _banner_time > 0.0:
 		_banner_time -= delta
 		_banner_lbl.modulate.a = clamp(_banner_time / 0.7, 0.0, 1.0)
@@ -407,7 +422,44 @@ func _show_next_choice() -> void:
 		_cards_box.add_child(_make_card(pool[i], i + 1))
 	_set_levelup_speaker(shown)
 	_levelup_root.visible = true
+	_start_avatar_intro()
 	get_tree().paused = true
+
+func _set_ava_slide(v: float) -> void:
+	_ava_slide = v
+	_apply_avatar_transform()
+
+func _apply_avatar_transform() -> void:
+	if _levelup_avatar == null:
+		return
+	var slide_px := _ava_slide * -AVA_SLIDE_PX
+	var bob := sin(_ava_bob_t * 1.6) * 7.0
+	_levelup_avatar.offset_left = AVA_L + slide_px
+	_levelup_avatar.offset_right = AVA_R + slide_px
+	_levelup_avatar.offset_top = AVA_T + bob
+	_levelup_avatar.offset_bottom = AVA_B + bob
+	if _levelup_avatar.size.x > 1.0:
+		_levelup_avatar.pivot_offset = _levelup_avatar.size * 0.5
+	var s := 1.0 + sin(_ava_bob_t * 1.15 + 0.6) * 0.013
+	_levelup_avatar.scale = Vector2(s, s)
+
+func _start_avatar_intro() -> void:
+	_ava_slide = 1.0
+	_ava_bob_t = 0.0
+	_levelup_avatar.modulate.a = 0.0
+	_apply_avatar_transform()
+	if _levelup_quote:
+		_levelup_quote.modulate.a = 0.0
+	if _ava_tween and _ava_tween.is_valid():
+		_ava_tween.kill()
+	_ava_tween = create_tween()
+	_ava_tween.set_parallel(true)
+	_ava_tween.tween_property(_levelup_avatar, "modulate:a", 1.0, 0.32)
+	_ava_tween.tween_method(_set_ava_slide, 1.0, 0.0, 0.44) \
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	if _levelup_quote:
+		_ava_tween.tween_property(_levelup_quote, "modulate:a", 1.0, 0.5) \
+			.set_delay(0.18)
 
 func _avatar_tex(who: String) -> Texture2D:
 	# 优先放大半身立绘（升级面板左栏），无则回退头肩像
