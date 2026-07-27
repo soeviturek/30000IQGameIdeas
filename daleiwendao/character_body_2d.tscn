@@ -1,29 +1,29 @@
-[gd_scene load_steps=17 format=3 uid="uid://bp1kbo22ll26d"]
+[gd_scene load_steps=12 format=3 uid="uid://bp1kbo22ll26d"]
 
 [ext_resource type="Script" uid="uid://cvi3tymufxmdh" path="res://character_body_2d.gd" id="1_ij6vw"]
 [ext_resource type="PackedScene" uid="uid://dw5h4y4na7qhl" path="res://character_stats.tscn" id="2_dd465"]
-[ext_resource type="Texture2D" uid="uid://bvhdtucgjwyml" path="res://run/01A-2.png" id="3_y1dt5"]
 [ext_resource type="PackedScene" uid="uid://2j112p7a83i4" path="res://healthBar.tscn" id="4_44cfe"]
-[ext_resource type="Texture2D" uid="uid://cq0seshk2j1fg" path="res://run/01A.png" id="4_au0nh"]
-[ext_resource type="Texture2D" uid="uid://b7ekbau2718y5" path="res://run/RUN-A-1.png" id="5_76bt2"]
 [ext_resource type="PackedScene" uid="uid://dmfwdcs0yd6tk" path="res://wand.tscn" id="6_lhvu3"]
 [ext_resource type="PackedScene" path="res://slash_weapon.tscn" id="7_slash"]
-[ext_resource type="Texture2D" uid="uid://bj8x2cryg7t71" path="res://run/RUN-A-2.png" id="6_sxias"]
-[ext_resource type="Texture2D" uid="uid://dm3h2qk3qidf7" path="res://run/RUN-A-3.png" id="7_ucfvk"]
-[ext_resource type="Texture2D" uid="uid://dqo22li42xqsg" path="res://run/RUN-A-4.png" id="8_2dyae"]
-[ext_resource type="Texture2D" uid="uid://cigqcaf3rx23e" path="res://run/RUN-A-5.png" id="9_2u5n8"]
-[ext_resource type="Texture2D" uid="uid://e4x02m1xodcg" path="res://run/RUN-A-6.png" id="10_73nau"]
-[ext_resource type="Texture2D" uid="uid://beto1ukxdnsuu" path="res://run/RUN-A-7.png" id="11_skrk8"]
-[ext_resource type="Texture2D" uid="uid://co1qcra66v5be" path="res://run/RUN-A-8.png" id="12_ye16i"]
+[ext_resource type="Texture2D" path="res://mainchar.png" id="3_main"]
+
+[sub_resource type="AtlasTexture" id="mc_0"]
+atlas = ExtResource("3_main")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="mc_1"]
+atlas = ExtResource("3_main")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="mc_2"]
+atlas = ExtResource("3_main")
+region = Rect2(64, 0, 32, 32)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_ebjds"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("3_y1dt5")
-}, {
-"duration": 1.0,
-"texture": ExtResource("4_au0nh")
+"texture": SubResource("mc_1")
 }],
 "loop": true,
 "name": &"idle",
@@ -31,32 +31,17 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("5_76bt2")
+"texture": SubResource("mc_0")
 }, {
 "duration": 1.0,
-"texture": ExtResource("6_sxias")
+"texture": SubResource("mc_1")
 }, {
 "duration": 1.0,
-"texture": ExtResource("7_ucfvk")
-}, {
-"duration": 1.0,
-"texture": ExtResource("8_2dyae")
-}, {
-"duration": 1.0,
-"texture": ExtResource("9_2u5n8")
-}, {
-"duration": 1.0,
-"texture": ExtResource("10_73nau")
-}, {
-"duration": 1.0,
-"texture": ExtResource("11_skrk8")
-}, {
-"duration": 1.0,
-"texture": ExtResource("12_ye16i")
+"texture": SubResource("mc_2")
 }],
 "loop": true,
 "name": &"walk",
-"speed": 10.0
+"speed": 12.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ghijl"]
