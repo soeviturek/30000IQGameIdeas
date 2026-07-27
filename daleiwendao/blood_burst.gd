@@ -65,14 +65,15 @@ func _ready() -> void:
 		await get_tree().create_timer(11.0).timeout
 		queue_free()
 		return
+	if not _crit:
+		queue_free()          # 普通命中不再喷血，仅暴击出血
+		return
 	_spawn_spray()
-	var ttl := 1.2
-	if _crit:
-		_spawn_decals()
-		_spawn_crit_number()
-		GameState.shake(0.12, 4.0)
-		ttl = 8.5
-	await get_tree().create_timer(ttl).timeout
+	_spawn_decals()
+	_spawn_crit_number()
+	Sfx.play("crit", -3.0)
+	GameState.shake(0.12, 4.0)
+	await get_tree().create_timer(8.5).timeout
 	queue_free()
 
 func _spawn_spray() -> void:
@@ -122,17 +123,26 @@ func _spawn_crit_number() -> void:
 	var f := _get_font()
 	if f:
 		l.add_theme_font_override("font", f)
-	l.add_theme_font_size_override("font_size", 30)
+	l.add_theme_font_size_override("font_size", 34)
 	l.add_theme_color_override("font_color", Color(1.0, 0.86, 0.24))
 	l.add_theme_color_override("font_outline_color", Color(0.45, 0.04, 0.0))
 	l.add_theme_constant_override("outline_size", 6)
 	l.z_index = 20
-	l.position = Vector2(-28, -70)
+	l.position = Vector2(-32, -72)
+	l.pivot_offset = Vector2(34, 22)              # 以文字中心缩放
+	l.scale = Vector2(0.25, 0.25)
+	l.modulate = Color(1.7, 1.7, 1.7, 1.0)        # 出现瞬间过曝闪白
 	add_child(l)
-	var tw := create_tween()
-	tw.set_parallel(true)
-	tw.tween_property(l, "position:y", -128.0, 0.75).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tw.tween_property(l, "modulate:a", 0.0, 0.75).set_delay(0.28)
+	# 弹跳放大 punch：0.25→1.4→1.0，制造"闪"一下的爆点感
+	var pop := create_tween()
+	pop.tween_property(l, "scale", Vector2(1.4, 1.4), 0.11).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	pop.tween_property(l, "scale", Vector2(1.0, 1.0), 0.09).set_trans(Tween.TRANS_SINE)
+	# 同时：闪白快速回落 + 上浮 + 淡出
+	var mv := create_tween()
+	mv.set_parallel(true)
+	mv.tween_property(l, "modulate", Color(1, 1, 1, 1), 0.14)
+	mv.tween_property(l, "position:y", -134.0, 0.85).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	mv.tween_property(l, "modulate:a", 0.0, 0.5).set_delay(0.55)
 
 # 暴击斩杀专用：全向大爆血
 func _spawn_gib_burst() -> void:

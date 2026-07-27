@@ -72,7 +72,8 @@ func take_damage(damage: int, attacker_position: Vector2, is_crit: bool = false)
 	velocity = knockback_dir * (knockback_strength * (1.6 if is_crit else 1.0))
 	moving_timer.start(knockback_time)
 	flash_red()
-	BloodBurst.spawn(get_tree().current_scene, global_position, knockback_dir, is_crit, damage)
+	if is_crit:
+		BloodBurst.spawn(get_tree().current_scene, global_position, knockback_dir, is_crit, damage)
 	super.take_damage(damage, attacker_position, is_crit)
 
 func die() -> void:

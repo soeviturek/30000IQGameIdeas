@@ -3,7 +3,7 @@ extends Node
 # 音源为程序化占位音（res://sfx/*.wav），后续可无痛替换为正式素材。
 
 const POOL_SIZE := 12
-const SFX_NAMES := ["attack", "hurt", "levelup", "kill", "victory", "defeat", "dash", "boss"]
+const SFX_NAMES := ["attack", "hurt", "levelup", "kill", "victory", "defeat", "dash", "boss", "crit"]
 
 var _players: Array[AudioStreamPlayer] = []
 var _next := 0

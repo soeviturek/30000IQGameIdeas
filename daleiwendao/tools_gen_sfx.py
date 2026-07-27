@@ -116,10 +116,24 @@ def gen_boss():
     return out
 
 
+def gen_crit():
+    # 暴击：明亮金属"锵"——高频铃音 + 金属泛音 + 起始噪声冲击 + 快速下滑
+    n = dur(0.24); out = []
+    for i in range(n):
+        f = 1650 - 550 * i / n
+        s = 0.42 * math.sin(2 * math.pi * f * i / SR)
+        s += 0.24 * math.sin(2 * math.pi * f * 2.5 * i / SR)   # 金属泛音
+        s += 0.12 * math.sin(2 * math.pi * f * 4.1 * i / SR)   # 更亮的高泛音
+        if i < dur(0.018):
+            s += 0.55 * (random.random() * 2 - 1)              # 起始"咔"冲击
+        out.append(s * env(i, n, 6.5))
+    return out
+
+
 for name, fn in [
     ("attack", gen_attack), ("hurt", gen_hurt), ("levelup", gen_levelup),
     ("kill", gen_kill), ("victory", gen_victory), ("defeat", gen_defeat),
-    ("dash", gen_dash), ("boss", gen_boss),
+    ("dash", gen_dash), ("boss", gen_boss), ("crit", gen_crit),
 ]:
     _write(name, fn())
 print("DONE")
