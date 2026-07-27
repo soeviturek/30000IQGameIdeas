@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://dw3raqho2blae"]
+[gd_scene load_steps=10 format=3 uid="uid://dw3raqho2blae"]
 
 [ext_resource type="PackedScene" uid="uid://bp1kbo22ll26d" path="res://character_body_2d.tscn" id="1_wtdyi"]
 [ext_resource type="PackedScene" uid="uid://gwyi0vx8rpl4" path="res://kobolt_monster.tscn" id="2_xtb1e"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://hud.gd" id="5_hud"]
 [ext_resource type="Script" path="res://camera_shake.gd" id="6_shake"]
 [ext_resource type="Script" path="res://camera_follow.gd" id="7_follow"]
+[ext_resource type="Script" path="res://boundary_fog.gd" id="8_fog"]
 
 [sub_resource type="RectangleShape2D" id="HWall"]
 size = Vector2(2264, 24)
@@ -44,6 +45,9 @@ shape = SubResource("VWall")
 [node name="WallRight" type="CollisionShape2D" parent="Walls"]
 position = Vector2(1132, 0)
 shape = SubResource("VWall")
+
+[node name="BoundaryFog" type="Node2D" parent="."]
+script = ExtResource("8_fog")
 
 [node name="MosnterSpawningPoint" parent="." instance=ExtResource("3_dn5c8")]
 position = Vector2(-498, 26)
