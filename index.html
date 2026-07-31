@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>大雷问道 · 企划案 v3</title>
+<title>大雷问道 · 企划案 v5</title>
 <style>
   body{font-family:"Microsoft YaHei",sans-serif;background:#151022;color:#eee0c8;margin:0;padding:0}
   header{padding:40px 20px;text-align:center;background:linear-gradient(135deg,#2b1f4a,#4a2f5a);border-bottom:2px solid #d4af37}
@@ -31,11 +31,71 @@
 <body>
 <header>
   <h1>大雷问道</h1>
-  <p>美少女仙侠割草游戏 · 企划案 v3</p>
+  <p>美少女仙侠割草游戏 · 企划案 v5</p>
   <p style="font-size:0.85em;color:#a89ac8">商业模式定位变更：买断制 + DLC，单机/最多4人联机，不做抽卡</p>
 </header>
 
 <main>
+
+<section>
+  <h2>当前实装进度 · Demo 已跑通 <span class="tag new">v5</span></h2>
+  <div class="fix">✅ <b>v5 本次更新：</b>企划案首次<b>对齐实际开发进度</b>——下面是已经做出来、能玩的部分，以及与企划案的差距（诚实标注），让文档从"纯画饼"变成"现状 + 路线图"。</div>
+  <p style="color:#c9b8e8">技术栈：Godot 4.5.1 · 已可导出 Windows 单文件可执行程序。第一章《幽篁秘境》单局约 75 秒 → 关底妖王。</p>
+
+  <h3>核心循环（已跑通）</h3>
+  <div class="cards">
+    <div class="card"><h3>走位 + 自动攻击</h3><p>WASD/方向键移动、空格闪避（dash）；双武器<b>同时自动索敌开火</b>：惊鸿剑（近战扇形AoE + 剑气特效）+ 灵弓（远程追踪箭矢）。</p></div>
+    <div class="card"><h3>道行升级 · 造化三选一</h3><p>击杀掉经验，满级弹出升级窗，<b>10 张造化卡三选一</b>（按 1/2/3 或点击），稀有度分级（精良/稀有/进化）。</p></div>
+    <div class="card"><h3>Modifier 数值系统</h3><p>攻击力/攻击力%/范围/冷却/移速/气血上限/暴击率/暴击伤害，支持加值(ADD)与增幅(MUL)叠加——<b>后续法宝词条可直接复用</b>。</p></div>
+    <div class="card"><h3>波次导演 + 妖王</h3><p>0s 妖群 → 25s 飞妖 → 50s 妖潮 → 75s <b>妖王·噬魂法王</b>；刷怪频率/批量随时间递增，Boss 登场清场折算战功。</p></div>
+    <div class="card"><h3>结算 + 灵石</h3><p>击杀数 + 灵石（300 + 击杀×5 + 道行×20）；道陨（败）/ 道成·出关（胜）双结算界面。</p></div>
+    <div class="card"><h3>手感 / 演出</h3><p>暴击跳字、震屏、血花、剑气、边界迷雾/毒圈、音效、跟随镜头——割草爽感基础层已铺好。</p></div>
+  </div>
+
+  <h3>已实装造化卡（10 张）</h3>
+  <table>
+    <tr><th>造化</th><th>稀有度</th><th>效果</th></tr>
+    <tr><td>惊鸿剑气</td><td>精良</td><td>攻击力 +8</td></tr>
+    <tr><td>杀伐果决</td><td>稀有</td><td>攻击力 +15%</td></tr>
+    <tr><td>雷剑真解</td><td>进化</td><td>攻击力 +20% / 攻击范围 +40</td></tr>
+    <tr><td>追风诀</td><td>稀有</td><td>攻击冷却 -12%</td></tr>
+    <tr><td>疾风步</td><td>精良</td><td>移动速度 +12%</td></tr>
+    <tr><td>罡气护体</td><td>精良</td><td>气血上限 +40 并立即回复</td></tr>
+    <tr><td>千里追魂</td><td>精良</td><td>攻击范围 +60</td></tr>
+    <tr><td>回春术</td><td>精良</td><td>立即回复全部气血</td></tr>
+    <tr><td>杀机毕现</td><td>稀有</td><td>暴击率 +8%</td></tr>
+    <tr><td>血溅七步</td><td>进化</td><td>暴击伤害 +50%</td></tr>
+  </table>
+
+  <div class="note"><b>与企划案的差距（诚实标注）：</b>
+    ① 造化目前<b>只加数值</b>，还没有"掉新法宝 / 进化组合"（企划案核心卖点 → Roadmap A）；
+    ② 灵石已结算但<b>局外门派养成未实装</b>（→ Roadmap B）；
+    ③ 目前 1 章 1 Boss，<b>修真境界体系未做</b>（→ Roadmap C）。
+  </div>
+</section>
+
+<section>
+  <h2>战斗深度 Roadmap · 下一步做什么 <span class="tag new">v5</span></h2>
+  <p style="color:#c9b8e8">战斗核心已跑通，"像 Brotato 硬打 + 升级系统"其实<b>已经有了</b>。接下来往三个方向加深度，避免停在纯数值堆叠：</p>
+  <div class="cards">
+    <div class="card">
+      <h3>A · 局内 Build 深度 <span class="tag">最高优先级</span></h3>
+      <p>造化卡池扩展：除数值卡外加入<b>法宝卡</b>（掉落新武器，多槽位并行开火，对标吸血鬼幸存者）；<b>进化组合</b>——某法宝满级 + 特定造化 → 究极形态（直接落地本页《武器基座 + 进化组合》那张表，如 惊鸿剑气 + 符箓 → 剑气化虹 360°）。复用现有 Modifier 承接词条。</p>
+      <p style="color:#9ce8b0"><b>产出：</b>"每局不同 build"的重复可玩性——最能拉开与 Brotato 差距的护城河。工作量最大。</p>
+    </div>
+    <div class="card">
+      <h3>B · 局外门派养成 <span class="tag">留存</span></h3>
+      <p>灵石现在算出来了却没处花。加<b>局外灵石消费</b>：买永久强化（弟子功法、初始法宝、初始造化），对接企划案"局外门派养成"层，一局强于一局。</p>
+      <p style="color:#9ce8b0"><b>产出：</b>给"再来一局"一个理由。中等工作量。</p>
+    </div>
+    <div class="card">
+      <h3>C · 境界突破 + 内容节奏 <span class="tag">性价比最高</span></h3>
+      <p>"道行 Lv" 重构为<b>修真境界</b>（练气→筑基→金丹→元婴…）；到境界节点触发<b>破境</b>——一次"大造化"稀有三选一 + 破境光效 / 短暂力量爆发。再扩第二章（雪山 / 魔窟）+ 新妖王。</p>
+      <p style="color:#9ce8b0"><b>产出：</b>节奏爆点 + 仙侠代入感。最便宜，最快出味。</p>
+    </div>
+  </div>
+  <div class="fix"><b>建议推进顺序：</b>C（便宜、立刻出仙侠味）→ A（Build 深度护城河）→ B（长线留存）。若以 Steam Demo 差异化为首要目标，可 A 优先。</div>
+</section>
 
 <section>
   <h2>v3 核心变更</h2>
@@ -198,6 +258,6 @@ enemy_hp_coop(base_hp, player_count) = base_hp * (1 + 0.6 * (player_count - 1))
 </section>
 
 </main>
-<footer>企划案 v3 · 商业模式定位变更修订 · 详见同目录 README.md</footer>
+<footer>企划案 v5 · 对齐实装现状 + 战斗深度路线图 · 详见同目录 README.md</footer>
 </body>
 </html>
