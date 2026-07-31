@@ -35,6 +35,9 @@ func _physics_process(delta: float) -> void:
 		velocity = (target.global_position - global_position).normalized() * move_speed
 		#print("has target, moving")
 		#print(velocity)
+	# 让箭头朝向飞行方向（箭贴图默认朝上，故 +PI/2）
+	if velocity.length() > 0.1:
+		rotation = velocity.angle() + PI / 2.0
 	position += velocity * delta
 
 

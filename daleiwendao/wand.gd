@@ -4,7 +4,7 @@ class_name RangedWeapon
 @export var projectile_scene: PackedScene
 
 @onready var marker = $Marker2D
-@onready var shooting_point = $Marker2D/Sprite2D/ShootingPoint
+@onready var shooting_point = $Marker2D/ShootingPoint
 
 var disable: bool = false
 

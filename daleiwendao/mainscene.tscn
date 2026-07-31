@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://dw3raqho2blae"]
+[gd_scene load_steps=11 format=3 uid="uid://dw3raqho2blae"]
 
 [ext_resource type="PackedScene" uid="uid://bp1kbo22ll26d" path="res://character_body_2d.tscn" id="1_wtdyi"]
 [ext_resource type="PackedScene" uid="uid://gwyi0vx8rpl4" path="res://kobolt_monster.tscn" id="2_xtb1e"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" path="res://camera_shake.gd" id="6_shake"]
 [ext_resource type="Script" path="res://camera_follow.gd" id="7_follow"]
 [ext_resource type="Script" path="res://boundary_fog.gd" id="8_fog"]
+[ext_resource type="Texture2D" uid="uid://mumdfuebaqs7" path="res://bg_scene3.jpg" id="9_bg"]
 
 [sub_resource type="RectangleShape2D" id="HWall"]
 size = Vector2(2264, 24)
@@ -16,6 +17,11 @@ size = Vector2(2264, 24)
 size = Vector2(24, 1200)
 
 [node name="Main" type="Node2D"]
+
+[node name="Background" type="Sprite2D" parent="."]
+z_index = -10
+texture = ExtResource("9_bg")
+scale = Vector2(1.75, 1.75)
 
 [node name="Player" parent="." instance=ExtResource("1_wtdyi")]
 

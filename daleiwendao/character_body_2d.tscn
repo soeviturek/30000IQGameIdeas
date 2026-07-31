@@ -1,47 +1,66 @@
-[gd_scene load_steps=12 format=3 uid="uid://bp1kbo22ll26d"]
+[gd_scene load_steps=16 format=3 uid="uid://bp1kbo22ll26d"]
 
 [ext_resource type="Script" uid="uid://cvi3tymufxmdh" path="res://character_body_2d.gd" id="1_ij6vw"]
 [ext_resource type="PackedScene" uid="uid://dw5h4y4na7qhl" path="res://character_stats.tscn" id="2_dd465"]
 [ext_resource type="PackedScene" uid="uid://2j112p7a83i4" path="res://healthBar.tscn" id="4_44cfe"]
 [ext_resource type="PackedScene" uid="uid://dmfwdcs0yd6tk" path="res://wand.tscn" id="6_lhvu3"]
 [ext_resource type="PackedScene" path="res://slash_weapon.tscn" id="7_slash"]
-[ext_resource type="Texture2D" path="res://mainchar.png" id="3_main"]
+[ext_resource type="Texture2D" uid="uid://dni2owivot2nq" path="res://char_breath.png" id="3_breath"]
+[ext_resource type="Texture2D" uid="uid://cu47jn52jbvft" path="res://char_run.png" id="3_run"]
 
-[sub_resource type="AtlasTexture" id="mc_0"]
-atlas = ExtResource("3_main")
-region = Rect2(0, 0, 32, 32)
+[sub_resource type="AtlasTexture" id="br_0"]
+atlas = ExtResource("3_breath")
+region = Rect2(0, 0, 64, 64)
 
-[sub_resource type="AtlasTexture" id="mc_1"]
-atlas = ExtResource("3_main")
-region = Rect2(32, 0, 32, 32)
+[sub_resource type="AtlasTexture" id="br_1"]
+atlas = ExtResource("3_breath")
+region = Rect2(64, 0, 64, 64)
 
-[sub_resource type="AtlasTexture" id="mc_2"]
-atlas = ExtResource("3_main")
-region = Rect2(64, 0, 32, 32)
+[sub_resource type="AtlasTexture" id="br_2"]
+atlas = ExtResource("3_breath")
+region = Rect2(128, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="rn_0"]
+atlas = ExtResource("3_run")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="rn_1"]
+atlas = ExtResource("3_run")
+region = Rect2(64, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="rn_2"]
+atlas = ExtResource("3_run")
+region = Rect2(128, 0, 64, 64)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_ebjds"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("mc_1")
+"texture": SubResource("br_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("br_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("br_2")
 }],
 "loop": true,
 "name": &"idle",
-"speed": 3.0
+"speed": 5.0
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("mc_0")
+"texture": SubResource("rn_0")
 }, {
 "duration": 1.0,
-"texture": SubResource("mc_1")
+"texture": SubResource("rn_1")
 }, {
 "duration": 1.0,
-"texture": SubResource("mc_2")
+"texture": SubResource("rn_2")
 }],
 "loop": true,
 "name": &"walk",
-"speed": 12.0
+"speed": 10.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ghijl"]
@@ -57,11 +76,10 @@ script = ExtResource("1_ij6vw")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 texture_filter = 1
-scale = Vector2(1.0088754, 0.9947512)
+scale = Vector2(0.5, 0.5)
 sprite_frames = SubResource("SpriteFrames_ebjds")
 animation = &"idle"
 autoplay = "idle"
-frame_progress = 0.009266341
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0.33333206, 1.6666679)
