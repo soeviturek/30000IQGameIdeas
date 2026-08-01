@@ -87,7 +87,17 @@ func _ready() -> void:
 	GameState.stage_cleared.connect(_on_stage_cleared)
 	_on_xp_changed(GameState.xp, GameState.xp_to_next, GameState.level)
 	_on_kills_changed(GameState.kills)
+	_grant_meta_start()
 	call_deferred("_connect_director")
+
+# 洞府「造化」永久强化：出关起手即赠若干造化点
+func _grant_meta_start() -> void:
+	if not has_node("/root/Meta"):
+		return
+	var sp := int(get_node("/root/Meta").starting_points())
+	if sp > 0:
+		_pending_points += sp
+		_update_points_label()
 
 func _connect_director() -> void:
 	var dir = get_tree().current_scene.get_node_or_null("MosnterSpawningPoint")
@@ -324,7 +334,7 @@ func _build_gameover_panel() -> void:
 	flavor.custom_minimum_size = Vector2(340, 0)
 	flavor.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	vbox.add_child(flavor)
-	var again := _make_label("按 R 重入秘境", 20, COL_GOLD, HORIZONTAL_ALIGNMENT_CENTER)
+	var again := _make_label("Enter 返回洞府 · R 原地再战", 20, COL_GOLD, HORIZONTAL_ALIGNMENT_CENTER)
 	vbox.add_child(again)
 
 func _build_victory_panel() -> void:
@@ -364,7 +374,7 @@ func _build_victory_panel() -> void:
 	flavor.custom_minimum_size = Vector2(340, 0)
 	flavor.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	vbox.add_child(flavor)
-	var again := _make_label("按 R 再入秘境", 20, COL_GOLD, HORIZONTAL_ALIGNMENT_CENTER)
+	var again := _make_label("Enter 返回洞府 · R 再入秘境", 20, COL_GOLD, HORIZONTAL_ALIGNMENT_CENTER)
 	vbox.add_child(again)
 
 # ---------- 信号回调 ----------
@@ -475,7 +485,7 @@ func _on_game_over_changed(is_over: bool) -> void:
 	if is_over:
 		var total := int(GameState.elapsed)
 		var summary: Label = _gameover_root.get_meta("summary")
-		summary.text = "斩妖 %d · 存活 %02d:%02d · 道行 Lv.%d" % [GameState.kills, total / 60, total % 60, GameState.level]
+		summary.text = "斩妖 %d · 存活 %02d:%02d · 道行 Lv.%d\n落败仍得灵石 ×%d" % [GameState.kills, total / 60, total % 60, GameState.level, GameState.spirit_stones]
 		_gameover_root.visible = true
 		get_tree().paused = true
 
@@ -617,6 +627,11 @@ func _input(event: InputEvent) -> void:
 	if key == null or not key.pressed or key.echo:
 		return
 	var kc := key.keycode
+	# 结算界面：Enter 返回洞府结算强化，R 原地再战（R 在 _process 里处理）
+	if GameState.game_over or GameState.victory:
+		if kc == KEY_ENTER or kc == KEY_KP_ENTER:
+			_go_cave()
+		return
 	# Tab：切换「道途·状态」面板（战斗中、未结算、未开升级面板时）
 	if kc == KEY_TAB and not _levelup_root.visible and not GameState.game_over and not GameState.victory:
 		_toggle_status()
@@ -720,6 +735,12 @@ func _restart() -> void:
 		_status_root.visible = false
 	GameState.reset()
 	get_tree().reload_current_scene()
+
+# 返回洞府：解暂停 + 重置局内状态（灵石已在结算时入账）→ 切到洞府枢纽
+func _go_cave() -> void:
+	get_tree().paused = false
+	GameState.reset()
+	get_tree().change_scene_to_file("res://cave.tscn")
 
 # ---------- 小工具 ----------
 

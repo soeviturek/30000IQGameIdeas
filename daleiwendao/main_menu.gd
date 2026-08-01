@@ -125,8 +125,7 @@ func _label(text: String, size: int, col: Color, align: int) -> Label:
 	return l
 
 func _on_start() -> void:
-	GameState.reset()
-	get_tree().change_scene_to_file("res://mainscene.tscn")
+	get_tree().change_scene_to_file("res://cave.tscn")
 
 func _on_quit() -> void:
 	get_tree().quit()

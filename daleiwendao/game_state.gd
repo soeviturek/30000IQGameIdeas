@@ -13,6 +13,8 @@ var game_over: bool = false:
 		if game_over == value:
 			return
 		game_over = value
+		if value and not victory:
+			_end_defeat()
 		game_over_changed.emit(value)
 
 var victory: bool = false:
@@ -63,10 +65,27 @@ func _process(delta: float) -> void:
 func win_stage() -> void:
 	if victory:
 		return
-	# 通关灵石结算：底数 + 斩妖数 + 道行等级加成
-	spirit_stones = 300 + kills * 5 + level * 20
+	# 通关灵石结算：底数 + 斩妖数 + 道行等级加成，再乘洞府「敛财」倍率
+	var reward := int((300 + kills * 5 + level * 20) * _stone_mult())
+	spirit_stones = reward
+	_bank(reward)
 	victory = true
 	stage_cleared.emit(spirit_stones)
+
+# 失败也有收获（roguelite 元进度：每局都在攒灵石变强，努力不白费）
+func _end_defeat() -> void:
+	var reward := int((80 + kills * 3 + level * 10) * _stone_mult())
+	spirit_stones = reward
+	_bank(reward)
+
+func _stone_mult() -> float:
+	if has_node("/root/Meta"):
+		return float(get_node("/root/Meta").stone_mult())
+	return 1.0
+
+func _bank(amount: int) -> void:
+	if has_node("/root/Meta"):
+		get_node("/root/Meta").add_stones(amount)
 
 func add_kill(xp_value: int) -> void:
 	kills += 1

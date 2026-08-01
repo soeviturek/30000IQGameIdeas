@@ -32,8 +32,27 @@ func _ready() -> void:
 	_init_health()
 	stats.critChance = 0.10
 	stats.critMultiplier = 2.0
+	_apply_meta()
 	weapon1.init_weapon(stats)
 	slash_weapon.init_weapon(stats)
+	_apply_meta_qi()
+
+# 洞府永久强化：气血/攻击/移速/暴击叠加，并按新上限刷新血条
+func _apply_meta() -> void:
+	if not has_node("/root/Meta"):
+		return
+	get_node("/root/Meta").apply_to_stats(stats)
+	health_bar.set_max_health(stats.get_max_health())
+	health_bar.set_health(stats.get_max_health())
+
+# 剑胎：出关起手即带若干层惊鸿剑气
+func _apply_meta_qi() -> void:
+	if not has_node("/root/Meta"):
+		return
+	var n := int(get_node("/root/Meta").starting_qi())
+	for i in n:
+		if slash_weapon and slash_weapon.has_method("add_qi_level"):
+			slash_weapon.add_qi_level()
 
 func _physics_process(delta: float) -> void:
 	if _iframe_left > 0.0:

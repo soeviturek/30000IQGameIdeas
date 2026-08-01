@@ -8,8 +8,8 @@ class_name BossMonster
 
 const BULLET := preload("res://fire_bullet.tscn")
 
-enum BossState { IDLE, TELEGRAPH, FIRE, SPIRAL, DASH_TELEGRAPH, DASH, DASH_PAUSE, RECOVER }
-enum Attack { RING, FAN, SPIRAL, HAZARD }
+enum BossState { IDLE, TELEGRAPH, FIRE, SPIRAL, AIMED, CROSS, DASH_TELEGRAPH, DASH, DASH_PAUSE, RECOVER }
+enum Attack { RING, FAN, SPIRAL, HAZARD, AIMED, CROSS, NOVA }
 
 # 竞技场边界（地火落点 clamp，略内缩于墙体 1120/600）
 const ARENA_X := 1080.0
@@ -17,9 +17,9 @@ const ARENA_Y := 560.0
 const HAZARD_SPREAD := 380.0   # 地火围绕玩家散布半径
 
 # —— 节奏时长（秒） ——
-const TELEGRAPH_TIME := 0.42
-const FIRE_TIME := 0.3
-const SPIRAL_TIME := 1.25
+const TELEGRAPH_TIME := 0.32
+const FIRE_TIME := 0.22
+const SPIRAL_TIME := 1.0
 const DASH_TELEGRAPH_TIME := 0.85   # 连段首击蓄力预警（红色冲击走廊显形 ~1s）
 const DASH_TIME := 0.53             # 走廊长度 ÷ 冲刺速度（冲满整条走廊）
 const DASH_PAUSE_TIME := 0.55       # 连段间隙（重新锁向 + 重划走廊）
@@ -43,6 +43,18 @@ const SPIRAL_SPEED := 205.0
 const SPIRAL_EMIT := 0.05           # 螺旋每股发射间隔（更密）
 const SPIRAL_ARMS := 3
 const SPIRAL_STEP := 0.30           # 每股旋转步进（弧度）
+# —— 追命速射（点名连发，惩罚站桩） ——
+const AIMED_TIME := 0.6
+const AIMED_EMIT := 0.1
+const AIMED_SPEED := 340.0
+# —— 轮转十字（旋转四向，铺满走位空间） ——
+const CROSS_TIME := 1.1
+const CROSS_EMIT := 0.09
+const CROSS_SPEED := 180.0
+const CROSS_STEP := 0.16            # 每股旋转步进（弧度）
+# —— 雷爆环（瞬爆内慢外快双层扩散环，阶段3“炸场”） ——
+const NOVA_COUNT := 22
+const NOVA_SPEED := 175.0
 const BULLET_DAMAGE := 16
 
 # —— 地火 ——
@@ -54,7 +66,7 @@ const HAZARD_DAMAGE := 16
 var can_attack: bool = true
 var _state: int = BossState.IDLE
 var _state_timer: float = 0.0
-var _pattern_cd: float = 0.8         # 首个招式 ~0.8s（开局即压迫）
+var _pattern_cd: float = 0.5         # 首个招式 ~0.5s（开局即压迫）
 var _dash_cd: float = 4.5            # 首次连突 ~4.5s
 var _dash_dir: Vector2 = Vector2.ZERO
 var _dash_hit_done: bool = false
@@ -66,6 +78,10 @@ var _phase: int = 1                   # 1/2/3 随血量升级
 # 螺旋运行态
 var _spiral_angle: float = 0.0
 var _spiral_emit: float = 0.0
+# 追命/十字运行态
+var _aimed_emit: float = 0.0
+var _cross_angle: float = 0.0
+var _cross_emit: float = 0.0
 
 func _ready() -> void:
 	super._ready()
@@ -113,6 +129,18 @@ func _physics_process(delta: float) -> void:
 			velocity = Vector2.ZERO
 			animated_sprite.play("idle")
 			_tick_spiral(delta)
+			if _state_timer <= 0.0:
+				_end_pattern()
+		BossState.AIMED:
+			velocity = Vector2.ZERO
+			animated_sprite.play("idle")
+			_tick_aimed(delta)
+			if _state_timer <= 0.0:
+				_end_pattern()
+		BossState.CROSS:
+			velocity = Vector2.ZERO
+			animated_sprite.play("idle")
+			_tick_cross(delta)
 			if _state_timer <= 0.0:
 				_end_pattern()
 		BossState.DASH_TELEGRAPH:
@@ -193,6 +221,20 @@ func _dispatch_attack() -> void:
 			Sfx.play("boss", -6.0)
 			_state = BossState.SPIRAL
 			_state_timer = SPIRAL_TIME
+		Attack.AIMED:
+			_aimed_emit = 0.0
+			Sfx.play("boss", -6.0)
+			_state = BossState.AIMED
+			_state_timer = AIMED_TIME
+		Attack.CROSS:
+			_cross_angle = randf() * TAU
+			_cross_emit = 0.0
+			Sfx.play("boss", -6.0)
+			_state = BossState.CROSS
+			_state_timer = CROSS_TIME
+		Attack.NOVA:
+			_fire_nova()
+			_after_instant()
 
 func _after_instant() -> void:
 	Sfx.play("boss", -6.0)
@@ -206,12 +248,14 @@ func _end_pattern() -> void:
 
 # 招式池随阶段扩充，避免连续重复
 func _pick_attack() -> int:
-	var pool := [Attack.RING, Attack.FAN, Attack.HAZARD]
+	var pool := [Attack.RING, Attack.FAN, Attack.HAZARD, Attack.AIMED]
 	if _phase >= 2:
 		pool.append(Attack.SPIRAL)
-		pool.append(Attack.FAN)      # 提高点名频率
+		pool.append(Attack.CROSS)
+		pool.append(Attack.AIMED)    # 提高点名/追命频率
 	if _phase >= 3:
 		pool.append(Attack.SPIRAL)   # 螺旋权重更高
+		pool.append(Attack.NOVA)
 		pool.append(Attack.HAZARD)
 	var pick: int = pool[randi() % pool.size()]
 	if pick == _last_attack and pool.size() > 1:
@@ -254,6 +298,46 @@ func _tick_spiral(delta: float) -> void:
 		var a := _spiral_angle + TAU * float(arm) / float(SPIRAL_ARMS)
 		_spawn_bullet(Vector2.RIGHT.rotated(a), speed)
 	_spiral_angle += SPIRAL_STEP
+
+# —— 追命速射：每 AIMED_EMIT 秒朝玩家当前位置点名连发（惩罚站桩） ——
+func _tick_aimed(delta: float) -> void:
+	_aimed_emit -= delta
+	if _aimed_emit > 0.0:
+		return
+	_aimed_emit = AIMED_EMIT
+	if not is_instance_valid(_player):
+		return
+	var speed := AIMED_SPEED * _bullet_speed_mult()
+	var base := (_player.global_position - global_position).angle()
+	_spawn_bullet(Vector2.RIGHT.rotated(base), speed)
+	if _phase >= 2:
+		_spawn_bullet(Vector2.RIGHT.rotated(base + 0.12), speed)
+		_spawn_bullet(Vector2.RIGHT.rotated(base - 0.12), speed)
+
+# —— 轮转十字：四向弹幕持续旋转，铺满走位空间 ——
+func _tick_cross(delta: float) -> void:
+	_cross_emit -= delta
+	if _cross_emit > 0.0:
+		return
+	_cross_emit = CROSS_EMIT
+	var speed := CROSS_SPEED * _bullet_speed_mult()
+	for i in 4:
+		var a := _cross_angle + TAU * float(i) / 4.0
+		_spawn_bullet(Vector2.RIGHT.rotated(a), speed)
+	_cross_angle += CROSS_STEP
+
+# —— 雷爆环：瞬爆内慢外快双层扩散环（阶段3“炸场”一击） ——
+func _fire_nova() -> void:
+	var speed := NOVA_SPEED * _bullet_speed_mult()
+	var offset := randf_range(0.0, TAU / float(NOVA_COUNT))
+	for i in NOVA_COUNT:
+		var ang := offset + TAU * float(i) / float(NOVA_COUNT)
+		_spawn_bullet(Vector2.RIGHT.rotated(ang), speed)
+	var off2 := offset + PI / float(NOVA_COUNT)
+	for i in NOVA_COUNT:
+		var a2 := off2 + TAU * float(i) / float(NOVA_COUNT)
+		_spawn_bullet(Vector2.RIGHT.rotated(a2), speed * 1.5)
+	GameState.shake(0.2, 7.0)
 
 func _spawn_bullet(dir: Vector2, speed: float) -> void:
 	var b := BULLET.instantiate()
@@ -381,19 +465,19 @@ func _update_phase() -> void:
 			GameState.shake(0.4, 10.0)
 
 func _pattern_cooldown() -> float:
-	# 弹幕招式冷却减半 → 攻击频率翻倍
+	# 招式冷却进一步压缩 → 节奏更快、几乎无喘息
 	if _phase >= 3:
-		return 0.7
+		return 0.45
 	elif _phase >= 2:
-		return 1.05
-	return 1.5
+		return 0.7
+	return 1.0
 
 func _dash_cooldown() -> float:
 	if _phase >= 3:
-		return 4.5
+		return 3.6
 	elif _phase >= 2:
-		return 6.0
-	return 8.5
+		return 5.0
+	return 7.0
 
 func _bullet_speed_mult() -> float:
 	if _phase >= 3:
