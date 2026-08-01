@@ -69,6 +69,7 @@ var _points_pulse: float = 0.0
 var _taken: Dictionary = {}
 var _status_root: Control
 var _status_body: Label
+var _spend_prompt: Label
 var _levelup_avatar: TextureRect
 var _levelup_line: Label
 var _levelup_quote: PanelContainer
@@ -160,6 +161,13 @@ func _build_ui() -> void:
 	_set_offset(_points_lbl, 16, 58, 560, 86)
 	_points_lbl.visible = false
 	_root.add_child(_points_lbl)
+
+	# 醒目「可闭关突破」提示（居中偏下，脉冲发光，非阻塞，提醒可消耗造化点）
+	_spend_prompt = _make_label("", 30, Color("ffe6a0"), HORIZONTAL_ALIGNMENT_CENTER)
+	_set_anchor(_spend_prompt, 0.5, 0.60, 0.5, 0.60)
+	_set_offset(_spend_prompt, -380, -26, 380, 26)
+	_spend_prompt.visible = false
+	_root.add_child(_spend_prompt)
 
 	# 妖王名（关底 Boss 出现时显示）
 	_boss_name = _make_label("噬魂法王", 18, Color("ff8a7a"), HORIZONTAL_ALIGNMENT_CENTER)
@@ -368,9 +376,19 @@ func _process(delta: float) -> void:
 	if _levelup_root and _levelup_root.visible:
 		_ava_bob_t += delta
 		_apply_avatar_transform()
-	if _pending_points > 0 and _points_lbl.visible:
+	if _pending_points > 0:
 		_points_pulse += delta
-		_points_lbl.modulate.a = 0.72 + 0.28 * sin(_points_pulse * 5.0)
+		if _points_lbl.visible:
+			_points_lbl.modulate.a = 0.72 + 0.28 * sin(_points_pulse * 5.0)
+		var show_prompt := not _levelup_root.visible and not _status_root.visible
+		_spend_prompt.visible = show_prompt
+		if show_prompt:
+			var s := 1.0 + 0.06 * sin(_points_pulse * 4.0)
+			_spend_prompt.pivot_offset = _spend_prompt.size * 0.5
+			_spend_prompt.scale = Vector2(s, s)
+			_spend_prompt.modulate.a = 0.82 + 0.18 * sin(_points_pulse * 4.0)
+	elif _spend_prompt.visible:
+		_spend_prompt.visible = false
 	if (GameState.game_over or GameState.victory) and Input.is_action_just_pressed("restart"):
 		_restart()
 
@@ -768,9 +786,13 @@ func _update_points_label() -> void:
 	if _pending_points > 0:
 		_points_lbl.text = "造化点 ×%d · 按 [F] 闭关突破" % _pending_points
 		_points_lbl.visible = true
+		if _spend_prompt:
+			_spend_prompt.text = "【 按 F · 闭关突破 】造化点 ×%d" % _pending_points
 	else:
 		_points_lbl.visible = false
 		_points_lbl.modulate.a = 1.0
+		if _spend_prompt:
+			_spend_prompt.visible = false
 
 func _spawn_level_glow() -> void:
 	var p := _player()

@@ -27,7 +27,7 @@ var spirit_stones: int = 0
 var kills: int = 0
 var xp: int = 0
 var level: int = 1
-var xp_to_next: int = 20
+var xp_to_next: int = 16
 var elapsed: float = 0.0
 
 func _ready() -> void:
@@ -85,7 +85,7 @@ func add_xp(amount: int) -> void:
 	while xp >= xp_to_next:
 		xp -= xp_to_next
 		level += 1
-		xp_to_next = int(xp_to_next * 1.25) + 10
+		xp_to_next = int(xp_to_next * 1.16) + 8
 		leveled_up.emit(level)
 	xp_changed.emit(xp, xp_to_next, level)
 
@@ -93,7 +93,7 @@ func reset() -> void:
 	kills = 0
 	xp = 0
 	level = 1
-	xp_to_next = 20
+	xp_to_next = 16
 	elapsed = 0.0
 	game_over = false
 	victory = false
