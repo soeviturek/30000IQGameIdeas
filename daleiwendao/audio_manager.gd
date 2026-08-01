@@ -3,7 +3,7 @@ extends Node
 # 音源为程序化占位音（res://sfx/*.wav），后续可无痛替换为正式素材。
 
 const POOL_SIZE := 12
-const SFX_NAMES := ["attack", "hurt", "levelup", "kill", "victory", "defeat", "dash", "boss", "crit", "ascend", "brush"]
+const SFX_NAMES := ["attack", "hurt", "levelup", "kill", "victory", "defeat", "dash", "boss", "bossroar", "monster", "crit", "ascend", "brush"]
 
 var _players: Array[AudioStreamPlayer] = []
 var _next := 0
@@ -18,9 +18,19 @@ func _ready() -> void:
 		add_child(p)
 		_players.append(p)
 	for n in SFX_NAMES:
-		var path := "res://sfx/%s.wav" % n
-		if ResourceLoader.exists(path):
-			_streams[n] = load(path)
+		var stream = null
+		var wav_path := "res://sfx/%s.wav" % n
+		var mp3_path := "res://sfx/%s.mp3" % n
+		if ResourceLoader.exists(wav_path):
+			stream = load(wav_path)
+		elif ResourceLoader.exists(mp3_path):
+			stream = load(mp3_path)
+		if stream == null:
+			continue
+		var as_mp3 := stream as AudioStreamMP3
+		if as_mp3:
+			as_mp3.loop = false          # 叫声/血溅为一次性音效，禁止循环
+		_streams[n] = stream
 
 func play(sfx_name: String, volume_db: float = 0.0, pitch_var: float = 0.1) -> void:
 	if not _streams.has(sfx_name):

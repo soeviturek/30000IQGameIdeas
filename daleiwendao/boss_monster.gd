@@ -374,10 +374,10 @@ func _update_phase() -> void:
 		target = 2
 	if target > _phase:
 		_phase = target
+		# 狂暴阶段不再弹横幅（与"妖王降临"雷同、重复、多余）：只用震屏反馈
 		if _phase == 2:
-			_announce("妖王暴怒", Color(1, 0.4, 0.35))
+			GameState.shake(0.22, 6.0)
 		elif _phase == 3:
-			_announce("血魔现世！", Color(1, 0.22, 0.22))
 			GameState.shake(0.4, 10.0)
 
 func _pattern_cooldown() -> float:
@@ -401,11 +401,6 @@ func _bullet_speed_mult() -> float:
 	elif _phase >= 2:
 		return 1.12
 	return 1.0
-
-func _announce(text: String, color: Color) -> void:
-	var dir = get_tree().current_scene.get_node_or_null("MosnterSpawningPoint")
-	if dir and dir.has_signal("announce"):
-		dir.announce.emit(text, color)
 
 func die() -> void:
 	# 妖王陨落 = 通关：只记一次击杀 + 少量经验，随后进入通关结算

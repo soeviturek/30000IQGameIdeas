@@ -55,6 +55,7 @@ func _update_phase(e: float) -> void:
 			0: announce.emit("第一波 · 妖群袭来", COL_GOLD)
 			1: announce.emit("第二波 · 飞妖出没", COL_GOLD)
 			2: announce.emit("妖潮涌动 · 全力御敌", COL_RED)
+		Sfx.play("monster", -5.0, 0.06)   # 波次刷新时的妖物嘶吼
 
 func _spawn_one(e: float) -> void:
 	# 30秒前只出近战狗头人，之后混入远程飞妖
@@ -78,7 +79,7 @@ func _spawn_boss() -> void:
 			e.queue_free()
 	GameState.add_bonus_kills(cleared)
 	GameState.shake(0.5, 11.0)
-	Sfx.play("boss")
+	Sfx.play("bossroar", -2.0, 0.03)
 	announce.emit("妖王降临 · 噬魂法王", COL_RED)
 	var boss = BOSS_SCENE.instantiate()
 	get_tree().current_scene.add_child(boss)

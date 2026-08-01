@@ -464,9 +464,10 @@ func _on_kills_changed(kills: int) -> void:
 	_kills_lbl.text = "击杀 %d" % kills
 
 func _on_leveled_up(_level: int) -> void:
-	# 不再打断游戏：积攒造化点 + 升级光效，玩家自行按 F 闭关突破（升级音效已关闭）
+	# 不再打断游戏：积攒造化点 + 升级光效 + 升级音效，玩家自行按 F 闭关突破
 	_pending_points += 1
 	_spawn_level_glow()
+	Sfx.play("levelup", -3.0, 0.02)
 	_update_points_label()
 	_float_point_gain()
 
