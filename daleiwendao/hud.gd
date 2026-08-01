@@ -29,6 +29,8 @@ const UPGRADES := [
 	{"id": "heal", "name": "回春术", "rarity": "精良", "desc": "立即回复全部气血"},
 	{"id": "crit", "name": "杀机毕现", "rarity": "稀有", "desc": "暴击率 +8%"},
 	{"id": "crit_dmg", "name": "血溅七步", "rarity": "进化", "desc": "暴击伤害 +50%"},
+	{"id": "qi", "name": "惊鸿剑气·凝", "rarity": "精良", "desc": "剑气 +1 道 · 剑伤 +10%\n(满3道 + 符箓术 → 化虹)"},
+	{"id": "fulu", "name": "符箓术", "rarity": "稀有", "desc": "剑气附灵符\n(与惊鸿剑气凑齐则化虹)"},
 ]
 
 # 升级弹窗角色台词（阶段4）：随机角色 + 台词，强化"角色在教你变强"的陪伴感
@@ -567,6 +569,20 @@ func _add_mod(stat: int, mtype: int, val: float) -> void:
 	if p.has_method("_on_stats_changed"):
 		p._on_stats_changed()
 
+func _sword() -> Node:
+	var p := _player()
+	return p.get_node_or_null("SlashWeapon") if p else null
+
+func _sword_add_qi() -> void:
+	var w := _sword()
+	if w and w.has_method("add_qi_level"):
+		w.add_qi_level()
+
+func _sword_add_fulu() -> void:
+	var w := _sword()
+	if w and w.has_method("add_fulu"):
+		w.add_fulu()
+
 func _heal(amount: int) -> void:
 	var p := _player()
 	if p == null or p.health_bar == null:
@@ -597,6 +613,8 @@ func _apply_upgrade(id: String) -> void:
 		"aspd": _add_mod(Modifier.StatType.ATTACK_SPEED, Modifier.ModType.MUL, 0.12)
 		"crit": _add_mod(Modifier.StatType.CRIT_CHANCE, Modifier.ModType.ADD, 0.08)
 		"crit_dmg": _add_mod(Modifier.StatType.CRIT_DAMAGE, Modifier.ModType.ADD, 0.5)
+		"qi": _sword_add_qi()
+		"fulu": _sword_add_fulu()
 
 func _restart() -> void:
 	get_tree().paused = false
