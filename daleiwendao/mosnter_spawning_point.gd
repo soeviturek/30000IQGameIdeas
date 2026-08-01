@@ -8,9 +8,9 @@ signal announce(text: String, color: Color)
 const BOSS_SCENE := preload("res://boss_monster.tscn")
 
 # —— 时间线（秒）——
-const T_RANGED := 25.0   # 飞妖加入
-const T_SWARM := 50.0    # 妖潮
-const BOSS_TIME := 75.0  # 妖王降临
+const T_RANGED := 33.0   # 飞妖加入
+const T_SWARM := 66.0    # 妖潮
+const BOSS_TIME := 100.0 # 妖王降临
 
 const COL_GOLD := Color("f0d98c")
 const COL_RED := Color("ff6a5c")

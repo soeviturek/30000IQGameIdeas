@@ -4,7 +4,7 @@ extends MonsterBase
 @export var attack_range: float = 300.0
 @export var safe_range: float = 250.0
 @export var projectile_speed: float = 200.0
-@export var attack_cooldown: float = 2.5
+@export var attack_cooldown: float = 3.6
 @export var prediction_factor: float = 0.1
 
 var can_attack: bool = true
@@ -14,7 +14,7 @@ func _ready() -> void:
 	super._ready()
 	stats.init_character(
 		"FlyingDemon",
-		150.0,          # speed
+		110.0,          # speed（降低移速，更好拉扯）
 		1,              # type = enemy
 		80,             # hp
 		300,            # attack range

@@ -5,6 +5,8 @@ const COL_BG := Color(0, 0, 0, 0.38)
 const COL_GOLD := Color("f0d98c")
 const COL_TEXT := Color("eee0c8")
 
+const LEVEL_GLOW := preload("res://level_glow.gd")
+
 # 升级立绘基准偏移（呼吸浮动/划入在此基础上叠加）
 const AVA_L := 8.0
 const AVA_R := 0.0
@@ -59,8 +61,14 @@ var _victory_root: Control
 var _boss_bar: ProgressBar
 var _boss_name: Label
 var _banner_lbl: Label
-var _banner_time: float = 0.0
-var _pending_levelups: int = 0
+var _banner_ink: ColorRect
+var _banner_tween: Tween
+var _pending_points: int = 0
+var _points_lbl: Label
+var _points_pulse: float = 0.0
+var _taken: Dictionary = {}
+var _status_root: Control
+var _status_body: Label
 var _levelup_avatar: TextureRect
 var _levelup_line: Label
 var _levelup_quote: PanelContainer
@@ -141,10 +149,17 @@ func _build_ui() -> void:
 	_root.add_child(_xp_bar)
 
 	# 底部操作提示
-	var hint := _make_label("方向键 / WASD 移动 · 自动攻击 · 升级时按 1/2/3 或点击卡牌选择造化", 15, Color("a89ac8"), HORIZONTAL_ALIGNMENT_CENTER)
+	var hint := _make_label("方向键/WASD 移动 · 自动攻击 · 攒够造化点按 [F] 闭关突破 · [Tab] 查看道途状态", 15, Color("a89ac8"), HORIZONTAL_ALIGNMENT_CENTER)
 	_set_anchor(hint, 0, 1, 1, 1)
 	_set_offset(hint, 0, -34, 0, -10)
 	_root.add_child(hint)
+
+	# 造化点指示（积攒 → 按 F 闭关突破批量升级）
+	_points_lbl = _make_label("", 20, COL_GOLD, HORIZONTAL_ALIGNMENT_LEFT)
+	_set_anchor(_points_lbl, 0, 0, 0, 0)
+	_set_offset(_points_lbl, 16, 58, 560, 86)
+	_points_lbl.visible = false
+	_root.add_child(_points_lbl)
 
 	# 妖王名（关底 Boss 出现时显示）
 	_boss_name = _make_label("噬魂法王", 18, Color("ff8a7a"), HORIZONTAL_ALIGNMENT_CENTER)
@@ -164,7 +179,16 @@ func _build_ui() -> void:
 	_boss_bar.visible = false
 	_root.add_child(_boss_bar)
 
-	# 波次横幅（居中大字，淡出）
+	# 波次横幅：墨笔横扫 + 逐字写出（_show_banner 里以 tween 驱动，非阻塞）
+	_banner_ink = ColorRect.new()
+	_banner_ink.color = Color(0.04, 0.02, 0.06, 0.5)
+	_set_anchor(_banner_ink, 0.5, 0.30, 0.5, 0.30)
+	_set_offset(_banner_ink, -470, -30, 470, 34)
+	_banner_ink.pivot_offset = Vector2(470, 32)
+	_banner_ink.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_banner_ink.visible = false
+	_root.add_child(_banner_ink)
+
 	_banner_lbl = _make_label("", 46, COL_GOLD, HORIZONTAL_ALIGNMENT_CENTER)
 	_set_anchor(_banner_lbl, 0.5, 0.30, 0.5, 0.30)
 	_set_offset(_banner_lbl, -420, -40, 420, 40)
@@ -174,6 +198,7 @@ func _build_ui() -> void:
 	_build_levelup_panel()
 	_build_gameover_panel()
 	_build_victory_panel()
+	_build_status_panel()
 
 func _build_levelup_panel() -> void:
 	_levelup_root = Control.new()
@@ -343,11 +368,9 @@ func _process(delta: float) -> void:
 	if _levelup_root and _levelup_root.visible:
 		_ava_bob_t += delta
 		_apply_avatar_transform()
-	if _banner_time > 0.0:
-		_banner_time -= delta
-		_banner_lbl.modulate.a = clamp(_banner_time / 0.7, 0.0, 1.0)
-		if _banner_time <= 0.0:
-			_banner_lbl.visible = false
+	if _pending_points > 0 and _points_lbl.visible:
+		_points_pulse += delta
+		_points_lbl.modulate.a = 0.72 + 0.28 * sin(_points_pulse * 5.0)
 	if (GameState.game_over or GameState.victory) and Input.is_action_just_pressed("restart"):
 		_restart()
 
@@ -371,11 +394,39 @@ func _update_boss_bar() -> void:
 	_boss_name.visible = true
 
 func _show_banner(text: String, color: Color) -> void:
+	# 墨笔横扫 + 逐字写出，落笔回弹后停留淡出（非阻塞，不暂停游戏）
+	if _banner_tween and _banner_tween.is_valid():
+		_banner_tween.kill()
 	_banner_lbl.text = text
 	_banner_lbl.add_theme_color_override("font_color", color)
-	_banner_lbl.modulate.a = 1.0
-	_banner_time = 2.4
+	_banner_lbl.visible_ratio = 0.0
+	_banner_lbl.modulate = Color(1, 1, 1, 1)
+	_banner_lbl.pivot_offset = _banner_lbl.size * 0.5
+	_banner_lbl.scale = Vector2(1.08, 1.08)
 	_banner_lbl.visible = true
+	_banner_ink.color = Color(0.04, 0.02, 0.06, 0.55)
+	_banner_ink.scale = Vector2(0.0, 1.0)
+	_banner_ink.modulate = Color(1, 1, 1, 1)
+	_banner_ink.visible = true
+	Sfx.play("brush", -2.0, 0.05)
+	_banner_tween = create_tween()
+	_banner_tween.set_parallel(true)
+	# 墨迹刷开（从中心横扫）
+	_banner_tween.tween_property(_banner_ink, "scale:x", 1.0, 0.28) \
+		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	# 逐字写出（像被笔一划写出来）
+	_banner_tween.tween_property(_banner_lbl, "visible_ratio", 1.0, 0.42).set_delay(0.06)
+	# 落笔回弹
+	_banner_tween.tween_property(_banner_lbl, "scale", Vector2.ONE, 0.5).set_delay(0.06) \
+		.set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
+	# 停留后淡出
+	_banner_tween.tween_property(_banner_lbl, "modulate:a", 0.0, 0.55).set_delay(1.7)
+	_banner_tween.tween_property(_banner_ink, "modulate:a", 0.0, 0.55).set_delay(1.7)
+	_banner_tween.tween_callback(_hide_banner).set_delay(2.3)
+
+func _hide_banner() -> void:
+	_banner_lbl.visible = false
+	_banner_ink.visible = false
 
 func _on_stage_cleared(reward: int) -> void:
 	Sfx.play("victory")
@@ -395,10 +446,12 @@ func _on_kills_changed(kills: int) -> void:
 	_kills_lbl.text = "击杀 %d" % kills
 
 func _on_leveled_up(_level: int) -> void:
-	Sfx.play("levelup")
-	_pending_levelups += 1
-	if not _levelup_root.visible:
-		_show_next_choice()
+	# 不再打断游戏：积攒造化点 + 升级光效 + 唱诗吟唱，玩家自行按 F 闭关突破
+	_pending_points += 1
+	_spawn_level_glow()
+	Sfx.play("ascend", -1.0, 0.04)
+	_update_points_label()
+	_float_point_gain()
 
 func _on_game_over_changed(is_over: bool) -> void:
 	if is_over:
@@ -411,11 +464,13 @@ func _on_game_over_changed(is_over: bool) -> void:
 # ---------- 三选一逻辑 ----------
 
 func _show_next_choice() -> void:
-	if _pending_levelups <= 0:
+	if _pending_points <= 0:
 		_levelup_root.visible = false
 		get_tree().paused = false
+		_update_points_label()
 		return
-	_pending_levelups -= 1
+	_pending_points -= 1
+	_update_points_label()
 	for c in _cards_box.get_children():
 		c.queue_free()
 	var pool := UPGRADES.duplicate()
@@ -535,17 +590,35 @@ func _make_card(data: Dictionary, index: int) -> Control:
 	btn.custom_minimum_size = Vector2(100, 0)
 	btn.size_flags_vertical = Control.SIZE_FILL
 	btn.pressed.connect(_on_pick.bind(data.id))
+	btn.focus_mode = Control.FOCUS_NONE
 	hb.add_child(btn)
 	return panel
 
 func _input(event: InputEvent) -> void:
-	if not _levelup_root.visible:
+	var key := event as InputEventKey
+	if key == null or not key.pressed or key.echo:
 		return
-	if event is InputEventKey and event.pressed and not event.echo:
+	var kc := key.keycode
+	# Tab：切换「道途·状态」面板（战斗中、未结算、未开升级面板时）
+	if kc == KEY_TAB and not _levelup_root.visible and not GameState.game_over and not GameState.victory:
+		_toggle_status()
+		get_viewport().set_input_as_handled()
+		return
+	if _status_root.visible:
+		if kc == KEY_ESCAPE:
+			_toggle_status()
+		return
+	# F：闭关突破（攒够造化点、无弹窗时批量升级）
+	if kc == KEY_F and not _levelup_root.visible and _pending_points > 0 \
+			and not GameState.game_over and not GameState.victory:
+		_show_next_choice()
+		return
+	# 升级面板：1/2/3 选卡
+	if _levelup_root.visible:
 		var idx := -1
-		if event.keycode == KEY_1: idx = 0
-		elif event.keycode == KEY_2: idx = 1
-		elif event.keycode == KEY_3: idx = 2
+		if kc == KEY_1: idx = 0
+		elif kc == KEY_2: idx = 1
+		elif kc == KEY_3: idx = 2
 		if idx >= 0 and idx < _cards_box.get_child_count():
 			var card := _cards_box.get_child(idx)
 			var btn := card.get_child(0).get_child(card.get_child(0).get_child_count() - 1)
@@ -553,6 +626,7 @@ func _input(event: InputEvent) -> void:
 				btn.emit_signal("pressed")
 
 func _on_pick(upgrade_id: String) -> void:
+	_track_taken(upgrade_id)
 	_apply_upgrade(upgrade_id)
 	_show_next_choice()
 
@@ -621,7 +695,11 @@ func _restart() -> void:
 	_levelup_root.visible = false
 	_gameover_root.visible = false
 	_victory_root.visible = false
-	_pending_levelups = 0
+	_pending_points = 0
+	_taken.clear()
+	_update_points_label()
+	if _status_root:
+		_status_root.visible = false
 	GameState.reset()
 	get_tree().reload_current_scene()
 
@@ -681,3 +759,151 @@ func _set_offset(c: Control, l: float, t: float, r: float, b: float) -> void:
 	c.offset_top = t
 	c.offset_right = r
 	c.offset_bottom = b
+
+# ---------- 造化点 / 升级光效 / 状态面板 ----------
+
+func _update_points_label() -> void:
+	if _points_lbl == null:
+		return
+	if _pending_points > 0:
+		_points_lbl.text = "造化点 ×%d · 按 [F] 闭关突破" % _pending_points
+		_points_lbl.visible = true
+	else:
+		_points_lbl.visible = false
+		_points_lbl.modulate.a = 1.0
+
+func _spawn_level_glow() -> void:
+	var p := _player()
+	if p == null:
+		return
+	var scn := get_tree().current_scene
+	if scn == null:
+		return
+	var g = LEVEL_GLOW.new()
+	scn.add_child(g)
+	g.global_position = p.global_position
+
+func _float_point_gain() -> void:
+	var lbl := _make_label("+1 造化", 22, Color("ffe08a"), HORIZONTAL_ALIGNMENT_LEFT)
+	_set_anchor(lbl, 0, 0, 0, 0)
+	_set_offset(lbl, 26, 86, 320, 114)
+	_root.add_child(lbl)
+	var tw := create_tween()
+	tw.set_parallel(true)
+	tw.tween_property(lbl, "offset_top", 60.0, 0.75).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	tw.tween_property(lbl, "offset_bottom", 88.0, 0.75)
+	tw.tween_property(lbl, "modulate:a", 0.0, 0.75)
+	tw.chain().tween_callback(lbl.queue_free)
+
+func _track_taken(id: String) -> void:
+	var nm := id
+	for u in UPGRADES:
+		if u.id == id:
+			nm = u.name
+			break
+	_taken[nm] = int(_taken.get(nm, 0)) + 1
+
+func _toggle_status() -> void:
+	if _status_root == null:
+		return
+	if _status_root.visible:
+		_status_root.visible = false
+		get_tree().paused = false
+	else:
+		_refresh_status()
+		_status_root.visible = true
+		get_tree().paused = true
+
+func _build_status_panel() -> void:
+	_status_root = Control.new()
+	_status_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_status_root.visible = false
+	_root.add_child(_status_root)
+
+	var dim := ColorRect.new()
+	dim.color = Color(0.02, 0.02, 0.05, 0.80)
+	dim.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_status_root.add_child(dim)
+
+	var panel := PanelContainer.new()
+	panel.anchor_left = 0.5
+	panel.anchor_right = 0.5
+	panel.anchor_top = 0.5
+	panel.anchor_bottom = 0.5
+	panel.offset_left = -380
+	panel.offset_right = 380
+	panel.offset_top = -290
+	panel.offset_bottom = 290
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color("140f22")
+	sb.set_border_width_all(3)
+	sb.border_color = COL_GOLD
+	sb.set_corner_radius_all(16)
+	sb.set_content_margin_all(26)
+	panel.add_theme_stylebox_override("panel", sb)
+	_status_root.add_child(panel)
+
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 10)
+	panel.add_child(vb)
+
+	var title := _make_label("道 途 · 状 态", 34, COL_GOLD, HORIZONTAL_ALIGNMENT_CENTER)
+	vb.add_child(title)
+	var sub := _make_label("— 按 [Tab] / [Esc] 返回秘境 —", 15, Color("9a8ac0"), HORIZONTAL_ALIGNMENT_CENTER)
+	vb.add_child(sub)
+	var gap := Control.new()
+	gap.custom_minimum_size = Vector2(0, 6)
+	vb.add_child(gap)
+
+	_status_body = _make_label("", 19, COL_TEXT, HORIZONTAL_ALIGNMENT_LEFT)
+	_status_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_status_body.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	vb.add_child(_status_body)
+
+func _refresh_status() -> void:
+	if _status_body == null:
+		return
+	var lines: Array = []
+	var total := int(GameState.elapsed)
+	lines.append("【当前任务】第一章 · 幽篁秘境")
+	lines.append("　目标：坚守百息，剿灭妖王「噬魂法王」")
+	lines.append("　进度：%02d:%02d　·　斩妖 %d　·　道行 Lv.%d" % [total / 60, total % 60, GameState.kills, GameState.level])
+	lines.append("")
+	if _pending_points > 0:
+		lines.append("【造化点】×%d　未使用（按 [F] 闭关突破）" % _pending_points)
+	else:
+		lines.append("【造化点】暂无（升级后自动积攒）")
+	lines.append("")
+	var p := _player()
+	if p != null and p.stats != null:
+		var st = p.stats
+		lines.append("【本命属性】")
+		var rng: int = st.get_attack_range()
+		var sw := _sword()
+		if sw != null and sw.stats != null:
+			rng = sw.stats.get_final_range(st)
+		lines.append("　攻击 %d　·　攻速 ×%.2f　·　攻击范围 %d" % [st.get_attack_damage(), st.get_attack_speed(), rng])
+		lines.append("　移速 %d　·　气血上限 %d" % [int(st.get_move_speed()), st.get_max_health()])
+		lines.append("　暴击 %d%%　·　暴伤 ×%.2f" % [int(round(st.get_crit_chance() * 100.0)), st.get_crit_multiplier()])
+		lines.append("")
+	var w := _sword()
+	if w != null:
+		var evolved := bool(w.get("evolved"))
+		var qi := int(w.get("qi_level"))
+		var fulu := bool(w.get("has_fulu"))
+		var dao := "%d 道" % (8 if evolved else (1 + qi))
+		var evo_txt := ""
+		if evolved:
+			evo_txt = "已化虹 · 究极形态"
+		else:
+			evo_txt = "凝气 %d/3%s" % [qi, "　·　已得符箓" if fulu else ""]
+		lines.append("【惊鸿剑气】%s　·　%s" % [dao, evo_txt])
+		lines.append("")
+	if _taken.is_empty():
+		lines.append("【已选造化】尚未选择")
+	else:
+		lines.append("【已选造化】")
+		for k in _taken.keys():
+			lines.append("　· %s ×%d" % [k, int(_taken[k])])
+	_status_body.text = "\n".join(lines)
