@@ -20,27 +20,29 @@ const HAZARD_SPREAD := 380.0   # 地火围绕玩家散布半径
 const TELEGRAPH_TIME := 0.42
 const FIRE_TIME := 0.3
 const SPIRAL_TIME := 1.25
-const DASH_TELEGRAPH_TIME := 0.42   # 连段首击蓄力预警
-const DASH_TIME := 0.24
-const DASH_PAUSE_TIME := 0.26       # 连段间隙（含快闪再锁向）
+const DASH_TELEGRAPH_TIME := 0.85   # 连段首击蓄力预警（红色冲击走廊显形 ~1s）
+const DASH_TIME := 0.53             # 走廊长度 ÷ 冲刺速度（冲满整条走廊）
+const DASH_PAUSE_TIME := 0.55       # 连段间隙（重新锁向 + 重划走廊）
 const RECOVER_TIME := 0.5           # 连段收招硬直（玩家输出窗口）
 
-# —— 冲刺 ——
-const DASH_SPEED := 360.0
+# —— 冲刺（红色走廊预警 → 高速冲过，接触即伤） ——
+const DASH_SPEED := 1050.0
 const DASH_DAMAGE := 42
-const DASH_HIT_RANGE := 76.0
+const DASH_HIT_RANGE := 72.0        # 接触判定半径（约走廊半宽 + 余量）
 const DASH_PREDICT := 0.12
+const DASH_RANGE := 560.0           # 冲刺走廊长度（预警区）
+const DASH_WIDTH := 104.0           # 冲刺走廊宽度（显示与判定参照）
 
-# —— 弹幕 ——
-const RING_COUNT := 12
-const RING_SPEED := 195.0
-const FAN_COUNT := 5
+# —— 弹幕（更密更快） ——
+const RING_COUNT := 16
+const RING_SPEED := 255.0
+const FAN_COUNT := 7
 const FAN_SPREAD_DEG := 60.0
-const FAN_SPEED := 285.0
-const SPIRAL_SPEED := 150.0
-const SPIRAL_EMIT := 0.075          # 螺旋每股发射间隔
-const SPIRAL_ARMS := 2
-const SPIRAL_STEP := 0.32           # 每股旋转步进（弧度）
+const FAN_SPEED := 360.0
+const SPIRAL_SPEED := 205.0
+const SPIRAL_EMIT := 0.05           # 螺旋每股发射间隔（更密）
+const SPIRAL_ARMS := 3
+const SPIRAL_STEP := 0.30           # 每股旋转步进（弧度）
 const BULLET_DAMAGE := 16
 
 # —— 地火 ——
@@ -52,7 +54,7 @@ const HAZARD_DAMAGE := 16
 var can_attack: bool = true
 var _state: int = BossState.IDLE
 var _state_timer: float = 0.0
-var _pattern_cd: float = 1.6         # 首个招式 ~1.6s（开局即压迫）
+var _pattern_cd: float = 0.8         # 首个招式 ~0.8s（开局即压迫）
 var _dash_cd: float = 4.5            # 首次连突 ~4.5s
 var _dash_dir: Vector2 = Vector2.ZERO
 var _dash_hit_done: bool = false
@@ -291,6 +293,7 @@ func _enter_dash_combo() -> void:
 	_state = BossState.DASH_TELEGRAPH
 	_state_timer = DASH_TELEGRAPH_TIME
 	_relock_dash()
+	_spawn_dash_warning(DASH_TELEGRAPH_TIME)
 	var tw := create_tween()
 	tw.tween_property(animated_sprite, "modulate", Color(1, 0.55, 0.2), DASH_TELEGRAPH_TIME)
 	tw.parallel().tween_property(animated_sprite, "scale", _base_scale * 1.22, DASH_TELEGRAPH_TIME)
@@ -300,6 +303,7 @@ func _enter_dash_pause() -> void:
 	_state = BossState.DASH_PAUSE
 	_state_timer = DASH_PAUSE_TIME
 	_relock_dash()   # 连段追身：重新锁向玩家
+	_spawn_dash_warning(DASH_PAUSE_TIME)
 	var tw := create_tween()
 	tw.tween_property(animated_sprite, "modulate", Color(1, 0.55, 0.2), DASH_PAUSE_TIME * 0.8)
 
@@ -313,6 +317,12 @@ func _relock_dash() -> void:
 	if _dash_dir == Vector2.ZERO:
 		_dash_dir = Vector2.RIGHT
 	animated_sprite.flip_h = _dash_dir.x < 0
+
+func _spawn_dash_warning(warn: float) -> void:
+	# 沿锁定方向铺一条红色冲击走廊，蓄力期显形，冲刺瞬间随之消散
+	var w := DashWarning.new()
+	get_tree().current_scene.add_child(w)
+	w.setup(global_position, _dash_dir, DASH_RANGE, DASH_WIDTH, warn)
 
 func _begin_dash() -> void:
 	animated_sprite.modulate = Color.WHITE
@@ -365,17 +375,18 @@ func _update_phase() -> void:
 	if target > _phase:
 		_phase = target
 		if _phase == 2:
-			_announce("妖王暴怒 · 噬魂法王", Color(1, 0.4, 0.35))
+			_announce("妖王暴怒", Color(1, 0.4, 0.35))
 		elif _phase == 3:
-			_announce("噬魂法王 · 血魔现世！", Color(1, 0.22, 0.22))
+			_announce("血魔现世！", Color(1, 0.22, 0.22))
 			GameState.shake(0.4, 10.0)
 
 func _pattern_cooldown() -> float:
+	# 弹幕招式冷却减半 → 攻击频率翻倍
 	if _phase >= 3:
-		return 1.4
+		return 0.7
 	elif _phase >= 2:
-		return 2.1
-	return 3.0
+		return 1.05
+	return 1.5
 
 func _dash_cooldown() -> float:
 	if _phase >= 3:
