@@ -2,9 +2,17 @@ extends Node
 # 大雷问道 · 洞府永久进度（自动加载单例 "Meta"）
 #   局外无限成长：灵石银行 + 永久强化（每级更贵、效果线性叠加 → 永远有得买、越买越强）
 #   每次出关（胜/负皆有灵石入账）归来，都能在洞府继续精进 → 下一局更强 → 挣更多灵石
+#   境界脊柱：战斗掉「修为」跨局累积（永不清零，仅飞升重置），跨阈值 → 突破大境界（总闸+身份）
 #   存档：user://meta.save（ConfigFile，跨启动持久）
 
+signal realm_advanced(realm_index: int, realm_name: String)
+
 const SAVE_PATH := "user://meta.save"
+
+# 境界阶梯（身份脊柱）。修为为「闸门轨」：只推进境界，材料加速不了。
+# REALM_THRESH = 到达该境所需的累计修为（provisional，实现后按 §2 时间线校准；P1 只用前 3 境）。
+const REALMS := ["炼气", "筑基", "金丹", "元婴", "化神", "炼虚", "大乘", "飞升"]
+const REALM_THRESH := [0, 300, 900, 2200, 4800, 9000, 16000, 28000]
 
 # 永久强化目录。kind 决定出关时如何生效：
 #   maxhp / atk_mul / move_mul / crit_add  → 直接叠 Modifier
@@ -22,6 +30,8 @@ const UPGRADES := [
 
 var stones: int = 0
 var levels: Dictionary = {}
+var cultivation: int = 0   # 累计修为（闸门轨，永不清零）
+var realm: int = 0         # 当前大境界下标（0=炼气）
 
 func _ready() -> void:
 	load_game()
@@ -32,6 +42,9 @@ func load_game() -> void:
 	if cfg.load(SAVE_PATH) != OK:
 		return
 	stones = int(cfg.get_value("meta", "stones", 0))
+	cultivation = int(cfg.get_value("meta", "cultivation", 0))
+	realm = int(cfg.get_value("meta", "realm", 0))
+	realm = clampi(realm, 0, REALMS.size() - 1)
 	var saved = cfg.get_value("meta", "levels", {})
 	if saved is Dictionary:
 		for k in saved.keys():
@@ -40,11 +53,15 @@ func load_game() -> void:
 func save_game() -> void:
 	var cfg := ConfigFile.new()
 	cfg.set_value("meta", "stones", stones)
+	cfg.set_value("meta", "cultivation", cultivation)
+	cfg.set_value("meta", "realm", realm)
 	cfg.set_value("meta", "levels", levels)
 	cfg.save(SAVE_PATH)
 
 func reset_all() -> void:
 	stones = 0
+	cultivation = 0
+	realm = 0
 	levels.clear()
 	save_game()
 
@@ -88,6 +105,57 @@ func add_stones(n: int) -> void:
 		return
 	stones += n
 	save_game()
+
+# —— 境界 / 修为（闸门轨）——
+# 战斗中累积修为；跨阈值即当场突破大境界，逐境发 realm_advanced（供 HUD 演出 + 世界当场变）。
+func add_cultivation(n: int) -> int:
+	if n <= 0:
+		return 0
+	cultivation += n
+	var advanced := 0
+	while realm + 1 < REALMS.size() and cultivation >= REALM_THRESH[realm + 1]:
+		realm += 1
+		advanced += 1
+		realm_advanced.emit(realm, REALMS[realm])
+	if advanced > 0:
+		save_game()
+	return advanced
+
+func realm_name() -> String:
+	return REALMS[clampi(realm, 0, REALMS.size() - 1)]
+
+func realm_index() -> int:
+	return realm
+
+func is_max_realm() -> bool:
+	return realm + 1 >= REALMS.size()
+
+func next_realm_name() -> String:
+	if is_max_realm():
+		return ""
+	return REALMS[realm + 1]
+
+func next_realm_thresh() -> int:
+	if is_max_realm():
+		return REALM_THRESH[realm]
+	return REALM_THRESH[realm + 1]
+
+# 当前境界内已积攒的修为（用于进度条 "x / y"）
+func cultivation_in_realm() -> int:
+	return cultivation - REALM_THRESH[realm]
+
+func realm_span() -> int:
+	if is_max_realm():
+		return 0
+	return REALM_THRESH[realm + 1] - REALM_THRESH[realm]
+
+func realm_progress() -> float:
+	if is_max_realm():
+		return 1.0
+	var span := realm_span()
+	if span <= 0:
+		return 1.0
+	return clampf(float(cultivation_in_realm()) / float(span), 0.0, 1.0)
 
 # —— 出关时生效 ——
 func _total(id: String) -> float:

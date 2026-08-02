@@ -69,6 +69,7 @@ func win_stage() -> void:
 	var reward := int((300 + kills * 5 + level * 20) * _stone_mult())
 	spirit_stones = reward
 	_bank(reward)
+	_flush_meta()
 	victory = true
 	stage_cleared.emit(spirit_stones)
 
@@ -77,6 +78,7 @@ func _end_defeat() -> void:
 	var reward := int((80 + kills * 3 + level * 10) * _stone_mult())
 	spirit_stones = reward
 	_bank(reward)
+	_flush_meta()
 
 func _stone_mult() -> float:
 	if has_node("/root/Meta"):
@@ -87,10 +89,21 @@ func _bank(amount: int) -> void:
 	if has_node("/root/Meta"):
 		get_node("/root/Meta").add_stones(amount)
 
+# 修为脊柱：每次斩妖同时累积「修为」（跨局永久，推进境界）。妖王 xp 高 → 修为多。
+func _gain_cultivation(xp_value: int) -> void:
+	if has_node("/root/Meta"):
+		get_node("/root/Meta").add_cultivation(max(2, int(xp_value * 0.4)))
+
+# 出关落盘：把本局累积的修为/境界写入存档（银行结算已顺带存档，这里兜底一次）
+func _flush_meta() -> void:
+	if has_node("/root/Meta"):
+		get_node("/root/Meta").save_game()
+
 func add_kill(xp_value: int) -> void:
 	kills += 1
 	kills_changed.emit(kills)
 	add_xp(max(xp_value, 5))
+	_gain_cultivation(xp_value)
 
 # 妖王清场补偿：被清掉的杂鱼折算成战功（计入 kills → 最终灵石），不触发升级刷屏
 func add_bonus_kills(n: int) -> void:

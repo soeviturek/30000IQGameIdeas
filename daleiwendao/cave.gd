@@ -10,6 +10,9 @@ const COL_STONE := Color("bfe8ff")
 
 var _meta: Node
 var _stone_lbl: Label
+var _realm_lbl: Label
+var _cult_bar: ProgressBar
+var _cult_lbl: Label
 var _rows: Array = []
 
 func _ready() -> void:
@@ -61,6 +64,8 @@ func _build() -> void:
 
 	col.add_child(_label("消耗灵石永久精进 · 每次出关归来皆有所得 · 道行无止境", 16, COL_DIM, HORIZONTAL_ALIGNMENT_LEFT))
 
+	col.add_child(_build_realm_panel())
+
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -86,6 +91,59 @@ func _build() -> void:
 
 	_refresh()
 	go.grab_focus()
+
+func _build_realm_panel() -> Control:
+	var panel := PanelContainer.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.14, 0.10, 0.05, 0.80)
+	sb.set_border_width_all(1)
+	sb.border_color = Color(0.62, 0.52, 0.28, 0.75)
+	sb.set_corner_radius_all(8)
+	sb.set_content_margin_all(12)
+	panel.add_theme_stylebox_override("panel", sb)
+
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 6)
+	panel.add_child(vb)
+
+	var top := HBoxContainer.new()
+	top.add_theme_constant_override("separation", 14)
+	vb.add_child(top)
+	top.add_child(_label("境 界", 20, COL_DIM, HORIZONTAL_ALIGNMENT_LEFT))
+	_realm_lbl = _label("", 30, COL_GOLD, HORIZONTAL_ALIGNMENT_LEFT)
+	top.add_child(_realm_lbl)
+	var sp := Control.new()
+	sp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	top.add_child(sp)
+	_cult_lbl = _label("", 18, COL_STONE, HORIZONTAL_ALIGNMENT_RIGHT)
+	top.add_child(_cult_lbl)
+
+	_cult_bar = ProgressBar.new()
+	_cult_bar.show_percentage = false
+	_cult_bar.custom_minimum_size = Vector2(0, 14)
+	_cult_bar.max_value = 1.0
+	var bg := StyleBoxFlat.new()
+	bg.bg_color = Color(0.08, 0.06, 0.03, 0.9)
+	bg.set_corner_radius_all(6)
+	var fg := StyleBoxFlat.new()
+	fg.bg_color = COL_GOLD
+	fg.set_corner_radius_all(6)
+	_cult_bar.add_theme_stylebox_override("background", bg)
+	_cult_bar.add_theme_stylebox_override("fill", fg)
+	vb.add_child(_cult_bar)
+
+	return panel
+
+func _refresh_realm() -> void:
+	if _meta == null or _realm_lbl == null:
+		return
+	_realm_lbl.text = "%s境" % str(_meta.realm_name())
+	_cult_bar.value = float(_meta.realm_progress())
+	if bool(_meta.is_max_realm()):
+		_cult_lbl.text = "修为 %d · 已臻绝巅" % int(_meta.cultivation)
+	else:
+		_cult_lbl.text = "修为 %d / %d → %s" % [
+			int(_meta.cultivation_in_realm()), int(_meta.realm_span()), str(_meta.next_realm_name())]
 
 func _make_row(u: Dictionary) -> Control:
 	var panel := PanelContainer.new()
@@ -122,6 +180,7 @@ func _refresh() -> void:
 	if _meta == null:
 		return
 	_stone_lbl.text = "灵石 ×%d" % int(_meta.stones)
+	_refresh_realm()
 	for r in _rows:
 		var id := str(r["id"])
 		r["name_lbl"].text = "%s  Lv.%d" % [str(r["name"]), int(_meta.get_level(id))]

@@ -76,6 +76,7 @@ var _levelup_quote: PanelContainer
 var _ava_slide: float = 0.0      # 1=完全滑出屏幕左侧，0=归位
 var _ava_bob_t: float = 0.0      # 呼吸浮动计时
 var _ava_tween: Tween
+var _realm_chapter_lbl: Label   # 顶栏「章节 · 境界」，突破时刷新
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -88,6 +89,8 @@ func _ready() -> void:
 	_on_xp_changed(GameState.xp, GameState.xp_to_next, GameState.level)
 	_on_kills_changed(GameState.kills)
 	_grant_meta_start()
+	if has_node("/root/Meta"):
+		get_node("/root/Meta").realm_advanced.connect(_on_realm_advanced)
 	call_deferred("_connect_director")
 
 # 洞府「造化」永久强化：出关起手即赠若干造化点
@@ -103,6 +106,27 @@ func _connect_director() -> void:
 	var dir = get_tree().current_scene.get_node_or_null("MosnterSpawningPoint")
 	if dir and dir.has_signal("announce"):
 		dir.announce.connect(_show_banner)
+
+# 顶栏文案：章节 · 当前境界（突破时刷新，让「变强」在世界里留下痕迹）
+func _chapter_text() -> String:
+	var r := "炼气"
+	if has_node("/root/Meta"):
+		r = str(get_node("/root/Meta").realm_name())
+	return "第一章 · 幽篁秘境　·　%s境" % r
+
+# 当场突破大境界：墨笔横幅 + 吟唱音效 + 震屏（W2 将挂接「世界当场变」）
+func _on_realm_advanced(_realm_index: int, realm_name: String) -> void:
+	if is_instance_valid(_realm_chapter_lbl):
+		_realm_chapter_lbl.text = _chapter_text()
+	var spaced := ""
+	for i in realm_name.length():
+		spaced += realm_name[i]
+		if i < realm_name.length() - 1:
+			spaced += " "
+	_show_banner("突 破 · %s 境" % spaced, COL_GOLD)
+	if has_node("/root/Sfx"):
+		get_node("/root/Sfx").play("ascend", 0.0, 0.0)
+	GameState.shake(0.5, 12.0)
 
 func _build_ui() -> void:
 	var theme := Theme.new()
@@ -125,11 +149,11 @@ func _build_ui() -> void:
 	strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_root.add_child(strip)
 
-	# 章节（左）
-	var chapter := _make_label("第一章 · 幽篁秘境", 20, COL_GOLD, HORIZONTAL_ALIGNMENT_LEFT)
-	_set_anchor(chapter, 0, 0, 0, 0)
-	_set_offset(chapter, 16, 12, 420, 44)
-	_root.add_child(chapter)
+	# 章节 + 境界（左）
+	_realm_chapter_lbl = _make_label(_chapter_text(), 20, COL_GOLD, HORIZONTAL_ALIGNMENT_LEFT)
+	_set_anchor(_realm_chapter_lbl, 0, 0, 0, 0)
+	_set_offset(_realm_chapter_lbl, 16, 12, 480, 44)
+	_root.add_child(_realm_chapter_lbl)
 
 	# 计时（中）
 	_timer_lbl = _make_label("00:00", 30, Color.WHITE, HORIZONTAL_ALIGNMENT_CENTER)
