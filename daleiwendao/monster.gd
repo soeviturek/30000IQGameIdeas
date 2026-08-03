@@ -88,7 +88,7 @@ func take_damage(damage: int, attacker_position: Vector2, is_crit: bool = false)
 
 func die() -> void:
 	if not GameState.game_over:
-		GameState.add_kill(stats.get_loot_drop())
+		GameState.add_kill(stats.get_loot_drop(), threat_priority)
 	Sfx.play("kill", -8.0)
 	if _last_hit_was_crit:
 		BloodBurst.spawn_gib(get_tree().current_scene, global_position, _last_hit_dir)

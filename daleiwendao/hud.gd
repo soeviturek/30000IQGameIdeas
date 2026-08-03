@@ -21,17 +21,17 @@ const RARITY_COLORS := {
 	"进化": Color("f0c040"),
 }
 const UPGRADES := [
-	{"id": "atk", "name": "惊鸿剑气", "rarity": "精良", "desc": "攻击力 +8"},
-	{"id": "atk_mul", "name": "杀伐果决", "rarity": "稀有", "desc": "攻击力 +15%"},
-	{"id": "atk_big", "name": "雷剑真解", "rarity": "进化", "desc": "攻击力 +20%\n攻击范围 +40"},
-	{"id": "aspd", "name": "追风诀", "rarity": "稀有", "desc": "攻击冷却 -12%"},
-	{"id": "spd", "name": "疾风步", "rarity": "精良", "desc": "移动速度 +12%"},
-	{"id": "hp", "name": "罡气护体", "rarity": "精良", "desc": "气血上限 +40\n并立即回复"},
-	{"id": "range", "name": "千里追魂", "rarity": "精良", "desc": "攻击范围 +60"},
+	{"id": "atk", "name": "惊鸿剑气", "rarity": "精良", "desc": "攻击力 +6"},
+	{"id": "atk_mul", "name": "杀伐果决", "rarity": "稀有", "desc": "攻击力 +8%"},
+	{"id": "atk_big", "name": "雷剑真解", "rarity": "进化", "desc": "攻击力 +12%\n攻击范围 +30"},
+	{"id": "aspd", "name": "追风诀", "rarity": "稀有", "desc": "攻击冷却 -8%"},
+	{"id": "spd", "name": "疾风步", "rarity": "精良", "desc": "移动速度 +8%"},
+	{"id": "hp", "name": "罡气护体", "rarity": "精良", "desc": "气血上限 +35\n并立即回复"},
+	{"id": "range", "name": "千里追魂", "rarity": "精良", "desc": "攻击范围 +45"},
 	{"id": "heal", "name": "回春术", "rarity": "精良", "desc": "立即回复全部气血"},
-	{"id": "crit", "name": "杀机毕现", "rarity": "稀有", "desc": "暴击率 +8%"},
-	{"id": "crit_dmg", "name": "血溅七步", "rarity": "进化", "desc": "暴击伤害 +50%"},
-	{"id": "qi", "name": "惊鸿剑气·凝", "rarity": "精良", "desc": "剑气 +1 道 · 剑伤 +10%\n(满3道 + 符箓术 → 化虹)"},
+	{"id": "crit", "name": "杀机毕现", "rarity": "稀有", "desc": "暴击率 +5%"},
+	{"id": "crit_dmg", "name": "血溅七步", "rarity": "进化", "desc": "暴击伤害 +30%"},
+	{"id": "qi", "name": "惊鸿剑气·凝", "rarity": "精良", "desc": "凝聚剑气 · 剑伤 +5%\n(每2层多1道 · 满6层+符箓 → 化虹)"},
 	{"id": "fulu", "name": "符箓术", "rarity": "稀有", "desc": "剑气附灵符\n(与惊鸿剑气凑齐则化虹)"},
 ]
 
@@ -767,20 +767,20 @@ func _scale_cooldown(_mult: float) -> void:
 
 func _apply_upgrade(id: String) -> void:
 	match id:
-		"atk": _add_mod(Modifier.StatType.ATTACK_DAMAGE, Modifier.ModType.ADD, 8)
-		"atk_mul": _add_mod(Modifier.StatType.ATTACK_DAMAGE, Modifier.ModType.MUL, 0.15)
+		"atk": _add_mod(Modifier.StatType.ATTACK_DAMAGE, Modifier.ModType.ADD, 6)
+		"atk_mul": _add_mod(Modifier.StatType.ATTACK_DAMAGE, Modifier.ModType.MUL, 0.08)
 		"atk_big":
-			_add_mod(Modifier.StatType.ATTACK_DAMAGE, Modifier.ModType.MUL, 0.20)
-			_add_mod(Modifier.StatType.ATTACK_RANGE, Modifier.ModType.ADD, 40)
-		"spd": _add_mod(Modifier.StatType.MOVE_SPEED, Modifier.ModType.MUL, 0.12)
-		"range": _add_mod(Modifier.StatType.ATTACK_RANGE, Modifier.ModType.ADD, 60)
+			_add_mod(Modifier.StatType.ATTACK_DAMAGE, Modifier.ModType.MUL, 0.12)
+			_add_mod(Modifier.StatType.ATTACK_RANGE, Modifier.ModType.ADD, 30)
+		"spd": _add_mod(Modifier.StatType.MOVE_SPEED, Modifier.ModType.MUL, 0.08)
+		"range": _add_mod(Modifier.StatType.ATTACK_RANGE, Modifier.ModType.ADD, 45)
 		"hp":
-			_add_mod(Modifier.StatType.MAX_HEALTH, Modifier.ModType.ADD, 40)
-			_heal(40)
+			_add_mod(Modifier.StatType.MAX_HEALTH, Modifier.ModType.ADD, 35)
+			_heal(35)
 		"heal": _heal(-1)
-		"aspd": _add_mod(Modifier.StatType.ATTACK_SPEED, Modifier.ModType.MUL, 0.12)
-		"crit": _add_mod(Modifier.StatType.CRIT_CHANCE, Modifier.ModType.ADD, 0.08)
-		"crit_dmg": _add_mod(Modifier.StatType.CRIT_DAMAGE, Modifier.ModType.ADD, 0.5)
+		"aspd": _add_mod(Modifier.StatType.ATTACK_SPEED, Modifier.ModType.MUL, 0.08)
+		"crit": _add_mod(Modifier.StatType.CRIT_CHANCE, Modifier.ModType.ADD, 0.05)
+		"crit_dmg": _add_mod(Modifier.StatType.CRIT_DAMAGE, Modifier.ModType.ADD, 0.3)
 		"qi": _sword_add_qi()
 		"fulu": _sword_add_fulu()
 

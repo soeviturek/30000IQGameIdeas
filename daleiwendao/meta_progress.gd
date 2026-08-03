@@ -25,7 +25,7 @@ const UPGRADES := [
 	{"id": "shen_shi", "name": "神识", "kind": "crit_add", "desc": "每级 +2% 暴击率", "per": 0.02, "base_cost": 100, "growth": 1.33, "max": 25},
 	{"id": "lian_cai", "name": "敛财", "kind": "stones_mul", "desc": "每级 +10% 灵石获取", "per": 0.10, "base_cost": 120, "growth": 1.30, "max": 0},
 	{"id": "zao_hua", "name": "造化", "kind": "start_points", "desc": "每级 出关起手 +1 造化点", "per": 1.0, "base_cost": 150, "growth": 1.6, "max": 8},
-	{"id": "jian_tai", "name": "剑胎", "kind": "start_qi", "desc": "每级 出关起手 +1 层惊鸿剑气", "per": 1.0, "base_cost": 220, "growth": 1.9, "max": 3},
+	{"id": "jian_tai", "name": "剑胎", "kind": "start_qi", "desc": "出关起手 +1 层惊鸿剑气", "per": 1.0, "base_cost": 220, "growth": 1.9, "max": 1},
 ]
 
 var stones: int = 0

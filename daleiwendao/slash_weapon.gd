@@ -9,8 +9,9 @@ class_name SlashWeapon
 const QI_SPAWN_FORWARD := 40.0
 
 # —— 法宝进化：惊鸿剑气 →（集齐符箓术）→ 剑气化虹 ——
-const QI_MAX_LEVEL := 3
-var qi_level: int = 0        # 惊鸿剑气·凝 层数：每层 +1 道剑气 & +10% 剑伤
+const QI_MAX_LEVEL := 8      # 剑气圆满层数（每 2 层多 1 道，每层 +5% 剑伤）
+const QI_EVOLVE_LEVEL := 6   # 化虹门槛：≥6 层 且 集齐符箓术
+var qi_level: int = 0        # 惊鸿剑气·凝 层数
 var has_fulu: bool = false   # 是否已得符箓术
 var evolved: bool = false    # 剑气化虹（究极形态）
 
@@ -26,7 +27,7 @@ func _ready() -> void:
 
 # —— 造化接口（升级时由 HUD 调用）——
 func add_qi_level() -> void:
-	qi_level += 1
+	qi_level = mini(qi_level + 1, QI_MAX_LEVEL)
 	_try_evolve()
 
 func add_fulu() -> void:
@@ -34,7 +35,7 @@ func add_fulu() -> void:
 	_try_evolve()
 
 func _try_evolve() -> void:
-	if not evolved and qi_level >= QI_MAX_LEVEL and has_fulu:
+	if not evolved and qi_level >= QI_EVOLVE_LEVEL and has_fulu:
 		_evolve()
 
 func _evolve() -> void:
@@ -47,7 +48,7 @@ func _range_bonus() -> float:
 	return 80.0 if evolved else 0.0
 
 func _dmg_mult() -> float:
-	return (1.35 if evolved else 1.0) * (1.0 + 0.10 * float(qi_level))
+	return (1.25 if evolved else 1.0) * (1.0 + 0.05 * float(qi_level))
 
 func _can_perform_attack() -> bool:
 	return not slashing
@@ -85,8 +86,8 @@ func _spawn_sword_qi(target: Node2D) -> void:
 		for i in n:
 			_spawn_one_qi(dir + TAU * float(i) / float(n), true)
 	else:
-		# 惊鸿剑气：朝目标扇形，道数随凝气层数 (1 + qi_level)
-		var count := 1 + qi_level
+		# 惊鸿剑气：朝目标扇形，道数每 2 层凝气 +1（1 + qi/2）
+		var count := 1 + int(qi_level / 2)
 		var spread := deg_to_rad(16.0)
 		for i in count:
 			var off := (float(i) - float(count - 1) * 0.5) * spread

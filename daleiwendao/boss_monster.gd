@@ -489,6 +489,6 @@ func _bullet_speed_mult() -> float:
 func die() -> void:
 	# 妖王陨落 = 通关：只记一次击杀 + 少量经验，随后进入通关结算
 	if not GameState.game_over and not GameState.victory:
-		GameState.add_kill(30)
+		GameState.add_kill(30, 2)
 		GameState.win_stage()
 	queue_free()

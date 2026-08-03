@@ -10,7 +10,8 @@ const BOSS_SCENE := preload("res://boss_monster.tscn")
 # —— 时间线（秒）——
 const T_RANGED := 33.0   # 飞妖加入
 const T_SWARM := 66.0    # 妖潮
-const BOSS_TIME := 100.0 # 妖王降临
+const BOSS_TIME := 100.0 # 妖王降临（到点后停刷，肃清余孽方降临）
+const BOSS_FORCE_DELAY := 25.0 # 到点后最多再等这么久仍未清场 → 强制降临（兜底防卡死）
 
 const COL_GOLD := Color("f0d98c")
 const COL_RED := Color("ff6a5c")
@@ -18,6 +19,7 @@ const COL_RED := Color("ff6a5c")
 var _accum: float = 0.0
 var _phase: int = -1
 var _boss_spawned: bool = false
+var _boss_pending: bool = false   # 已到时间：停止刷怪，等待玩家清场
 
 func _process(delta: float) -> void:
 	if GameState.game_over or GameState.victory:
@@ -25,11 +27,16 @@ func _process(delta: float) -> void:
 	var e: float = GameState.elapsed
 	_update_phase(e)
 
-	# 妖王降临：停常规刷怪，生成 Boss
-	if not _boss_spawned and e >= BOSS_TIME:
-		_spawn_boss()
-		return
+	# 妖王降临：到点先停常规刷怪，肃清余孽后妖王方降临；超时则强制（兜底防卡死）
 	if _boss_spawned:
+		return
+	if e >= BOSS_TIME:
+		if not _boss_pending:
+			_boss_pending = true
+			announce.emit("妖气汇聚 · 肃清余孽，妖王将临", COL_RED)
+			Sfx.play("monster", -3.0, 0.03)
+		if _living_enemy_count() == 0 or e >= BOSS_TIME + BOSS_FORCE_DELAY:
+			_spawn_boss()
 		return
 	if monsters_to_spawn.is_empty():
 		return
@@ -69,6 +76,13 @@ func _spawn_one(e: float) -> void:
 	_apply_scaling(monster)
 	monster.add_to_group("Enemy")
 	monster.global_position = _pick_spawn_pos()
+
+func _living_enemy_count() -> int:
+	var n := 0
+	for x in get_tree().get_nodes_in_group("Enemy"):
+		if is_instance_valid(x):
+			n += 1
+	return n
 
 func _spawn_boss() -> void:
 	_boss_spawned = true
