@@ -9,8 +9,8 @@ class_name SlashWeapon
 const QI_SPAWN_FORWARD := 40.0
 
 # —— 法宝进化：惊鸿剑气 →（集齐符箓术）→ 剑气化虹 ——
-const QI_MAX_LEVEL := 5      # 剑气圆满层数（0→5 即化虹；玩家记住的是"化虹"而非第几层）
-const QI_EVOLVE_LEVEL := 5   # 化虹门槛：满 5 层 且 集齐符箓术
+const QI_MAX_LEVEL := 12     # 剑气全程成长：整局都在长，每级多一道剑（一局内很难满）
+const QI_EVOLVE_LEVEL := 5   # 化虹＝中段质变高光（满 5 层 且 集齐符箓术）；化虹后道数继续增长
 var qi_level: int = 0        # 惊鸿剑气·凝 层数
 var has_fulu: bool = false   # 是否已得符箓术
 var evolved: bool = false    # 剑气化虹（究极形态）
@@ -48,7 +48,7 @@ func _range_bonus() -> float:
 	return 80.0 if evolved else 0.0
 
 func _dmg_mult() -> float:
-	return (1.25 if evolved else 1.0) * (1.0 + 0.05 * float(qi_level))
+	return (1.25 if evolved else 1.0) * (1.0 + 0.04 * float(qi_level))
 
 func _can_perform_attack() -> bool:
 	return not slashing
@@ -76,19 +76,24 @@ func _start_attack(attack_data: Dictionary, target: Node2D) -> void:
 			var roll := _roll_damage(base_dmg)
 			enemy.take_damage(roll.damage, global_position, roll.crit)
 
+# 道数：每级凝气 +1 把剑（1→13）。这是"又多一把剑"的爽点来源（纯表现，伤害走近战 AoE）。
+func _dao_count() -> int:
+	return 1 + qi_level
+
 func _spawn_sword_qi(target: Node2D) -> void:
 	if sword_qi_scene == null or target == null:
 		return
 	var dir := (target.global_position - global_position).angle()
+	var count := _dao_count()
 	if evolved:
-		# 剑气化虹：八方环绕
-		var n := 8
-		for i in n:
-			_spawn_one_qi(dir + TAU * float(i) / float(n), true)
+		# 剑气化虹：环绕全场，道数随成长继续增多（万剑归宗雏形）
+		for i in count:
+			_spawn_one_qi(dir + TAU * float(i) / float(count), true)
 	else:
-		# 惊鸿剑气：朝目标扇形，道数每 2 层凝气 +1（1 + qi/2）
-		var count := 1 + int(qi_level / 2)
+		# 惊鸿剑气：朝目标扇形；道数越多扇面越密，总张角封顶 ~120°
 		var spread := deg_to_rad(16.0)
+		if spread * float(count - 1) > deg_to_rad(120.0):
+			spread = deg_to_rad(120.0) / float(max(count - 1, 1))
 		for i in count:
 			var off := (float(i) - float(count - 1) * 0.5) * spread
 			_spawn_one_qi(dir + off, false)
