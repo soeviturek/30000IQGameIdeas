@@ -13,6 +13,8 @@ var _stone_lbl: Label
 var _realm_lbl: Label
 var _cult_bar: ProgressBar
 var _cult_lbl: Label
+var _danger_choice_lbl: Label
+var _danger_effect_lbl: Label
 var _rows: Array = []
 
 func _ready() -> void:
@@ -81,6 +83,7 @@ func _build() -> void:
 	var footer := HBoxContainer.new()
 	footer.add_theme_constant_override("separation", 20)
 	footer.alignment = BoxContainer.ALIGNMENT_CENTER
+	col.add_child(_build_danger_panel())
 	col.add_child(footer)
 	var go := _menu_button("出 关 挑 战", 260)
 	go.pressed.connect(_on_challenge)
@@ -145,6 +148,70 @@ func _refresh_realm() -> void:
 		_cult_lbl.text = "修为 %d / %d → %s" % [
 			int(_meta.cultivation_in_realm()), int(_meta.realm_span()), str(_meta.next_realm_name())]
 
+func _build_danger_panel() -> Control:
+	var panel := PanelContainer.new()
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.16, 0.06, 0.06, 0.80)
+	sb.set_border_width_all(1)
+	sb.border_color = Color(0.72, 0.34, 0.30, 0.78)
+	sb.set_corner_radius_all(8)
+	sb.set_content_margin_all(12)
+	panel.add_theme_stylebox_override("panel", sb)
+
+	var vb := VBoxContainer.new()
+	vb.add_theme_constant_override("separation", 6)
+	panel.add_child(vb)
+
+	var top := HBoxContainer.new()
+	top.add_theme_constant_override("separation", 14)
+	vb.add_child(top)
+	top.add_child(_label("险 地", 20, COL_DIM, HORIZONTAL_ALIGNMENT_LEFT))
+	var minus := _menu_button("降 险", 120)
+	minus.pressed.connect(_on_danger_adjust.bind(-1))
+	top.add_child(minus)
+	_danger_choice_lbl = _label("", 26, COL_GOLD, HORIZONTAL_ALIGNMENT_CENTER)
+	_danger_choice_lbl.custom_minimum_size = Vector2(180, 0)
+	top.add_child(_danger_choice_lbl)
+	var plus := _menu_button("升 险", 120)
+	plus.pressed.connect(_on_danger_adjust.bind(1))
+	top.add_child(plus)
+	var sp := Control.new()
+	sp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	top.add_child(sp)
+	_danger_effect_lbl = _label("", 18, COL_STONE, HORIZONTAL_ALIGNMENT_RIGHT)
+	top.add_child(_danger_effect_lbl)
+
+	vb.add_child(_label("出关前择险地：越险，妖物越凶横、收获越丰；示弱则妖弱，境界馈赠不减", 15, COL_DIM, HORIZONTAL_ALIGNMENT_LEFT))
+	return panel
+
+func _refresh_danger() -> void:
+	if _danger_choice_lbl == null:
+		return
+	var d: int = GameState.danger_tier
+	var realm := 0
+	if _meta:
+		realm = int(_meta.realm_index())
+	var txt := ""
+	var col := COL_TEXT
+	if d > 0:
+		txt = "＋%d 凶险" % d
+		col = Difficulty.tier_color(clampi(d + 1, 0, 7))
+	elif d < 0:
+		txt = "%d 留情" % d
+		col = Color("7fb0e0")
+	else:
+		txt = "寻常"
+	_danger_choice_lbl.text = txt
+	_danger_choice_lbl.add_theme_color_override("font_color", col)
+	_danger_effect_lbl.text = "妖物 ×%.1f 强 · 收获 ×%.1f" % [Difficulty.hp_mult(realm, d), Difficulty.loot_mult(realm, d)]
+
+func _on_danger_adjust(delta: int) -> void:
+	if GameState.adjust_danger(delta):
+		Sfx.play("attack", -9.0)
+	else:
+		Sfx.play("hurt", -10.0)
+	_refresh_danger()
+
 func _make_row(u: Dictionary) -> Control:
 	var panel := PanelContainer.new()
 	var sb := StyleBoxFlat.new()
@@ -181,6 +248,7 @@ func _refresh() -> void:
 		return
 	_stone_lbl.text = "灵石 ×%d" % int(_meta.stones)
 	_refresh_realm()
+	_refresh_danger()
 	for r in _rows:
 		var id := str(r["id"])
 		r["name_lbl"].text = "%s  Lv.%d" % [str(r["name"]), int(_meta.get_level(id))]

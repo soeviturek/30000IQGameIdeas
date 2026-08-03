@@ -221,7 +221,7 @@ func _build_ui() -> void:
 	_root.add_child(_xp_bar)
 
 	# 底部操作提示
-	var hint := _make_label("方向键/WASD 移动 · 自动攻击 · 攒够造化点按 [F] 闭关突破 · [Tab] 查看道途状态 · [ / ] 调整险地", 15, Color("a89ac8"), HORIZONTAL_ALIGNMENT_CENTER)
+	var hint := _make_label("方向键/WASD 移动 · 自动攻击 · 攒够造化点按 [F] 闭关突破 · [Tab] 查看道途状态", 15, Color("a89ac8"), HORIZONTAL_ALIGNMENT_CENTER)
 	_set_anchor(hint, 0, 1, 1, 1)
 	_set_offset(hint, 0, -34, 0, -10)
 	_root.add_child(hint)
@@ -692,15 +692,6 @@ func _input(event: InputEvent) -> void:
 	if GameState.game_over or GameState.victory:
 		if kc == KEY_ENTER or kc == KEY_KP_ENTER:
 			_go_cave()
-		return
-	# [ / ] （或 - / =）手动增减险地难度：随时可调，作用于之后刷出的敌人
-	if kc == KEY_BRACKETLEFT or kc == KEY_MINUS or kc == KEY_KP_SUBTRACT:
-		GameState.adjust_danger(-1)
-		get_viewport().set_input_as_handled()
-		return
-	if kc == KEY_BRACKETRIGHT or kc == KEY_EQUAL or kc == KEY_KP_ADD:
-		GameState.adjust_danger(1)
-		get_viewport().set_input_as_handled()
 		return
 	# Tab：切换「道途·状态」面板（战斗中、未结算、未开升级面板时）
 	if kc == KEY_TAB and not _levelup_root.visible and not GameState.game_over and not GameState.victory:
