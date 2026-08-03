@@ -66,6 +66,7 @@ func _spawn_one(e: float) -> void:
 		scene = monsters_to_spawn.pick_random()
 	var monster = scene.instantiate()
 	get_tree().current_scene.add_child(monster)
+	_apply_scaling(monster)
 	monster.add_to_group("Enemy")
 	monster.global_position = _pick_spawn_pos()
 
@@ -83,6 +84,7 @@ func _spawn_boss() -> void:
 	announce.emit("妖王降临 · 噬魂法王", COL_RED)
 	var boss = BOSS_SCENE.instantiate()
 	get_tree().current_scene.add_child(boss)
+	_apply_scaling(boss)
 	boss.global_position = _pick_spawn_pos()
 
 func _pick_spawn_pos() -> Vector2:
@@ -95,3 +97,13 @@ func _pick_spawn_pos() -> Vector2:
 		if pos.distance_to(center) > 320.0:
 			break
 	return pos
+
+# 按当前境界 + 险地缩放刚生成的敌人（含妖王）。境界从 Meta 读，险地从 GameState 读。
+func _apply_scaling(node: Node) -> void:
+	if node == null or not node.has_method("apply_scaling"):
+		return
+	var realm := 0
+	var meta := get_node_or_null("/root/Meta")
+	if meta:
+		realm = meta.realm_index()
+	node.apply_scaling(realm, GameState.danger_tier)

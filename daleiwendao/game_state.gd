@@ -26,6 +26,10 @@ var victory: bool = false:
 
 var spirit_stones: int = 0
 
+# 险地难度（进关前选定，0=寻常）。敌人缩放 = 境界基线 × 险地系数。
+# 目前默认 0（早期体验不变）；未来的「险地选择」菜单在开局前写入即可全局生效。
+var danger_tier: int = 0
+
 var kills: int = 0
 var xp: int = 0
 var level: int = 1
