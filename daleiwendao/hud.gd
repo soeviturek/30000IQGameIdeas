@@ -77,6 +77,8 @@ var _ava_slide: float = 0.0      # 1=完全滑出屏幕左侧，0=归位
 var _ava_bob_t: float = 0.0      # 呼吸浮动计时
 var _ava_tween: Tween
 var _realm_chapter_lbl: Label   # 顶栏「章节 · 境界」，突破时刷新
+var _danger_lbl: Label          # 顶栏「险地」档位指示（玩家 [ / ] 手动增减）
+var _danger_tween: Tween
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -91,6 +93,7 @@ func _ready() -> void:
 	_grant_meta_start()
 	if has_node("/root/Meta"):
 		get_node("/root/Meta").realm_advanced.connect(_on_realm_advanced)
+	GameState.danger_changed.connect(_on_danger_changed)
 	call_deferred("_connect_director")
 
 # 洞府「造化」永久强化：出关起手即赠若干造化点
@@ -114,7 +117,7 @@ func _chapter_text() -> String:
 		r = str(get_node("/root/Meta").realm_name())
 	return "第一章 · 幽篁秘境　·　%s境" % r
 
-# 当场突破大境界：墨笔横幅 + 吟唱音效 + 震屏（W2 将挂接「世界当场变」）
+# 当场突破大境界：墨笔横幅 + 震屏（音效已按需求移除；W2 将挂接「世界当场变」）
 func _on_realm_advanced(_realm_index: int, realm_name: String) -> void:
 	if is_instance_valid(_realm_chapter_lbl):
 		_realm_chapter_lbl.text = _chapter_text()
@@ -124,9 +127,36 @@ func _on_realm_advanced(_realm_index: int, realm_name: String) -> void:
 		if i < realm_name.length() - 1:
 			spaced += " "
 	_show_banner("突 破 · %s 境" % spaced, COL_GOLD)
-	if has_node("/root/Sfx"):
-		get_node("/root/Sfx").play("ascend", 0.0, 0.0)
 	GameState.shake(0.5, 12.0)
+
+# 险地档位文案 + 配色（正=越红越凶，负=蓝色手下留情，0=寻常）
+func _update_danger_label() -> void:
+	if not is_instance_valid(_danger_lbl):
+		return
+	var d: int = GameState.danger_tier
+	var txt := ""
+	var col := Color("9a90b8")
+	if d > 0:
+		txt = "险地 +%d · 凶险" % d
+		col = Difficulty.tier_color(clampi(d + 1, 0, 7))
+	elif d < 0:
+		txt = "险地 %d · 留情" % d
+		col = Color("7fb0e0")
+	else:
+		txt = "险地 · 寻常"
+	_danger_lbl.text = txt
+	_danger_lbl.add_theme_color_override("font_color", col)
+
+func _on_danger_changed(_d: int) -> void:
+	_update_danger_label()
+	# 轻微脉冲反馈
+	if _danger_tween and _danger_tween.is_running():
+		_danger_tween.kill()
+	_danger_lbl.pivot_offset = _danger_lbl.size * 0.5
+	_danger_lbl.scale = Vector2(1.25, 1.25)
+	_danger_tween = create_tween()
+	_danger_tween.tween_property(_danger_lbl, "scale", Vector2.ONE, 0.18) \
+		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 func _build_ui() -> void:
 	var theme := Theme.new()
@@ -167,6 +197,13 @@ func _build_ui() -> void:
 	_set_offset(_kills_lbl, -240, 12, -16, 44)
 	_root.add_child(_kills_lbl)
 
+	# 险地档位（右，击杀下方）：玩家用 [ / ] 手动增减挑战
+	_danger_lbl = _make_label("", 18, Color("9a90b8"), HORIZONTAL_ALIGNMENT_RIGHT)
+	_set_anchor(_danger_lbl, 1, 0, 1, 0)
+	_set_offset(_danger_lbl, -320, 44, -16, 68)
+	_root.add_child(_danger_lbl)
+	_update_danger_label()
+
 	# 道行 Lv（中下）
 	_level_lbl = _make_label("道行 Lv.1", 16, COL_GOLD, HORIZONTAL_ALIGNMENT_CENTER)
 	_set_anchor(_level_lbl, 0.5, 0, 0.5, 0)
@@ -184,7 +221,7 @@ func _build_ui() -> void:
 	_root.add_child(_xp_bar)
 
 	# 底部操作提示
-	var hint := _make_label("方向键/WASD 移动 · 自动攻击 · 攒够造化点按 [F] 闭关突破 · [Tab] 查看道途状态", 15, Color("a89ac8"), HORIZONTAL_ALIGNMENT_CENTER)
+	var hint := _make_label("方向键/WASD 移动 · 自动攻击 · 攒够造化点按 [F] 闭关突破 · [Tab] 查看道途状态 · [ / ] 调整险地", 15, Color("a89ac8"), HORIZONTAL_ALIGNMENT_CENTER)
 	_set_anchor(hint, 0, 1, 1, 1)
 	_set_offset(hint, 0, -34, 0, -10)
 	_root.add_child(hint)
@@ -655,6 +692,15 @@ func _input(event: InputEvent) -> void:
 	if GameState.game_over or GameState.victory:
 		if kc == KEY_ENTER or kc == KEY_KP_ENTER:
 			_go_cave()
+		return
+	# [ / ] （或 - / =）手动增减险地难度：随时可调，作用于之后刷出的敌人
+	if kc == KEY_BRACKETLEFT or kc == KEY_MINUS or kc == KEY_KP_SUBTRACT:
+		GameState.adjust_danger(-1)
+		get_viewport().set_input_as_handled()
+		return
+	if kc == KEY_BRACKETRIGHT or kc == KEY_EQUAL or kc == KEY_KP_ADD:
+		GameState.adjust_danger(1)
+		get_viewport().set_input_as_handled()
 		return
 	# Tab：切换「道途·状态」面板（战斗中、未结算、未开升级面板时）
 	if kc == KEY_TAB and not _levelup_root.visible and not GameState.game_over and not GameState.victory:

@@ -104,7 +104,7 @@ func apply_scaling(realm: int, danger: int) -> void:
 	if _scaled:
 		return
 	_scaled = true
-	if realm > 0 or danger > 0:
+	if realm > 0 or danger != 0:
 		stats.add_modifier(Modifier.create(Modifier.StatType.MAX_HEALTH, Modifier.ModType.MUL, Difficulty.hp_mult(realm, danger) - 1.0))
 		stats.add_modifier(Modifier.create(Modifier.StatType.ATTACK_DAMAGE, Modifier.ModType.MUL, Difficulty.dmg_mult(realm, danger) - 1.0))
 		stats.add_modifier(Modifier.create(Modifier.StatType.LOOT_DROP, Modifier.ModType.MUL, Difficulty.loot_mult(realm, danger) - 1.0))

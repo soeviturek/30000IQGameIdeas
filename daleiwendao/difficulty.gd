@@ -15,16 +15,18 @@ const LOOT_PER_DANGER := 0.50
 const SPD_PER_DANGER := 0.06    # 只有险地加移速；境界不加，避免后期怪追不上/躲不掉失衡
 
 static func hp_mult(realm: int, danger: int) -> float:
-	return (1.0 + HP_PER_REALM * float(realm)) * (1.0 + HP_PER_DANGER * float(danger))
+	return maxf(0.2, (1.0 + HP_PER_REALM * float(realm)) * (1.0 + HP_PER_DANGER * float(danger)))
 
 static func dmg_mult(realm: int, danger: int) -> float:
-	return (1.0 + DMG_PER_REALM * float(realm)) * (1.0 + DMG_PER_DANGER * float(danger))
+	return maxf(0.2, (1.0 + DMG_PER_REALM * float(realm)) * (1.0 + DMG_PER_DANGER * float(danger)))
 
 static func loot_mult(realm: int, danger: int) -> float:
-	return (1.0 + LOOT_PER_REALM * float(realm)) * (1.0 + LOOT_PER_DANGER * float(danger))
+	# 负险地（玩家主动调低）不削弱境界奖励基线，只有正险地才加成 → 保住「进度」修复
+	var d := maxi(0, danger)
+	return (1.0 + LOOT_PER_REALM * float(realm)) * (1.0 + LOOT_PER_DANGER * float(d))
 
 static func speed_mult(danger: int) -> float:
-	return 1.0 + SPD_PER_DANGER * float(danger)
+	return maxf(0.4, 1.0 + SPD_PER_DANGER * float(danger))
 
 # 有效档位 → 颜色（境界 + 险地 叠加）。0=寻常白，越高越血红。
 static func tier_color(tier: int) -> Color:

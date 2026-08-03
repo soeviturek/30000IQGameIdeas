@@ -26,9 +26,23 @@ var victory: bool = false:
 
 var spirit_stones: int = 0
 
-# 险地难度（进关前选定，0=寻常）。敌人缩放 = 境界基线 × 险地系数。
-# 目前默认 0（早期体验不变）；未来的「险地选择」菜单在开局前写入即可全局生效。
+# 险地难度：玩家手动 +/- 的挑战偏移（0=寻常，正=更凶更肥，负=手下留情）。
+# 敌人有效强度 = 境界基线（自动）× 险地系数。可在战斗中随时按 [ / ] 调整，
+# 立即作用于之后刷出的敌人。负险地不削弱境界奖励基线（见 difficulty.gd）。
 var danger_tier: int = 0
+const DANGER_MIN := -3
+const DANGER_MAX := 8
+
+signal danger_changed(danger: int)
+
+# 手动增减险地档位，返回是否真的变化了（用于 HUD 反馈）。
+func adjust_danger(delta: int) -> bool:
+	var nv: int = clampi(danger_tier + delta, DANGER_MIN, DANGER_MAX)
+	if nv == danger_tier:
+		return false
+	danger_tier = nv
+	danger_changed.emit(danger_tier)
+	return true
 
 var kills: int = 0
 var xp: int = 0
