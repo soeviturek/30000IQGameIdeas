@@ -9,8 +9,8 @@ class_name SlashWeapon
 const QI_SPAWN_FORWARD := 40.0
 
 # —— 法宝进化：惊鸿剑气 →（集齐符箓术）→ 剑气化虹 ——
-const QI_MAX_LEVEL := 8      # 剑气圆满层数（每 2 层多 1 道，每层 +5% 剑伤）
-const QI_EVOLVE_LEVEL := 6   # 化虹门槛：≥6 层 且 集齐符箓术
+const QI_MAX_LEVEL := 5      # 剑气圆满层数（0→5 即化虹；玩家记住的是"化虹"而非第几层）
+const QI_EVOLVE_LEVEL := 5   # 化虹门槛：满 5 层 且 集齐符箓术
 var qi_level: int = 0        # 惊鸿剑气·凝 层数
 var has_fulu: bool = false   # 是否已得符箓术
 var evolved: bool = false    # 剑气化虹（究极形态）

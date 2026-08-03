@@ -31,7 +31,7 @@ const UPGRADES := [
 	{"id": "heal", "name": "回春术", "rarity": "精良", "desc": "立即回复全部气血"},
 	{"id": "crit", "name": "杀机毕现", "rarity": "稀有", "desc": "暴击率 +5%"},
 	{"id": "crit_dmg", "name": "血溅七步", "rarity": "进化", "desc": "暴击伤害 +30%"},
-	{"id": "qi", "name": "惊鸿剑气·凝", "rarity": "精良", "desc": "凝聚剑气 · 剑伤 +5%\n(每2层多1道 · 满6层+符箓 → 化虹)"},
+	{"id": "qi", "name": "惊鸿剑气·凝", "rarity": "精良", "desc": "凝聚剑气 · 剑伤 +5%\n(每2层多1道 · 满5层+符箓 → 化虹)"},
 	{"id": "fulu", "name": "符箓术", "rarity": "稀有", "desc": "剑气附灵符\n(与惊鸿剑气凑齐则化虹)"},
 ]
 
