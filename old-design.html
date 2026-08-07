@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>大雷问道 · Designer Bible（v5 冻结版）</title>
+<style>
+  :root{
+    --bg:#151022; --panel:#1e1830; --panel2:#2a2145; --line:#4a3a6a;
+    --gold:#f0d98c; --gold2:#d4af37; --text:#eee0c8; --muted:#c9b8e8; --dim:#9a8ac0;
+    --green:#9ce8b0; --red:#e89c9c; --blue:#7fc4f0;
+  }
+  *{box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;background:var(--bg);color:var(--text);margin:0;line-height:1.7}
+  a{color:var(--gold)}
+  main{max-width:1040px;margin:0 auto;padding:0 20px 40px}
+  section{margin:30px 0;background:var(--panel);border-radius:14px;padding:26px;border:1px solid var(--line)}
+  h2{color:var(--gold);border-left:5px solid var(--gold2);padding-left:14px;font-size:1.5em;margin:0 0 6px}
+  h3{color:#c9a9e8;margin:22px 0 8px}
+  p{margin:10px 0}
+  .lead{color:var(--muted)}
+  .small{font-size:.86em}
+  b,strong{color:#fbeec0}
+
+  /* Hero */
+  .hero{position:relative;min-height:92vh;display:flex;align-items:center;justify-content:center;text-align:center;
+    background:linear-gradient(180deg,rgba(21,16,34,.55),rgba(21,16,34,.82) 62%,var(--bg)),
+    url('site-img/hero.jpg') center 22% / cover no-repeat;border-bottom:2px solid var(--gold2)}
+  .hero-inner{max-width:900px;padding:40px 24px}
+  .hero h1{font-size:4.2em;color:var(--gold);margin:0;letter-spacing:.18em;text-shadow:0 4px 30px #000}
+  .hero .en{color:#b7a6df;letter-spacing:.42em;font-size:.9em;margin:6px 0 26px;text-transform:uppercase}
+  .pitch{font-size:1.5em;color:#fbeec0;font-weight:bold;line-height:1.55;text-shadow:0 2px 16px #000}
+  .pitch .en{display:block;font-size:.62em;color:#c8b8ee;font-weight:normal;letter-spacing:.06em;margin-top:12px;text-transform:none}
+  .tags{margin-top:26px}
+  .pill{display:inline-block;background:rgba(74,47,90,.7);color:var(--gold);padding:4px 14px;border-radius:14px;font-size:.82em;margin:4px;border:1px solid #6a4a8a}
+  .pill.new{background:rgba(42,90,58,.7);color:var(--green);border-color:#2a6a3a}
+  .pill.hot{background:rgba(90,42,42,.7);color:var(--red);border-color:#8a4a4a}
+
+  /* layout helpers */
+  .split{display:grid;grid-template-columns:1.35fr 1fr;gap:26px;align-items:center}
+  .split.rev{grid-template-columns:1fr 1.35fr}
+  figure{margin:0}
+  .fig{width:100%;border-radius:12px;border:1px solid var(--line);display:block;box-shadow:0 10px 34px rgba(0,0,0,.45);background:#17122b}
+  figcaption{color:var(--dim);font-size:.82em;text-align:center;margin-top:8px}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+  .card{background:var(--panel2);border-radius:12px;padding:16px 18px;border:1px solid #6a4a8a}
+  .card h3{margin:0 0 6px;color:var(--gold)}
+  .card .em{color:var(--green);font-size:.9em}
+
+  table{width:100%;border-collapse:collapse;margin-top:12px;font-size:.9em}
+  th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+  th{background:var(--panel2);color:var(--gold)}
+  tr.moment td{background:rgba(212,175,55,.10)}
+  tr.moment td:first-child{border-left:3px solid var(--gold2)}
+  .star{color:var(--gold);font-weight:bold}
+
+  .quote{background:#3a2a12;border-left:4px solid var(--gold2);padding:14px 18px;border-radius:8px;color:#f2e2c0;margin:14px 0;font-size:1.05em}
+  .note{background:#3a2020;border-left:4px solid #d46a4a;padding:12px 16px;border-radius:8px;color:#e8c8b8;margin:12px 0}
+  .fix{background:#12321f;border-left:4px solid #4ad46a;padding:12px 16px;border-radius:8px;color:#c8e8d0;margin:12px 0}
+  .info{background:#132534;border-left:4px solid #4a9cd4;padding:12px 16px;border-radius:8px;color:#c8dcec;margin:12px 0}
+  ul{line-height:1.8;margin:8px 0}
+  .moments{columns:2;column-gap:26px}
+  .moments div{break-inside:avoid;padding:5px 0;border-bottom:1px dashed #3a2f56}
+  .yes{color:var(--green)} .later{color:var(--dim)}
+  .chargrid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .charcard{background:var(--panel2);border:1px solid #6a4a8a;border-radius:12px;overflow:hidden;text-align:center}
+  .charcard img{width:100%;display:block;background:#17122b}
+  .charcard .body{padding:12px 16px}
+  footer{text-align:center;padding:30px 16px;color:#8a7aa8}
+  @media(max-width:760px){
+    .split,.split.rev,.chargrid{grid-template-columns:1fr}
+    .moments{columns:1}
+    .hero h1{font-size:2.8em}.pitch{font-size:1.15em}
+  }
+</style>
+</head>
+<body>
+<a href="index.html" style="position:fixed;top:14px;left:14px;z-index:99;background:rgba(15,22,32,.82);color:#e8c874;border:1px solid #d4af37;border-radius:20px;padding:7px 16px;font:600 14px/1 'Microsoft YaHei',sans-serif;text-decoration:none;backdrop-filter:blur(6px)">← 新版设计站 · New Site</a>
+
+<header class="hero">
+  <div class="hero-inner">
+    <h1>大雷问道</h1>
+    <div class="en">Da Lei Wen Dao</div>
+    <div class="pitch">
+      一剑化万剑。每一次突破，世界为之改变；每一次渡劫，可能失去多年修为。
+      <span class="en">One blade becomes ten thousand. Every breakthrough reshapes the world — every failed tribulation costs you years.</span>
+    </div>
+    <div class="tags">
+      <span class="pill">仙侠 · 剑修</span>
+      <span class="pill">Roguelite 割草</span>
+      <span class="pill">境界驱动 Meta</span>
+      <span class="pill">单机买断 · 不做抽卡</span>
+      <span class="pill new">Godot 4.5.1 · Demo 可玩</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section>
+  <h2>这是什么</h2>
+  <p class="lead">一款<strong>剑修</strong>题材的仙侠割草 Roguelite。核心命题：耐玩靠 <strong>Loop（决策）</strong> 而非 <strong>Content（工作量）</strong>；但玩家真正记住的，是<strong>具体时刻（stories）</strong>——「我第七道雷前一步死了」，不是资源流图。</p>
+  <div class="quote">至高条款：<strong>所有原则都服务于玩家体验；若玩家体验与原则冲突，以玩家体验为准。</strong>铁律是工具，不是信仰——测出来玩家最爱养剑而非境界？改理论，不改玩家。</div>
+  <div class="fix">📄 本页 = <strong>Designer Bible v5（冻结版）</strong>的公开呈现。设计已冻结，下一步是<strong>建造与验证</strong>，不再扩系统。生产进度见文末「现状 · 路线」。</div>
+</section>
+
+<section>
+  <h2>战斗 Fantasy · 一剑化万剑</h2>
+  <div class="split">
+    <div>
+      <p class="lead">Brotato 是「一台疯狂的武器机器」，VS 是「满屏都是我的弹幕」。我们的战斗幻想是——</p>
+      <div class="quote">剑修 —— <strong>一剑化万剑，以一敌万。</strong>满屏翻飞的剑气，就是本作的「VS 弹幕 / Brotato 机器」。</div>
+      <p><strong>关键洞察：战斗幻想 ⟺ 养剑 Meta，是同一件事。</strong>满屏剑气的源头，就是你跨局培养的那把<strong>本命剑</strong>；觉醒分叉（雷/血/飞）改变<strong>万剑如何铺满屏幕</strong>；境界越高，剑气越多越烈。于是「养剑」既是 Meta loop，又<strong>直接就是</strong>战斗爽点本身——两层焊成一层。</p>
+      <h3>世界观支柱（一句话）</h3>
+      <p class="quote">从一个凡人，修炼成能挑战天道、终将飞升的传奇修士。</p>
+      <p class="small lead">任何 feature 先回答：帮不帮这句话 / 帮不帮「一剑化万剑」？都不帮 → 砍。（种地 / 钓鱼 / 后宫 / 家园装修 → 砍。）</p>
+    </div>
+    <figure>
+      <img class="fig" src="site-img/sword.jpg" alt="剑修立绘">
+      <figcaption>剑修 · 一人一剑，剑气化千军</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section>
+  <h2>三样别人抄不走的组合</h2>
+  <div class="cards">
+    <div class="card"><h3>① 万剑战斗身份</h3><p>剑修「一剑化万剑」——满屏剑气就是核心爽点，且与养剑 Meta 同层。</p></div>
+    <div class="card"><h3>② 世界随境界演变</h3><p>每次突破，世界<strong>肉眼可见地变</strong>：新敌人 / 新掉落 / 新规则，而非弹出新菜单。</p></div>
+    <div class="card"><h3>③ 渡劫赌命</h3><p>渡劫可能<strong>失去多年修为</strong>——Risk/Reward 是所有决策的定盘星。</p></div>
+  </div>
+  <p class="small lead" style="margin-top:14px">Store 定位不是「修仙 Brotato」，而是 <em>“The world evolves with your cultivation.”</em>——这是「一款<strong>剑修</strong>游戏」，卖点聚焦，不是「成为任何修士」。</p>
+</section>
+
+<section>
+  <h2>玩家体验时间线 · 前两小时（本作脊柱）</h2>
+  <p class="lead">设计判据：如果这条线足够精彩，系统大概率成立；如果它只是不断解锁新菜单，再优雅的资源图也留不住人。<span class="star">★</span> = 核心决策 / 最强 story。</p>
+  <table>
+    <tr><th>时间</th><th>玩家在做什么</th><th>目标情绪</th></tr>
+    <tr><td>0–5 min</td><td>第一局割草，剑气炸群；造化三选一，道行连跳</td><td>「手感真爽，一分钟就变强」</td></tr>
+    <tr><td>5–18 min</td><td>结算掉<strong>修为 + 灵木</strong>能带走；第 2–3 局修为逼近筑基</td><td>「哦？这些能带走」「就差一点」</td></tr>
+    <tr class="moment"><td><strong>~20 min</strong></td><td><strong>首次筑基</strong>，墨笔「筑基」全屏；世界当场变：炼丹房开门 + 地图现<strong>魔修·墨罗</strong>（会偷 buff、会嘲讽）</td><td>「我升的是<strong>身份</strong>，不是数字」「<strong>世界因我而变了</strong>」</td></tr>
+    <tr><td>20–35 min</td><td>炼丹：材料只够一颗保命丹，炼了带下局</td><td>「资源要规划了」</td></tr>
+    <tr class="moment"><td><strong>~40 min</strong> <span class="star">★</span></td><td>攒够材料，逼出选择：<strong>炼渡劫丹冲金丹 / 觉醒木剑？</strong>（材料二选一）</td><td>「到底冲境界还是变 build」← <strong>核心决策</strong></td></tr>
+    <tr><td>40–55 min</td><td>选觉醒 → 木剑化<strong>雷剑</strong>，清群方式全变</td><td>「我的剑成型了」</td></tr>
+    <tr class="moment"><td><strong>~70 min</strong> <span class="star">★</span></td><td>首次<strong>渡劫天劫战</strong>：欠准备，第七道雷死了</td><td>「<strong>就差一颗保命丹！</strong>」← 最强 story</td></tr>
+    <tr><td>70–85 min</td><td>失败反噬，决定再刷两局炼保命丹</td><td>「这次稳一点，再来一局」</td></tr>
+    <tr class="moment"><td><strong>~90 min</strong></td><td>二次渡劫成功，<strong>金丹</strong>！世界再变：Boss 掉<strong>元神</strong>、敌人升级为会格挡的<strong>剑仙</strong></td><td>「我真的更深了」</td></tr>
+  </table>
+  <div class="info"><strong>三个必须成立的瞬间（唯一成功判据）：</strong>① ~20min 首次筑基「世界变了」；② ~40min 首个竞争「渡劫丹 vs 雷剑」真的纠结；③ ~70min 首次渡劫失败「想再来一局」而非摔手柄。三者成立 → 核心扎实；不成立 → 回来改配方，不加系统。</div>
+</section>
+
+<section>
+  <h2>境界脊柱 = 世界当场变（不是菜单）</h2>
+  <div class="split rev">
+    <figure>
+      <img class="fig" src="site-img/li-baiyi.jpg" alt="境界立绘">
+      <figcaption>境界不是 UI 数字，是身份</figcaption>
+    </figure>
+    <div>
+      <p>境界靠战斗掉的<strong>修为</strong>推进（闸门轨，材料加速不了）。它不只是 炼气→筑基→金丹 的阶梯，更是<strong>身份分叉轴</strong>。每次突破让世界<strong>可见地变</strong>——不是弹菜单，而是<strong>下一局进副本，世界肉眼不同了</strong>。</p>
+      <div class="fix">✅ <strong>W1 已实装：</strong>修为跨局累积（永不清零）+ 炼气→…→飞升 阈值 + 当场突破全屏墨笔演出 + 吟唱音效 + 存档。洞府常驻显示当前境界 / 修为进度。</div>
+    </div>
+  </div>
+  <table>
+    <tr><th>境界</th><th>身份</th><th>世界怎么变（可见）</th><th>敌人变</th></tr>
+    <tr><td>炼气</td><td>凡人入道</td><td>起点</td><td>妖兽</td></tr>
+    <tr class="moment"><td><strong>筑基</strong></td><td>正式修士</td><td><strong>炼丹房开门</strong> + 地图现灵脉（材料点）</td><td>出现<strong>魔修·墨罗</strong>（偷 buff）</td></tr>
+    <tr><td>金丹</td><td>结丹延寿</td><td>炼器房开门（装备分叉）+ Boss 掉元神</td><td>出现<strong>剑仙</strong>（格挡）</td></tr>
+    <tr><td>元婴</td><td>元神脱胎</td><td>藏经阁 + 灵兽园 + 敌人会夺舍</td><td>古神残骸（诅咒/夺技）</td></tr>
+    <tr><td>化神</td><td>感悟法则</td><td>悟道塔（无尽）+ 法宝 + 副本现「改规则区」</td><td>法则造物</td></tr>
+    <tr><td>炼虚·合体</td><td>半步大能</td><td>隐藏 Boss + 装备本命化</td><td>天人</td></tr>
+    <tr><td>大乘 → 飞升</td><td>圆满 → 换界</td><td>飞升 → 世界纪元（<strong>v1.5</strong>）</td><td>—</td></tr>
+  </table>
+  <p class="small lead">P1 先只接 炼气 / 筑基 / 金丹，元婴+ 做「即将开启」占位——用体验时间线控 scope。</p>
+</section>
+
+<section>
+  <h2>敌人阶梯 · 敌人 = 角色</h2>
+  <div class="split">
+    <div>
+      <p class="lead">修 review 抓的最大漏洞：敌人不成长。我们的解法——敌人不是「后面 +HP」，而是<strong>换身份 + 每阶带一个新机制 = 新决策</strong>。这让「更深的世界」成为 Loop 而非 Content。</p>
+      <table>
+        <tr><th>境界阶</th><th>敌人</th><th>新机制（制造决策）</th></tr>
+        <tr><td>炼气</td><td>妖兽</td><td>冲 / 扑</td></tr>
+        <tr class="moment"><td>筑基</td><td><strong>魔修</strong></td><td><strong>驱散/偷造化 buff</strong> → 逼你保护增益、优先点杀</td></tr>
+        <tr><td>金丹</td><td>剑仙</td><td><strong>格挡/反弹</strong>正面剑气 → 逼走位绕后、换 build</td></tr>
+        <tr><td>元婴</td><td>古神残骸</td><td><strong>诅咒/夺舍</strong>（暂夺一个技能）→ 逼取舍与容错</td></tr>
+        <tr><td>化神+</td><td>法则造物</td><td><strong>局部改规则</strong>（禁疗区 / 反重力弹幕）</td></tr>
+      </table>
+    </div>
+    <figure>
+      <img class="fig" src="site-img/boss.jpg" alt="Boss 立绘">
+      <figcaption>越靠后的关键敌人，越该有名字与台词</figcaption>
+    </figure>
+  </div>
+  <div class="quote">P1 便宜首例（近乎免费的一个 story）：给转折点那个「偷 buff 魔修」一个名字与一句嘲讽——<strong>噬魂魔修·墨罗</strong>。偷你增益时甩一句「此增益，我笑纳了」，被击杀时「区区筑基……也配……」。一个名字 + 两句 bark + 复用现成机制，就能造出玩家口中的「又是墨罗那王八」。</div>
+</section>
+
+<section>
+  <h2>核心决策 · 渡劫丹 vs 觉醒剑</h2>
+  <p class="lead">耐玩的根：<strong>竞争经济</strong>。闸门资源（<strong>修为</strong>，限速、不可替代）与经济资源（<strong>灵木 / 妖骨</strong>，被争夺）分两轨，否则「境界永远最重要」会把经济吸干成一本道。</p>
+  <table>
+    <tr><th>资源</th><th>轨</th><th>去向</th><th>竞争？</th></tr>
+    <tr><td><strong>修为 / 妖魂</strong></td><td>闸门</td><td>境界小层 + 圆满门槛</td><td>否（纯节拍）</td></tr>
+    <tr class="moment"><td><strong>灵木 / 妖骨</strong></td><td>经济</td><td>①渡劫丹 ②装备觉醒·分叉 ③洞府建设</td><td><span class="star">是（核心竞争）</span></td></tr>
+    <tr><td>灵石</td><td>经济</td><td>洞府建设 + 装备 +N + 占卜</td><td>软竞争</td></tr>
+    <tr class="moment"><td>丹药</td><td>中间品</td><td>战斗即时吃 <strong>或</strong> 囤着渡劫</td><td><span class="star">是（当下 vs 储备）</span></td></tr>
+  </table>
+  <h3>渡劫 · 风险 · 保底</h3>
+  <div class="cards">
+    <div class="card"><h3>不是掷骰，是试炼</h3><p>扛九道天雷（复用地火/预警）+ 每道间刷精英。成功由<strong>技术 + 准备余量</strong>决定，保留能动性。</p></div>
+    <div class="card"><h3>余量三来源</h3><p>①圆满度（修为超门槛越多越稳）②带的丹（保命丹续命）③装备分叉是否成型。所谓「80% 成功率」= 我准备到几成。</p></div>
+    <div class="card"><h3>失败反噬（不劝退）</h3><p><strong>不掉大境界</strong>（身份不回退）；但丹消耗 + 损失部分当前修为 + 短冷却 → 逼「再炼一颗保命丹再冲」。</p></div>
+    <div class="card"><h3>保底防雪崩</h3><p>连败 N 次后天劫强度递减 / 给一次「渡劫余烬」减伤，保证不会无限卡墙。</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>装备培养 · 木剑 → 觉醒 雷 / 血 / 飞</h2>
+  <p class="lead">培养链：<strong>木剑 → +N（灵石，软线）→ 觉醒（★三选一）→ 化形 → 本命法宝</strong>（终点，不用「飞升」一词——飞升只属于人物）。觉醒是分叉点，<strong>改整个 build</strong>，一把剑只能选一支。</p>
+  <div class="cards">
+    <div class="card"><h3>⚡ 雷</h3><p>范围连锁 / 清群。万剑化作连锁雷网，铺满全屏。</p></div>
+    <div class="card"><h3>🩸 血</h3><p>吸血 / 高风险高回报。残血反哺，一屏收割。</p></div>
+    <div class="card"><h3>🗡 飞</h3><p>御剑追击 / 单体爆发。一剑穿刺，直取 Boss。</p></div>
+  </div>
+  <div class="info">与敌人机制交叉：剑仙格挡正面剑气 → 血剑吸血 / 飞剑绕后各有解。<strong>敌人机制反过来给装备分叉制造意义。</strong>复用现成局内剑气进化技术，持久层只是接到跨局养成。</div>
+</section>
+
+<section>
+  <h2>流派 = 身份轴（Progression ≠ Fantasy）</h2>
+  <p class="lead">修仙是 <strong>Setting</strong>，不是 Fantasy——同一 Setting 下有几十种幻想（剑仙 / 炼丹师 / 御兽 / 邪修 / 体修）。若所有 loop 最终都只为「突破境界」，第 20 小时就沦为 checklist。解法：某一境选定<strong>流派</strong>，此后掉落表 / 商店 / Boss 掉落 / 资源权重全不同——<strong>同一套系统产出不同人生（改权重，不是加系统）</strong>。</p>
+  <div class="cards">
+    <div class="card"><h3>剑修 <span class="pill new">P1 唯一上线</span></h3><p>就是现在的游戏。「筑基选身份」由现成的<strong>觉醒分叉（雷/血/飞）</strong>承载——零新战斗引擎。</p></div>
+    <div class="card"><h3>丹 / 体 / 符 / 御兽 / 魔 <span class="pill">1.0 后</span></h3><p>体修无蓝条只血条、符修偏塔防、魔修更难但更快……<strong>验证后</strong>的重放放大器，重配掉落非新引擎。</p></div>
+  </div>
+  <div class="note"><strong>严格控 scope：</strong>小团队上线 5 套未验证战斗职业 = 发布不了的死法。卖点保持「一款剑修游戏」，「万剑」是主轴，流派是验证后纵向加宽。</div>
+</section>
+
+<section>
+  <h2>Story Moments · 可分享时刻清单</h2>
+  <p class="lead">玩家不会发「资源 A 流向 B」，会发「我第七道雷死了」。<strong>每个系统至少产出 1 个能截图 / 发 Discord / 讲给朋友的时刻，否则砍。</strong><span class="yes">✓ = P1 切片已能产出</span>　<span class="later">○ = 后续</span></p>
+  <div class="moments">
+    <div><span class="yes">✓</span> 第一次筑基，整个世界当场变了</div>
+    <div><span class="yes">✓</span> 第一次撞见偷 buff 的墨罗（「此增益，我笑纳了」）</div>
+    <div><span class="yes">✓</span> 第一次渡劫，第七道雷前一步死了——「就差一颗保命丹」</div>
+    <div><span class="yes">✓</span> 为了雷剑，放弃了这次金丹</div>
+    <div><span class="yes">✓</span> 木剑觉醒成雷剑那一下，清群方式全变</div>
+    <div><span class="yes">✓</span> 血剑吸血，残血反杀一屏</div>
+    <div><span class="yes">✓</span> 满屏剑气「一剑化万剑」的截图</div>
+    <div><span class="yes">✓</span> 渡劫失败后咬牙再刷两局，这次稳过九雷</div>
+    <div><span class="later">○</span> 连续突破三境</div>
+    <div><span class="later">○</span> 一剑（御剑穿刺）秒掉 Boss</div>
+    <div><span class="later">○</span> 练出一把「九霄雷剑」，别人问怎么弄的</div>
+    <div><span class="later">○</span> 剑冢天时，只掉剑，爆出红色法宝</div>
+    <div><span class="later">○</span> 剑仙 Boss 格挡我正面剑气，被迫绕后</div>
+    <div><span class="later">○</span> 古神残骸夺舍，抢走我一个技能</div>
+    <div><span class="later">○</span> 占卜燃香，硬改天时刷成血月 ×2</div>
+    <div><span class="later">○</span> 首杀某剑仙，洞府多了一幅壁画</div>
+    <div><span class="later">○</span> 保命丹囤一堆，赌一次超规格渡劫</div>
+    <div><span class="later">○</span> 两把剑分别走血 / 飞，对比 build</div>
+    <div><span class="later">○</span> 发现隐藏 Boss / 隐藏奇遇</div>
+    <div><span class="later">○</span> 化神后副本出现「禁疗区」，打法重构</div>
+    <div><span class="later">○</span>（1.0 后）换流派开局，同一游戏另一种人生</div>
+    <div><span class="later">○</span>（1.0 后）飞升进新纪元，世界规则变了</div>
+  </div>
+</section>
+
+<section>
+  <h2>同道 · 局外陪伴</h2>
+  <p class="lead">洞府里陪你精进的同门师姐——出关归来、境界突破、道成道陨时，她们会点评、会打气。局外美少女立绘是<strong>陪伴层</strong>，不是付费墙；游戏身份始终是「剑修割草 + 境界」。</p>
+  <div class="chargrid">
+    <div class="charcard">
+      <img src="site-img/char-baiyi.jpg" alt="白衣师姐">
+      <div class="body"><h3 style="color:var(--gold);margin:6px 0">白衣 · 师姐</h3><p class="small lead">「挑一样趁手的，为姐看好你。」温润稳重，稳扎稳打那一路。</p></div>
+    </div>
+    <div class="charcard">
+      <img src="site-img/char-qingshan.jpg" alt="青衫师妹">
+      <div class="body"><h3 style="color:var(--gold);margin:6px 0">青衫 · 师妹</h3><p class="small lead">「磨蹭啥呢，妖都要笑你啦！」跳脱促狭，专挑狠招那一路。</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>现状 · 路线（Doc B）</h2>
+  <div class="fix">✅ <strong>已实现（地基）：</strong>剑气割草战斗 loop + 道行 Lv + 局内造化三选一 draft；多招弹幕妖王（环/扇/追命/十字/螺旋/雷爆 + 冲刺红色走廊预警 + 三阶段狂暴）；洞府壳 + 持久灵石 + 永久强化；<strong>W1 境界/修为脊柱 + 当场突破演出</strong>。技术栈 Godot 4.5.1，已可导出 Windows 单文件。</div>
+  <table>
+    <tr><th>周</th><th>交付（每周都可玩）</th><th>命中瞬间</th></tr>
+    <tr class="moment"><td><strong>W1</strong> <span class="pill new">已实装</span></td><td>境界脊柱：修为跨局累积 + 阈值 + 全屏墨笔突破 + 存档</td><td>①地基</td></tr>
+    <tr><td>W2</td><td>境界改世界 v1：筑基当场——炼丹房入口 + 刷魔修·墨罗（偷 buff + 姓名 + bark）</td><td><strong>①</strong></td></tr>
+    <tr><td>W3</td><td>炼丹房 + 竞争材料：灵木/妖骨掉落 + 保命丹/渡劫丹（抢同一批材料）</td><td>②地基</td></tr>
+    <tr><td>W4</td><td>炼器觉醒分叉：木剑 → 雷/血/飞 三选一 + 锁定</td><td><strong>②闭环</strong></td></tr>
+    <tr><td>W5</td><td>渡劫天劫战 + 风险/保底：九雷战 + 余量式成功 + 失败反噬 + 连败保底</td><td><strong>③</strong></td></tr>
+    <tr><td>W6</td><td>打磨 + GO/NO-GO：按时间线校准数值，把三瞬间磨到爽</td><td>三瞬间齐</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>设计铁律 · 明确不做</h2>
+  <div class="split">
+    <div>
+      <h3>铁律</h3>
+      <ul>
+        <li><strong>Loop &gt; Content</strong>：同一套内容反复产生新决策才耐玩。</li>
+        <li><strong>体验 &gt; 框架</strong>：不制造「时刻」的优雅系统 → 砍。</li>
+        <li><strong>扇入竞争</strong>：每种主材至少一处硬竞争。</li>
+        <li><strong>闸门 ↔ 经济分离</strong>：修为限速，材料被争夺。</li>
+        <li><strong>一条主线</strong>：主线只有境界；装备/伙伴/法宝从属它。</li>
+        <li><strong>境界改世界，不开菜单</strong>；<strong>敌人跟着长</strong>。</li>
+      </ul>
+    </div>
+    <div>
+      <h3>明确不做 / 暂缓</h3>
+      <ul>
+        <li><span class="pill hot">砍</span> 纪元 / 飞升 prestige → v1.5（是第二个游戏，先证明核心）</li>
+        <li><span class="pill hot">不做</span> Idle / 离线产出（会削弱战斗核心）</li>
+        <li><span class="pill hot">不做</span> 图鉴当 loop → 降只读；真收集 = 奇遇/称号绑壮举</li>
+        <li><span class="pill hot">砍</span> 种地 / 钓鱼 / 酒馆 / 后宫 / 家园装修</li>
+        <li><span class="pill hot">砍</span> 抽卡（单机买断，无抽卡）</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer>大雷问道 · Designer Bible v5（冻结版）· 一剑化万剑，世界随境界演变 · Godot 4.5.1</footer>
+</body>
+</html>

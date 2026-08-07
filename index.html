@@ -3,326 +3,558 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>大雷问道 · Designer Bible（v5 冻结版）</title>
+<title>大雷问道 · Da Lei Wen Dao — Sword Cultivation Survivor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Noto+Serif+SC:wght@400;600;800;900&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#151022; --panel:#1e1830; --panel2:#2a2145; --line:#4a3a6a;
-    --gold:#f0d98c; --gold2:#d4af37; --text:#eee0c8; --muted:#c9b8e8; --dim:#9a8ac0;
-    --green:#9ce8b0; --red:#e89c9c; --blue:#7fc4f0;
+    --ink:#070c10; --ink2:#0a1116; --panel:#0f1a20; --panel2:#12222a;
+    --line:rgba(120,170,155,.18); --line2:rgba(120,170,155,.32);
+    --jade:#47e0b0; --jade-dp:#1f9d78; --gold:#ecc873; --gold-dp:#b8912f;
+    --cyan:#5fd8f2; --flame:#ff6a4d; --rose:#ff9db2;
+    --text:#eaf3ef; --muted:#9fb6ad; --dim:#6d867d;
+    --acc:var(--jade);
   }
   *{box-sizing:border-box}
-  body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;background:var(--bg);color:var(--text);margin:0;line-height:1.7}
-  a{color:var(--gold)}
-  main{max-width:1040px;margin:0 auto;padding:0 20px 40px}
-  section{margin:30px 0;background:var(--panel);border-radius:14px;padding:26px;border:1px solid var(--line)}
-  h2{color:var(--gold);border-left:5px solid var(--gold2);padding-left:14px;font-size:1.5em;margin:0 0 6px}
-  h3{color:#c9a9e8;margin:22px 0 8px}
-  p{margin:10px 0}
-  .lead{color:var(--muted)}
-  .small{font-size:.86em}
-  b,strong{color:#fbeec0}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--ink);color:var(--text);line-height:1.75;
+    font-family:"Noto Serif SC","Microsoft YaHei","PingFang SC",serif;
+    overflow-x:hidden}
+  /* ---------- animated aurora backdrop ---------- */
+  body::before{content:"";position:fixed;inset:-20% -10%;z-index:-2;
+    background:
+      radial-gradient(45% 40% at 18% 22%, rgba(71,224,176,.20), transparent 60%),
+      radial-gradient(40% 38% at 82% 18%, rgba(236,200,115,.16), transparent 62%),
+      radial-gradient(48% 46% at 72% 82%, rgba(95,216,242,.14), transparent 60%),
+      radial-gradient(42% 44% at 24% 82%, rgba(255,106,77,.10), transparent 60%);
+    filter:blur(30px);animation:drift 26s ease-in-out infinite alternate}
+  body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:
+      radial-gradient(120% 80% at 50% -10%, transparent 60%, rgba(0,0,0,.55)),
+      linear-gradient(rgba(120,170,155,.035) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(120,170,155,.035) 1px,transparent 1px);
+    background-size:100% 100%, 44px 44px, 44px 44px}
+  @keyframes drift{
+    0%{transform:translate3d(0,0,0) scale(1)}
+    50%{transform:translate3d(-3%,2%,0) scale(1.08)}
+    100%{transform:translate3d(3%,-2%,0) scale(1.04)}}
 
-  /* Hero */
-  .hero{position:relative;min-height:92vh;display:flex;align-items:center;justify-content:center;text-align:center;
-    background:linear-gradient(180deg,rgba(21,16,34,.55),rgba(21,16,34,.82) 62%,var(--bg)),
-    url('site-img/hero.jpg') center 22% / cover no-repeat;border-bottom:2px solid var(--gold2)}
-  .hero-inner{max-width:900px;padding:40px 24px}
-  .hero h1{font-size:4.2em;color:var(--gold);margin:0;letter-spacing:.18em;text-shadow:0 4px 30px #000}
-  .hero .en{color:#b7a6df;letter-spacing:.42em;font-size:.9em;margin:6px 0 26px;text-transform:uppercase}
-  .pitch{font-size:1.5em;color:#fbeec0;font-weight:bold;line-height:1.55;text-shadow:0 2px 16px #000}
-  .pitch .en{display:block;font-size:.62em;color:#c8b8ee;font-weight:normal;letter-spacing:.06em;margin-top:12px;text-transform:none}
-  .tags{margin-top:26px}
-  .pill{display:inline-block;background:rgba(74,47,90,.7);color:var(--gold);padding:4px 14px;border-radius:14px;font-size:.82em;margin:4px;border:1px solid #6a4a8a}
-  .pill.new{background:rgba(42,90,58,.7);color:var(--green);border-color:#2a6a3a}
-  .pill.hot{background:rgba(90,42,42,.7);color:var(--red);border-color:#8a4a4a}
+  a{color:var(--gold);text-decoration:none}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+  .en{font-family:"Cinzel",serif;letter-spacing:.16em}
 
-  /* layout helpers */
-  .split{display:grid;grid-template-columns:1.35fr 1fr;gap:26px;align-items:center}
-  .split.rev{grid-template-columns:1fr 1.35fr}
-  figure{margin:0}
-  .fig{width:100%;border-radius:12px;border:1px solid var(--line);display:block;box-shadow:0 10px 34px rgba(0,0,0,.45);background:#17122b}
-  figcaption{color:var(--dim);font-size:.82em;text-align:center;margin-top:8px}
+  /* ---------- nav ---------- */
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);
+    background:linear-gradient(rgba(7,12,16,.82),rgba(7,12,16,.52));
+    border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;gap:8px;height:60px}
+  .brand{font-family:"Ma Shan Zheng",cursive;font-size:1.7em;
+    background:linear-gradient(92deg,var(--gold),#fff6d8 40%,var(--jade));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    text-shadow:0 0 24px rgba(71,224,176,.25);white-space:nowrap}
+  .brand span{font-family:"Cinzel",serif;font-size:.32em;letter-spacing:.3em;
+    color:var(--dim);display:block;margin-top:-8px}
+  .navlinks{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap;align-items:center}
+  .navlinks a{color:var(--muted);font-size:.92em;padding:7px 12px;border-radius:9px;
+    transition:.2s;font-weight:600}
+  .navlinks a:hover{color:var(--text);background:rgba(71,224,176,.10)}
+  .navlinks a.active{color:var(--jade)}
+  .navlinks a.old{color:var(--gold);border:1px solid var(--gold-dp);
+    background:rgba(236,200,115,.06);margin-left:6px}
+  .navlinks a.old:hover{background:rgba(236,200,115,.14)}
 
-  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
-  .card{background:var(--panel2);border-radius:12px;padding:16px 18px;border:1px solid #6a4a8a}
-  .card h3{margin:0 0 6px;color:var(--gold)}
-  .card .em{color:var(--green);font-size:.9em}
+  /* ---------- hero ---------- */
+  .hero{position:relative;min-height:94vh;display:grid;
+    grid-template-columns:1.15fr .85fr;align-items:center;gap:20px;
+    padding:40px 0 30px}
+  .hero-copy{position:relative;z-index:2}
+  .kicker{font-family:"Cinzel",serif;letter-spacing:.42em;color:var(--jade);
+    font-size:.82em;text-transform:uppercase;margin-bottom:10px}
+  .hero h1{font-family:"Ma Shan Zheng",cursive;font-size:7.4em;line-height:.92;margin:0;
+    background:linear-gradient(120deg,#fff6d8,var(--gold) 34%,var(--jade) 78%,var(--cyan));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 6px 40px rgba(71,224,176,.28));letter-spacing:.06em}
+  .hero .sub{font-family:"Cinzel",serif;letter-spacing:.34em;color:#cfe6dc;
+    font-size:1.02em;margin:6px 0 20px;text-transform:uppercase}
+  .hero .pitch{font-size:1.28em;color:#f3ecd6;max-width:560px}
+  .hero .pitch b{color:#fff;font-weight:700}
+  .tags{margin:22px 0 26px;display:flex;flex-wrap:wrap;gap:9px}
+  .pill{border:1px solid var(--line2);background:rgba(15,26,32,.6);color:#cfe6dc;
+    padding:6px 14px;border-radius:20px;font-size:.85em;font-weight:600;backdrop-filter:blur(4px)}
+  .pill.g{color:var(--gold);border-color:var(--gold-dp)}
+  .pill.j{color:var(--jade);border-color:var(--jade-dp)}
+  .cta{display:flex;gap:14px;flex-wrap:wrap}
+  .btn{padding:13px 26px;border-radius:12px;font-weight:700;font-size:1.02em;
+    cursor:pointer;transition:.22s;border:1px solid transparent;display:inline-block}
+  .btn.primary{background:linear-gradient(100deg,var(--jade),var(--jade-dp));color:#04120d;
+    box-shadow:0 10px 30px rgba(71,224,176,.34)}
+  .btn.primary:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(71,224,176,.5)}
+  .btn.ghost{border-color:var(--gold-dp);color:var(--gold);background:rgba(236,200,115,.05)}
+  .btn.ghost:hover{background:rgba(236,200,115,.14);transform:translateY(-3px)}
 
-  table{width:100%;border-collapse:collapse;margin-top:12px;font-size:.9em}
-  th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
-  th{background:var(--panel2);color:var(--gold)}
-  tr.moment td{background:rgba(212,175,55,.10)}
-  tr.moment td:first-child{border-left:3px solid var(--gold2)}
-  .star{color:var(--gold);font-weight:bold}
+  .hero-art{position:relative;z-index:1;display:flex;justify-content:center;align-items:flex-end;height:100%}
+  .hero-art::before{content:"";position:absolute;inset:6% 8% 2% 8%;border-radius:50%;
+    background:radial-gradient(closest-side,rgba(71,224,176,.34),rgba(236,200,115,.12) 55%,transparent 74%);
+    filter:blur(14px);animation:pulse 6s ease-in-out infinite}
+  .hero-art img{position:relative;max-height:86vh;max-width:100%;
+    filter:drop-shadow(0 24px 50px rgba(0,0,0,.6)) drop-shadow(0 0 26px rgba(71,224,176,.22));
+    animation:float 7s ease-in-out infinite}
+  @keyframes pulse{50%{transform:scale(1.06);opacity:.85}}
+  @keyframes float{50%{transform:translateY(-14px)}}
+  .spark{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--gold);
+    box-shadow:0 0 12px var(--gold);opacity:.8;animation:rise 6s linear infinite}
+  .scrollcue{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);
+    color:var(--dim);font-size:.8em;letter-spacing:.3em;font-family:"Cinzel",serif;animation:float 3s ease-in-out infinite}
 
-  .quote{background:#3a2a12;border-left:4px solid var(--gold2);padding:14px 18px;border-radius:8px;color:#f2e2c0;margin:14px 0;font-size:1.05em}
-  .note{background:#3a2020;border-left:4px solid #d46a4a;padding:12px 16px;border-radius:8px;color:#e8c8b8;margin:12px 0}
-  .fix{background:#12321f;border-left:4px solid #4ad46a;padding:12px 16px;border-radius:8px;color:#c8e8d0;margin:12px 0}
-  .info{background:#132534;border-left:4px solid #4a9cd4;padding:12px 16px;border-radius:8px;color:#c8dcec;margin:12px 0}
-  ul{line-height:1.8;margin:8px 0}
-  .moments{columns:2;column-gap:26px}
-  .moments div{break-inside:avoid;padding:5px 0;border-bottom:1px dashed #3a2f56}
-  .yes{color:var(--green)} .later{color:var(--dim)}
-  .chargrid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-  .charcard{background:var(--panel2);border:1px solid #6a4a8a;border-radius:12px;overflow:hidden;text-align:center}
-  .charcard img{width:100%;display:block;background:#17122b}
-  .charcard .body{padding:12px 16px}
-  footer{text-align:center;padding:30px 16px;color:#8a7aa8}
-  @media(max-width:760px){
-    .split,.split.rev,.chargrid{grid-template-columns:1fr}
-    .moments{columns:1}
-    .hero h1{font-size:2.8em}.pitch{font-size:1.15em}
+  /* ---------- resource ribbon ---------- */
+  .ribbon{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin:6px 0 40px}
+  .res{position:relative;background:linear-gradient(180deg,rgba(18,34,42,.8),rgba(10,17,22,.8));
+    border:1px solid var(--line);border-radius:16px;padding:20px 16px;text-align:center;
+    transition:.25s;overflow:hidden}
+  .res:hover{transform:translateY(-6px);border-color:var(--line2);box-shadow:0 16px 40px rgba(0,0,0,.4)}
+  .res .ic{font-size:2.1em;line-height:1;margin-bottom:8px;filter:drop-shadow(0 0 10px var(--acc))}
+  .res h4{margin:4px 0 2px;color:var(--acc);font-size:1.24em}
+  .res .role{color:#e9f3ee;font-weight:600;font-size:.98em}
+  .res small{color:var(--muted);display:block;margin-top:4px;font-size:.82em}
+  .res::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;
+    background:linear-gradient(90deg,transparent,var(--acc),transparent);opacity:.7}
+
+  /* ---------- sections ---------- */
+  section.sys{padding:60px 0;border-top:1px solid var(--line)}
+  .sec-head{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:8px}
+  .sec-head .no{font-family:"Cinzel",serif;font-size:1.1em;color:var(--acc);letter-spacing:.2em}
+  .sec-head h2{font-size:2.5em;margin:0;color:#fff;
+    text-shadow:0 2px 30px color-mix(in srgb,var(--acc) 40%,transparent)}
+  .sec-head .tag{margin-left:auto;color:var(--acc);border:1px solid;padding:4px 12px;
+    border-radius:20px;font-size:.8em;font-weight:700;font-family:"Cinzel",serif;letter-spacing:.14em}
+  .lead{color:var(--muted);font-size:1.12em;max-width:820px;margin:6px 0 26px}
+  .lead b{color:var(--text)}
+
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:34px;align-items:center}
+  .split.rev>.art{order:2}
+  .art{position:relative;display:flex;justify-content:center}
+  .art img{max-width:100%;max-height:520px;
+    filter:drop-shadow(0 20px 44px rgba(0,0,0,.55)) drop-shadow(0 0 22px color-mix(in srgb,var(--acc) 30%,transparent))}
+  .art.glow::before{content:"";position:absolute;inset:8% 12%;border-radius:50%;z-index:-1;
+    background:radial-gradient(closest-side,color-mix(in srgb,var(--acc) 34%,transparent),transparent 72%);filter:blur(16px)}
+
+  .card{background:linear-gradient(180deg,rgba(18,32,40,.72),rgba(10,17,22,.72));
+    border:1px solid var(--line);border-radius:16px;padding:20px 22px;transition:.25s;backdrop-filter:blur(6px)}
+  .card:hover{transform:translateY(-5px);border-color:var(--acc);
+    box-shadow:0 18px 44px rgba(0,0,0,.42),0 0 0 1px color-mix(in srgb,var(--acc) 30%,transparent) inset}
+  .card h3{margin:0 0 6px;color:var(--acc);font-size:1.24em;display:flex;align-items:center;gap:8px}
+  .card p{margin:6px 0;color:#dfeae4}
+  .card .em{color:var(--gold);font-weight:600}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+
+  .rule{border-left:3px solid var(--acc);background:color-mix(in srgb,var(--acc) 8%,transparent);
+    padding:12px 18px;border-radius:10px;margin:16px 0;color:#eaf3ee}
+  .rule b{color:var(--acc)}
+  .no-rule{border-left:3px solid var(--flame);background:rgba(255,106,77,.08);
+    padding:12px 18px;border-radius:10px;margin:16px 0;color:#ffd9cf}
+  .no-rule b{color:var(--flame)}
+
+  table{width:100%;border-collapse:collapse;margin-top:14px;font-size:.94em}
+  th,td{border:1px solid var(--line);padding:10px 13px;text-align:left;vertical-align:top}
+  th{background:rgba(18,34,42,.9);color:var(--acc);font-family:"Cinzel",serif;letter-spacing:.06em}
+  tr:hover td{background:rgba(71,224,176,.04)}
+
+  /* ---------- 师姐 cards ---------- */
+  .maidens{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-top:8px}
+  .maiden{position:relative;border:1px solid var(--line);border-radius:16px;overflow:hidden;
+    background:linear-gradient(180deg,#0e1a20,#0a1116);transition:.28s}
+  .maiden:hover{transform:translateY(-8px);border-color:var(--acc);box-shadow:0 22px 50px rgba(0,0,0,.5)}
+  .maiden .pic{height:240px;display:flex;align-items:flex-end;justify-content:center;
+    background:radial-gradient(120% 90% at 50% 10%,rgba(71,224,176,.14),transparent 60%)}
+  .maiden .pic img{max-height:238px;filter:drop-shadow(0 12px 24px rgba(0,0,0,.5))}
+  .maiden .ph{height:238px;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    color:var(--dim);background:
+      repeating-linear-gradient(45deg,rgba(120,170,155,.06) 0 10px,transparent 10px 20px),
+      radial-gradient(120% 90% at 50% 20%,rgba(236,200,115,.10),transparent 60%)}
+  .maiden .ph .q{font-size:3em;color:var(--gold);opacity:.5;font-family:"Cinzel",serif}
+  .maiden .info{padding:12px 14px 16px}
+  .maiden .info h4{margin:0;color:#fff;font-size:1.12em}
+  .maiden .info .r{color:var(--acc);font-size:.82em;font-weight:700;font-family:"Cinzel",serif;letter-spacing:.08em}
+  .maiden .info p{margin:6px 0 0;font-size:.86em;color:var(--muted)}
+  .avatar{width:30px;height:30px;border-radius:50%;object-fit:cover;object-position:top center;
+    border:1px solid var(--acc);vertical-align:middle}
+  .gallery{display:flex;gap:14px;margin-top:20px;flex-wrap:wrap;justify-content:center}
+  .gallery figure{margin:0;flex:1 1 220px;max-width:290px;border:1px solid var(--line);border-radius:14px;
+    overflow:hidden;background:radial-gradient(120% 90% at 50% 0%,rgba(71,224,176,.10),transparent 60%);transition:.3s}
+  .gallery figure:hover{border-color:var(--acc);transform:translateY(-6px);box-shadow:0 18px 40px rgba(0,0,0,.45)}
+  .gallery img{width:100%;height:300px;object-fit:contain;display:block;
+    filter:drop-shadow(0 10px 22px rgba(0,0,0,.5))}
+  .gallery figcaption{text-align:center;color:var(--muted);font-size:.82em;padding:7px 0 12px}
+
+  /* ---------- battle band ---------- */
+  .flow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:18px 0;
+    font-family:"Cinzel",serif;font-size:.92em}
+  .flow .step{background:rgba(15,26,32,.7);border:1px solid var(--line2);border-radius:10px;
+    padding:8px 14px;color:#dfeae4}
+  .flow .step.boss{border-color:var(--flame);color:var(--flame)}
+  .flow .step.climax{border-color:var(--gold);color:var(--gold);font-weight:700}
+  .flow .arw{color:var(--dim)}
+
+  /* ---------- gacha / arcade ---------- */
+  .arcade{position:relative;border-radius:22px;padding:38px 30px;overflow:hidden;
+    background:radial-gradient(120% 120% at 50% 0%,#1a0f22,#0a0710 70%);
+    border:1px solid rgba(255,106,77,.4)}
+  .arcade::before{content:"";position:absolute;inset:0;border-radius:22px;padding:2px;pointer-events:none;
+    background:conic-gradient(from 0deg,var(--flame),var(--cyan),#c86bff,var(--gold),var(--flame));
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;mask-composite:exclude;opacity:.8;animation:spin 8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .arcade h3{text-align:center;font-family:"Ma Shan Zheng",cursive;font-size:2.6em;margin:0 0 4px;
+    color:#fff;text-shadow:0 0 18px var(--flame),0 0 40px var(--cyan)}
+  .neon-sub{text-align:center;font-family:"Cinzel",serif;letter-spacing:.3em;color:#ffb3a3;
+    animation:flicker 3.4s infinite}
+  @keyframes flicker{0%,19%,21%,100%{opacity:1}20%{opacity:.55}50%{opacity:.9}52%{opacity:.6}}
+  .slot{display:flex;justify-content:center;gap:14px;margin:26px 0 8px}
+  .reel{width:96px;height:110px;border-radius:14px;background:#05060a;
+    border:2px solid var(--cyan);box-shadow:0 0 20px rgba(95,216,242,.5) inset,0 0 24px rgba(95,216,242,.3);
+    display:flex;align-items:center;justify-content:center;font-size:3em;overflow:hidden}
+  .reel span{filter:drop-shadow(0 0 10px #fff)}
+  .pullrow{text-align:center;margin-top:18px}
+  .pull{font-family:"Cinzel",serif;letter-spacing:.2em;font-weight:800;font-size:1.1em;
+    padding:14px 40px;border-radius:40px;cursor:pointer;color:#1a0206;border:none;
+    background:linear-gradient(100deg,var(--flame),var(--gold));
+    box-shadow:0 0 30px rgba(255,106,77,.6);transition:.2s}
+  .pull:hover{transform:scale(1.05);box-shadow:0 0 44px rgba(255,106,77,.85)}
+  .pull:active{transform:scale(.97)}
+  .result{text-align:center;min-height:28px;margin-top:14px;font-weight:700;color:var(--cyan);font-size:1.05em}
+  .redline{margin-top:24px;text-align:center;background:rgba(255,106,77,.12);
+    border:1px dashed var(--flame);border-radius:12px;padding:14px 18px;color:#ffd9cf;font-weight:600}
+  .redline b{color:#fff}
+
+  /* ---------- footer ---------- */
+  footer{border-top:1px solid var(--line);padding:44px 0;margin-top:30px;color:var(--muted)}
+  footer .cols{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap}
+  footer a{color:var(--jade)}
+  .doclinks a{display:inline-block;margin:4px 12px 4px 0;color:var(--muted)}
+  .doclinks a:hover{color:var(--gold)}
+
+  /* reveal */
+  .reveal{opacity:0;transform:translateY(28px);transition:.7s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+
+  @media(max-width:900px){
+    .hero{grid-template-columns:1fr;text-align:center;min-height:auto;padding-top:24px}
+    .hero h1{font-size:5em}.hero-art{order:-1;margin-bottom:10px}.hero-art img{max-height:52vh}
+    .tags,.cta{justify-content:center}.hero .pitch{margin:0 auto}
+    .ribbon{grid-template-columns:repeat(2,1fr)}
+    .maidens{grid-template-columns:repeat(2,1fr)}
+    .split{grid-template-columns:1fr}.split.rev>.art{order:0}
+    .grid3,.grid2{grid-template-columns:1fr}
+    .brand span{display:none}
   }
 </style>
 </head>
 <body>
 
-<header class="hero">
-  <div class="hero-inner">
-    <h1>大雷问道</h1>
-    <div class="en">Da Lei Wen Dao</div>
-    <div class="pitch">
-      一剑化万剑。每一次突破，世界为之改变；每一次渡劫，可能失去多年修为。
-      <span class="en">One blade becomes ten thousand. Every breakthrough reshapes the world — every failed tribulation costs you years.</span>
-    </div>
-    <div class="tags">
-      <span class="pill">仙侠 · 剑修</span>
-      <span class="pill">Roguelite 割草</span>
-      <span class="pill">境界驱动 Meta</span>
-      <span class="pill">单机买断 · 不做抽卡</span>
-      <span class="pill new">Godot 4.5.1 · Demo 可玩</span>
+<nav>
+  <div class="wrap">
+    <div class="brand">大雷问道<span>DA LEI WEN DAO</span></div>
+    <div class="navlinks">
+      <a href="#resources">五资源</a>
+      <a href="#lingshi">灵石</a>
+      <a href="#shizhe">师姐</a>
+      <a href="#battle">战斗</a>
+      <a href="#xp">经验</a>
+      <a href="#xiuwei">修为</a>
+      <a href="#gacha">赌博</a>
+      <a class="old" href="old-design.html">Old Design ↗</a>
     </div>
   </div>
+</nav>
+
+<!-- ======================= HERO ======================= -->
+<header class="wrap hero">
+  <div class="hero-copy">
+    <div class="kicker">Sword Cultivation Survivor</div>
+    <h1>大雷问道</h1>
+    <div class="sub">One Blade · Ten-Thousand Swords · The Way</div>
+    <p class="pitch">一人一剑，闯 <b>20 波</b> 秘境为一局。<b>以一剑化万剑</b>，斩妖、渡劫、问道长生——
+      在割草的爽快里，把「洞府养成」与「破境求道」焊成一条线。</p>
+    <div class="tags">
+      <span class="pill j">Roguelite · 割草</span>
+      <span class="pill">20 波 = 一局</span>
+      <span class="pill g">买断制 · 无氪金战力</span>
+      <span class="pill j">五资源经济</span>
+      <span class="pill">剑修 · 唯一卖点</span>
+    </div>
+    <div class="cta">
+      <a class="btn primary" href="#resources">进入五资源宪法</a>
+      <a class="btn ghost" href="#gacha">看看灯红酒绿的赌坊</a>
+    </div>
+  </div>
+  <div class="hero-art">
+    <img src="site-img/sword-maiden.png" alt="剑修师姐立绘">
+  </div>
+  <div class="scrollcue">SCROLL ↓</div>
 </header>
 
-<main>
+<!-- ======================= RESOURCE RIBBON ======================= -->
+<div class="wrap" id="resources">
+  <div class="ribbon reveal">
+    <div class="res" style="--acc:var(--cyan)">
+      <div class="ic">⚡</div><h4>XP</h4>
+      <div class="role">这一局我变强</div><small>局内 · 出关清零</small>
+    </div>
+    <div class="res" style="--acc:var(--gold)">
+      <div class="ic">💎</div><h4>灵石</h4>
+      <div class="role">洞府越来越强</div><small>永久 · 纯数值</small>
+    </div>
+    <div class="res" style="--acc:var(--jade)">
+      <div class="ic">☯</div><h4>修为</h4>
+      <div class="role">世界越来越大</div><small>身份/解锁 · 不消费</small>
+    </div>
+    <div class="res" style="--acc:var(--rose)">
+      <div class="ic">🔮</div><h4>材料</h4>
+      <div class="role">流派越来越传奇</div><small>永久 · 技能觉醒</small>
+    </div>
+    <div class="res" style="--acc:var(--flame)">
+      <div class="ic">🎴</div><h4>天命</h4>
+      <div class="role">收藏与外观</div><small>可后做 · 绝不战力</small>
+    </div>
+  </div>
+</div>
 
-<section>
-  <h2>这是什么</h2>
-  <p class="lead">一款<strong>剑修</strong>题材的仙侠割草 Roguelite。核心命题：耐玩靠 <strong>Loop（决策）</strong> 而非 <strong>Content（工作量）</strong>；但玩家真正记住的，是<strong>具体时刻（stories）</strong>——「我第七道雷前一步死了」，不是资源流图。</p>
-  <div class="quote">至高条款：<strong>所有原则都服务于玩家体验；若玩家体验与原则冲突，以玩家体验为准。</strong>铁律是工具，不是信仰——测出来玩家最爱养剑而非境界？改理论，不改玩家。</div>
-  <div class="fix">📄 本页 = <strong>Designer Bible v5（冻结版）</strong>的公开呈现。设计已冻结，下一步是<strong>建造与验证</strong>，不再扩系统。生产进度见文末「现状 · 路线」。</div>
+<!-- ======================= 灵石 ======================= -->
+<section class="sys reveal" id="lingshi" style="--acc:var(--gold)">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="no">01</span><h2>灵石 · 洞府长青</h2>
+      <span class="tag">永久 · 纯数值</span>
+    </div>
+    <p class="lead">每通一局都能带出的硬通货。它只回答一个问题：<b>我的基础战力更强了吗？</b>
+      灵石在三位师姐处升级 <b>三维</b>——攻击 / 血量 / 防御 / 暴击 / 移速，无限成长、成本软上限（<code>max:0</code>，指数涨价自然减速），
+      每局都拿、每局都有去处。</p>
+    <div class="grid3">
+      <div class="card"><h3>⚔ 炼器 · 凌霜</h3><p>攻击 / 剑长 / 攻速 / 暴击（硬顶 50%）。</p><p class="em">剑痴冷冽，贴身校剑。</p></div>
+      <div class="card"><h3>🛡 炼体 · 素心</h3><p>生命 / 护甲 / 回血 / 初始回血。</p><p class="em">温润渡气，传功亲密。</p></div>
+      <div class="card"><h3>🍃 身法 · 赤芍</h3><p>移速 / 闪避 / 幸运（掉率·刷新）/ 开局金币。</p><p class="em">俏皮爱财，搭手暧昧。</p></div>
+    </div>
+    <div class="rule"><b>铁律：</b>灵石只买「数字」，<b>永不碰技能</b>。你不会在灵石菜单里看到「雷剑 Lv3」——那是身份与流派的事。灵石就是练基本功。</div>
+    <div class="no-rule"><b>杜绝：</b>一个菜单同时能买「攻击+5 / 双刀 Lv2 / 分身 Lv2」→ 灵石秒变「万能金币」，以后平衡地狱。</div>
+  </div>
 </section>
 
-<section>
-  <h2>战斗 Fantasy · 一剑化万剑</h2>
-  <div class="split">
+<!-- ======================= 师姐 ======================= -->
+<section class="sys reveal" id="shizhe" style="--acc:var(--jade)">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="no">02</span><h2>师姐系统 · 门面 · 师承 · 关系</h2>
+      <span class="tag">你才是主角</span>
+    </div>
+    <p class="lead"><b>主角是你</b>，在前线挥剑。师姐是<b>货源 / 老师 / 羁绊</b>——不是被养成的战力单位。
+      她们卖灵石强化、教你心法、陪你渡劫；你和她们的故事，是洞府这个「家」的温度。</p>
+    <div class="maidens">
+      <div class="maiden">
+        <div class="pic"><img src="site-img/shizhe-lingshuang.png" alt="凌霜"></div>
+        <div class="info"><img class="avatar" src="site-img/av-lingshuang.png" alt=""> <span class="r">炼器 · 灵石</span>
+          <h4>青衫 · 凌霜</h4><p>攻速与剑气的锋芒。</p></div>
+      </div>
+      <div class="maiden">
+        <div class="pic"><img src="site-img/shizhe-suxin.png" alt="素心"></div>
+        <div class="info"><img class="avatar" src="site-img/av-suxin.png" alt=""> <span class="r">炼体 · 灵石</span>
+          <h4>白衣 · 素心</h4><p>气血与护体的温润。</p></div>
+      </div>
+      <div class="maiden">
+        <div class="pic"><img src="site-img/shizhe-chishao.png" alt="赤芍"></div>
+        <div class="info"><span class="r">身法 · 灵石</span>
+          <h4>丹鼎 · 赤芍</h4><p>身法、闪避与财运。</p></div>
+      </div>
+      <div class="maiden">
+        <div class="pic"><img src="site-img/shizhe-danxiu.png" alt="丹修师姐"></div>
+        <div class="info"><span class="r">师承 · 材料</span>
+          <h4>丹修师姐</h4><p>金丹境拜师，炼丹渡劫。</p></div>
+      </div>
+      <div class="maiden">
+        <div class="ph"><div class="q">?</div><div style="font-family:'Cinzel',serif;letter-spacing:.2em">神秘师姐</div>
+          <small style="color:var(--dim)">立绘 WIP · 天命抽取</small></div>
+        <div class="info"><span class="r">天命 · 收藏</span>
+          <h4>？？？</h4><p>灯红酒绿处的惊鸿一面。</p></div>
+      </div>
+    </div>
+    <div class="rule"><b>好感度：</b>有，但<b>绝不给战力</b>。好感解锁——衣服 / 聊天 / 剧情 / 立绘 / 隐藏语音 / 称号 / 皮肤，甚至可 <b>gate 某个技能的「最终觉醒」</b>（玩法解锁，能不能用），但绝不 <code>好感+1 → 攻击+3%</code>。</div>
+    <div class="no-rule"><b>红线：</b>不做「女修养成」。师姐不是数值奶妈，否则修仙味秒变恋爱手游。</div>
+    <h3 style="color:var(--jade);margin:30px 0 2px;text-align:center">立绘收藏 · 随好感与天命解锁</h3>
+    <div class="gallery">
+      <figure><img src="site-img/gal-1.png" alt="立绘"><figcaption>白衣 · 惊鸿态</figcaption></figure>
+      <figure><img src="site-img/gal-2.png" alt="立绘"><figcaption>青衫 · 微醺态</figcaption></figure>
+      <figure><img src="site-img/gal-3.png" alt="立绘"><figcaption>隐藏 · 待解锁</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= 战斗 ======================= -->
+<section class="sys reveal" id="battle" style="--acc:var(--flame)">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="no">03</span><h2>战斗 · 20 波破境</h2>
+      <span class="tag">8–11 min / run</span>
+    </div>
+    <p class="lead"><b>20 波 = 一局（a game / run）</b>，约 8–11 分钟。全自动割草，你只管走位与抉择：
+      每波清场 → <b>造化三选一</b> → 加点 → 下一波。W10 中 boss、W20 妖王，越往后越癫狂。</p>
+    <div class="flow">
+      <span class="step">W1–9 刷怪 · 造化 draft</span><span class="arw">→</span>
+      <span class="step boss">W10 中 Boss</span><span class="arw">→</span>
+      <span class="step">W11–19 精英 · 狂暴</span><span class="arw">→</span>
+      <span class="step boss">W20 妖王</span><span class="arw">→</span>
+      <span class="step climax">☯ 渡劫门</span>
+    </div>
+    <div class="split rev">
+      <div class="art glow"><img src="site-img/arena.jpg" alt="秘境战场" style="border-radius:16px;border:1px solid var(--line)"></div>
+      <div>
+        <div class="card" style="margin-bottom:14px"><h3>🎲 险地阶 · 难度旋钮</h3>
+          <p>出关前自选险地 0…N：<span class="em">怪越强，但收获涨得更快</span>——高难更「划算」也更险，是真抉择。境界焊死你的险地上限。</p></div>
+        <div class="card"><h3>☯ 渡劫门 · 一局的高潮</h3>
+          <p>清完 W20 → 打<b>该境渡劫战</b>：秒伤门（DPS）+ 躲技能门（预兆雷/AoE）+ 轻 build 门。<span class="em">软失败——没过不掉东西，练强再来。</span></p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= 经验 XP ======================= -->
+<section class="sys reveal" id="xp" style="--acc:var(--cyan)">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="no">04</span><h2>经验 · 这一局的强大</h2>
+      <span class="tag">局内 · 清零</span>
+    </div>
+    <p class="lead">击杀掉落经验，<b>只属于这一局</b>。升级 → <code>+10 攻击 / +15 血 / 获得双刀 / 剑气+1</code>；
+      死亡或出关，<b>全部消失</b>。这是 Brotato / Vampire Survivors 那套即时爽感。</p>
+    <div class="grid2">
+      <div class="card"><h3>🃏 造化三选一</h3><p>每波末抽卡组 build：叠攻、点燃、吸血、剑气数、召分身……<span class="em">每局 build 都不一样。</span></p></div>
+      <div class="card"><h3>🔗 心法进池</h3><p>已<b>拜师</b>的心法（如雷剑）进入造化池，用 XP 临时堆叠成「这一局的流派」——永久强度不在这里，在材料。</p></div>
+    </div>
+    <div class="rule"><b>分工：</b>XP 决定<b>这一局</b>怎么打；灵石决定<b>基础</b>有多硬；材料决定<b>技能</b>有多传奇。三者互不侵占。</div>
+  </div>
+</section>
+
+<!-- ======================= 修为 / 境界 ======================= -->
+<section class="sys reveal" id="xiuwei" style="--acc:var(--jade)">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="no">05</span><h2>修为 · 世界越来越大</h2>
+      <span class="tag">是等级，不是货币</span>
+    </div>
+    <div class="split">
+      <div class="art glow"><img src="site-img/dujie.png" alt="渡劫入定"></div>
+      <div>
+        <p class="lead" style="margin-top:0">修为是<b>身份</b>，不是钱包。它只告诉游戏「你到了哪个层次」——像成就，<b>达标就解锁，永不 +属性</b>。
+          推进它不靠攒进度条，靠<b>打赢该境渡劫</b>。</p>
+        <div class="rule"><b>材料 → 流派：</b>真正改变玩法的，是材料不是钱。为那颗雷晶，再打一把。</div>
+        <table>
+          <tr><th>材料</th><th>觉醒</th><th>新玩法</th></tr>
+          <tr><td>雷晶</td><td>雷剑</td><td>连锁闪电</td></tr>
+          <tr><td>火魂</td><td>火剑</td><td>燃烧地面</td></tr>
+          <tr><td>龙骨</td><td>飞剑</td><td>穿透 Boss</td></tr>
+          <tr><td>玄铁</td><td>重剑</td><td>击退</td></tr>
+        </table>
+      </div>
+    </div>
+    <h3 style="color:var(--jade);margin:30px 0 4px">境界阶梯 · 每破一境，世界当场变</h3>
+    <p class="lead" style="margin-top:0">不是数字更大，是<b>能玩的东西更多</b>——新师姐 / 新图 / 新 Boss / 新系统。</p>
+    <table>
+      <tr><th>境界</th><th>解锁的世界（Boss / 地图）</th><th>师姐 / 系统</th><th>险地上限</th></tr>
+      <tr><td><b>炼气</b></td><td>狼妖 · 新手林</td><td>凌霜 · 素心</td><td>0–2</td></tr>
+      <tr><td><b>筑基</b></td><td>墨罗 · 剑冢</td><td>赤芍 + 拜师 · 炼丹房</td><td>0–5</td></tr>
+      <tr><td><b>金丹</b></td><td>剑仙 · 毒潭</td><td>符修 · 丹修 + 秘境 / 拍卖会</td><td>0–8</td></tr>
+      <tr><td><b>元婴</b></td><td>古神残骸 · 古墓</td><td>御兽 + 御剑峰 / 宗门</td><td>0–11</td></tr>
+      <tr><td><b>化神+</b></td><td>逐档新招 · 魔域…</td><td>逐境增量</td><td>0–14…</td></tr>
+      <tr><td><b>飞升</b></td><td>—</td><td><b>解锁无尽</b></td><td>去上限</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ======================= 赌博 / 天命 ======================= -->
+<section class="sys reveal" id="gacha" style="--acc:var(--flame)">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="no">06</span><h2>赌博 · 天命赌坊</h2>
+      <span class="tag">灯红酒绿 · 街机</span>
+    </div>
+    <p class="lead">攒够<b>天命</b>，去赌坊拉一把——街机般的灯光、音效与爽感。但奖池里<b>只有皮肤与玩法，没有战力</b>。
+      赢了很花哨，输了不心疼，这才是能长期玩的赌。</p>
+    <div class="arcade reveal">
+      <h3>天命 · 神秘师姐</h3>
+      <div class="neon-sub">PULL FOR SKINS &amp; PLAYSTYLES — NEVER POWER</div>
+      <div class="slot">
+        <div class="reel"><span id="r0">🎴</span></div>
+        <div class="reel"><span id="r1">💠</span></div>
+        <div class="reel"><span id="r2">🀄</span></div>
+      </div>
+      <div class="pullrow"><button class="pull" id="pullBtn" onclick="pull()">◈ PULL 拉一把 ◈</button></div>
+      <div class="result" id="result">投入 1 枚天命，试试手气</div>
+      <div class="redline"><b>红线：</b>没有 SSR 战力师姐、没有「攻击 +50%」。天命只换 <b>皮肤 / 特效 / 立绘 / 特殊玩法</b>，外加 ≤5% 的小便利（掉率之类，绝不挂修为）。它是收藏，不是氪金变强。</div>
+    </div>
+    <p class="lead" style="margin-top:24px;font-size:.98em;color:var(--dim)">
+      * 设计取舍：奖励太强 → 人人赌博、破坏平衡；太废 → 没人玩。答案是把「强度」抽离出赌局，只赌<b>好看与好玩</b>。Demo 阶段可后做。</p>
+  </div>
+</section>
+
+<!-- ======================= FOOTER ======================= -->
+<footer>
+  <div class="wrap cols">
     <div>
-      <p class="lead">Brotato 是「一台疯狂的武器机器」，VS 是「满屏都是我的弹幕」。我们的战斗幻想是——</p>
-      <div class="quote">剑修 —— <strong>一剑化万剑，以一敌万。</strong>满屏翻飞的剑气，就是本作的「VS 弹幕 / Brotato 机器」。</div>
-      <p><strong>关键洞察：战斗幻想 ⟺ 养剑 Meta，是同一件事。</strong>满屏剑气的源头，就是你跨局培养的那把<strong>本命剑</strong>；觉醒分叉（雷/血/飞）改变<strong>万剑如何铺满屏幕</strong>；境界越高，剑气越多越烈。于是「养剑」既是 Meta loop，又<strong>直接就是</strong>战斗爽点本身——两层焊成一层。</p>
-      <h3>世界观支柱（一句话）</h3>
-      <p class="quote">从一个凡人，修炼成能挑战天道、终将飞升的传奇修士。</p>
-      <p class="small lead">任何 feature 先回答：帮不帮这句话 / 帮不帮「一剑化万剑」？都不帮 → 砍。（种地 / 钓鱼 / 后宫 / 家园装修 → 砍。）</p>
+      <div class="brand" style="font-size:1.5em">大雷问道<span>DA LEI WEN DAO</span></div>
+      <p style="max-width:420px">剑修 · 割草 · 求道。一份把「爽」与「求道」焊在一起的仙侠 roguelite 设计。</p>
     </div>
-    <figure>
-      <img class="fig" src="site-img/sword.jpg" alt="剑修立绘">
-      <figcaption>剑修 · 一人一剑，剑气化千军</figcaption>
-    </figure>
-  </div>
-</section>
-
-<section>
-  <h2>三样别人抄不走的组合</h2>
-  <div class="cards">
-    <div class="card"><h3>① 万剑战斗身份</h3><p>剑修「一剑化万剑」——满屏剑气就是核心爽点，且与养剑 Meta 同层。</p></div>
-    <div class="card"><h3>② 世界随境界演变</h3><p>每次突破，世界<strong>肉眼可见地变</strong>：新敌人 / 新掉落 / 新规则，而非弹出新菜单。</p></div>
-    <div class="card"><h3>③ 渡劫赌命</h3><p>渡劫可能<strong>失去多年修为</strong>——Risk/Reward 是所有决策的定盘星。</p></div>
-  </div>
-  <p class="small lead" style="margin-top:14px">Store 定位不是「修仙 Brotato」，而是 <em>“The world evolves with your cultivation.”</em>——这是「一款<strong>剑修</strong>游戏」，卖点聚焦，不是「成为任何修士」。</p>
-</section>
-
-<section>
-  <h2>玩家体验时间线 · 前两小时（本作脊柱）</h2>
-  <p class="lead">设计判据：如果这条线足够精彩，系统大概率成立；如果它只是不断解锁新菜单，再优雅的资源图也留不住人。<span class="star">★</span> = 核心决策 / 最强 story。</p>
-  <table>
-    <tr><th>时间</th><th>玩家在做什么</th><th>目标情绪</th></tr>
-    <tr><td>0–5 min</td><td>第一局割草，剑气炸群；造化三选一，道行连跳</td><td>「手感真爽，一分钟就变强」</td></tr>
-    <tr><td>5–18 min</td><td>结算掉<strong>修为 + 灵木</strong>能带走；第 2–3 局修为逼近筑基</td><td>「哦？这些能带走」「就差一点」</td></tr>
-    <tr class="moment"><td><strong>~20 min</strong></td><td><strong>首次筑基</strong>，墨笔「筑基」全屏；世界当场变：炼丹房开门 + 地图现<strong>魔修·墨罗</strong>（会偷 buff、会嘲讽）</td><td>「我升的是<strong>身份</strong>，不是数字」「<strong>世界因我而变了</strong>」</td></tr>
-    <tr><td>20–35 min</td><td>炼丹：材料只够一颗保命丹，炼了带下局</td><td>「资源要规划了」</td></tr>
-    <tr class="moment"><td><strong>~40 min</strong> <span class="star">★</span></td><td>攒够材料，逼出选择：<strong>炼渡劫丹冲金丹 / 觉醒木剑？</strong>（材料二选一）</td><td>「到底冲境界还是变 build」← <strong>核心决策</strong></td></tr>
-    <tr><td>40–55 min</td><td>选觉醒 → 木剑化<strong>雷剑</strong>，清群方式全变</td><td>「我的剑成型了」</td></tr>
-    <tr class="moment"><td><strong>~70 min</strong> <span class="star">★</span></td><td>首次<strong>渡劫天劫战</strong>：欠准备，第七道雷死了</td><td>「<strong>就差一颗保命丹！</strong>」← 最强 story</td></tr>
-    <tr><td>70–85 min</td><td>失败反噬，决定再刷两局炼保命丹</td><td>「这次稳一点，再来一局」</td></tr>
-    <tr class="moment"><td><strong>~90 min</strong></td><td>二次渡劫成功，<strong>金丹</strong>！世界再变：Boss 掉<strong>元神</strong>、敌人升级为会格挡的<strong>剑仙</strong></td><td>「我真的更深了」</td></tr>
-  </table>
-  <div class="info"><strong>三个必须成立的瞬间（唯一成功判据）：</strong>① ~20min 首次筑基「世界变了」；② ~40min 首个竞争「渡劫丹 vs 雷剑」真的纠结；③ ~70min 首次渡劫失败「想再来一局」而非摔手柄。三者成立 → 核心扎实；不成立 → 回来改配方，不加系统。</div>
-</section>
-
-<section>
-  <h2>境界脊柱 = 世界当场变（不是菜单）</h2>
-  <div class="split rev">
-    <figure>
-      <img class="fig" src="site-img/li-baiyi.jpg" alt="境界立绘">
-      <figcaption>境界不是 UI 数字，是身份</figcaption>
-    </figure>
-    <div>
-      <p>境界靠战斗掉的<strong>修为</strong>推进（闸门轨，材料加速不了）。它不只是 炼气→筑基→金丹 的阶梯，更是<strong>身份分叉轴</strong>。每次突破让世界<strong>可见地变</strong>——不是弹菜单，而是<strong>下一局进副本，世界肉眼不同了</strong>。</p>
-      <div class="fix">✅ <strong>W1 已实装：</strong>修为跨局累积（永不清零）+ 炼气→…→飞升 阈值 + 当场突破全屏墨笔演出 + 吟唱音效 + 存档。洞府常驻显示当前境界 / 修为进度。</div>
+    <div class="doclinks">
+      <div style="color:var(--gold);font-family:'Cinzel',serif;letter-spacing:.2em;margin-bottom:6px">DESIGN DOCS</div>
+      <a href="design-plan-meta-v3.md">经济宪法 v3（五资源）</a><br>
+      <a href="system-design-two-scene.md">双场景系统设计</a><br>
+      <a href="fantasy-bible.md">Fantasy Bible</a><br>
+      <a href="old-design.html">← Old Design（旧设计站）</a>
     </div>
   </div>
-  <table>
-    <tr><th>境界</th><th>身份</th><th>世界怎么变（可见）</th><th>敌人变</th></tr>
-    <tr><td>炼气</td><td>凡人入道</td><td>起点</td><td>妖兽</td></tr>
-    <tr class="moment"><td><strong>筑基</strong></td><td>正式修士</td><td><strong>炼丹房开门</strong> + 地图现灵脉（材料点）</td><td>出现<strong>魔修·墨罗</strong>（偷 buff）</td></tr>
-    <tr><td>金丹</td><td>结丹延寿</td><td>炼器房开门（装备分叉）+ Boss 掉元神</td><td>出现<strong>剑仙</strong>（格挡）</td></tr>
-    <tr><td>元婴</td><td>元神脱胎</td><td>藏经阁 + 灵兽园 + 敌人会夺舍</td><td>古神残骸（诅咒/夺技）</td></tr>
-    <tr><td>化神</td><td>感悟法则</td><td>悟道塔（无尽）+ 法宝 + 副本现「改规则区」</td><td>法则造物</td></tr>
-    <tr><td>炼虚·合体</td><td>半步大能</td><td>隐藏 Boss + 装备本命化</td><td>天人</td></tr>
-    <tr><td>大乘 → 飞升</td><td>圆满 → 换界</td><td>飞升 → 世界纪元（<strong>v1.5</strong>）</td><td>—</td></tr>
-  </table>
-  <p class="small lead">P1 先只接 炼气 / 筑基 / 金丹，元婴+ 做「即将开启」占位——用体验时间线控 scope。</p>
-</section>
+</footer>
 
-<section>
-  <h2>敌人阶梯 · 敌人 = 角色</h2>
-  <div class="split">
-    <div>
-      <p class="lead">修 review 抓的最大漏洞：敌人不成长。我们的解法——敌人不是「后面 +HP」，而是<strong>换身份 + 每阶带一个新机制 = 新决策</strong>。这让「更深的世界」成为 Loop 而非 Content。</p>
-      <table>
-        <tr><th>境界阶</th><th>敌人</th><th>新机制（制造决策）</th></tr>
-        <tr><td>炼气</td><td>妖兽</td><td>冲 / 扑</td></tr>
-        <tr class="moment"><td>筑基</td><td><strong>魔修</strong></td><td><strong>驱散/偷造化 buff</strong> → 逼你保护增益、优先点杀</td></tr>
-        <tr><td>金丹</td><td>剑仙</td><td><strong>格挡/反弹</strong>正面剑气 → 逼走位绕后、换 build</td></tr>
-        <tr><td>元婴</td><td>古神残骸</td><td><strong>诅咒/夺舍</strong>（暂夺一个技能）→ 逼取舍与容错</td></tr>
-        <tr><td>化神+</td><td>法则造物</td><td><strong>局部改规则</strong>（禁疗区 / 反重力弹幕）</td></tr>
-      </table>
-    </div>
-    <figure>
-      <img class="fig" src="site-img/boss.jpg" alt="Boss 立绘">
-      <figcaption>越靠后的关键敌人，越该有名字与台词</figcaption>
-    </figure>
-  </div>
-  <div class="quote">P1 便宜首例（近乎免费的一个 story）：给转折点那个「偷 buff 魔修」一个名字与一句嘲讽——<strong>噬魂魔修·墨罗</strong>。偷你增益时甩一句「此增益，我笑纳了」，被击杀时「区区筑基……也配……」。一个名字 + 两句 bark + 复用现成机制，就能造出玩家口中的「又是墨罗那王八」。</div>
-</section>
+<script>
+  // scroll reveal
+  const io = new IntersectionObserver((es)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 
-<section>
-  <h2>核心决策 · 渡劫丹 vs 觉醒剑</h2>
-  <p class="lead">耐玩的根：<strong>竞争经济</strong>。闸门资源（<strong>修为</strong>，限速、不可替代）与经济资源（<strong>灵木 / 妖骨</strong>，被争夺）分两轨，否则「境界永远最重要」会把经济吸干成一本道。</p>
-  <table>
-    <tr><th>资源</th><th>轨</th><th>去向</th><th>竞争？</th></tr>
-    <tr><td><strong>修为 / 妖魂</strong></td><td>闸门</td><td>境界小层 + 圆满门槛</td><td>否（纯节拍）</td></tr>
-    <tr class="moment"><td><strong>灵木 / 妖骨</strong></td><td>经济</td><td>①渡劫丹 ②装备觉醒·分叉 ③洞府建设</td><td><span class="star">是（核心竞争）</span></td></tr>
-    <tr><td>灵石</td><td>经济</td><td>洞府建设 + 装备 +N + 占卜</td><td>软竞争</td></tr>
-    <tr class="moment"><td>丹药</td><td>中间品</td><td>战斗即时吃 <strong>或</strong> 囤着渡劫</td><td><span class="star">是（当下 vs 储备）</span></td></tr>
-  </table>
-  <h3>渡劫 · 风险 · 保底</h3>
-  <div class="cards">
-    <div class="card"><h3>不是掷骰，是试炼</h3><p>扛九道天雷（复用地火/预警）+ 每道间刷精英。成功由<strong>技术 + 准备余量</strong>决定，保留能动性。</p></div>
-    <div class="card"><h3>余量三来源</h3><p>①圆满度（修为超门槛越多越稳）②带的丹（保命丹续命）③装备分叉是否成型。所谓「80% 成功率」= 我准备到几成。</p></div>
-    <div class="card"><h3>失败反噬（不劝退）</h3><p><strong>不掉大境界</strong>（身份不回退）；但丹消耗 + 损失部分当前修为 + 短冷却 → 逼「再炼一颗保命丹再冲」。</p></div>
-    <div class="card"><h3>保底防雪崩</h3><p>连败 N 次后天劫强度递减 / 给一次「渡劫余烬」减伤，保证不会无限卡墙。</p></div>
-  </div>
-</section>
+  // nav active highlight
+  const links=[...document.querySelectorAll('.navlinks a:not(.old)')];
+  const secObs=new IntersectionObserver((es)=>es.forEach(e=>{
+    if(e.isIntersecting){links.forEach(l=>l.classList.toggle('active',l.getAttribute('href')==='#'+e.target.id));}
+  }),{rootMargin:'-45% 0px -50% 0px'});
+  document.querySelectorAll('section.sys,#resources').forEach(s=>secObs.observe(s));
 
-<section>
-  <h2>装备培养 · 木剑 → 觉醒 雷 / 血 / 飞</h2>
-  <p class="lead">培养链：<strong>木剑 → +N（灵石，软线）→ 觉醒（★三选一）→ 化形 → 本命法宝</strong>（终点，不用「飞升」一词——飞升只属于人物）。觉醒是分叉点，<strong>改整个 build</strong>，一把剑只能选一支。</p>
-  <div class="cards">
-    <div class="card"><h3>⚡ 雷</h3><p>范围连锁 / 清群。万剑化作连锁雷网，铺满全屏。</p></div>
-    <div class="card"><h3>🩸 血</h3><p>吸血 / 高风险高回报。残血反哺，一屏收割。</p></div>
-    <div class="card"><h3>🗡 飞</h3><p>御剑追击 / 单体爆发。一剑穿刺，直取 Boss。</p></div>
-  </div>
-  <div class="info">与敌人机制交叉：剑仙格挡正面剑气 → 血剑吸血 / 飞剑绕后各有解。<strong>敌人机制反过来给装备分叉制造意义。</strong>复用现成局内剑气进化技术，持久层只是接到跨局养成。</div>
-</section>
+  // hero sparks
+  const art=document.querySelector('.hero-art');
+  for(let i=0;i<12;i++){const s=document.createElement('span');s.className='spark';
+    s.style.left=(10+Math.random()*80)+'%';s.style.bottom=(Math.random()*40)+'%';
+    s.style.animationDelay=(Math.random()*6)+'s';s.style.animationDuration=(4+Math.random()*5)+'s';
+    s.style.background=Math.random()>.5?'var(--gold)':'var(--jade)';
+    s.style.boxShadow='0 0 12px '+(Math.random()>.5?'#ecc873':'#47e0b0');art.appendChild(s);}
 
-<section>
-  <h2>流派 = 身份轴（Progression ≠ Fantasy）</h2>
-  <p class="lead">修仙是 <strong>Setting</strong>，不是 Fantasy——同一 Setting 下有几十种幻想（剑仙 / 炼丹师 / 御兽 / 邪修 / 体修）。若所有 loop 最终都只为「突破境界」，第 20 小时就沦为 checklist。解法：某一境选定<strong>流派</strong>，此后掉落表 / 商店 / Boss 掉落 / 资源权重全不同——<strong>同一套系统产出不同人生（改权重，不是加系统）</strong>。</p>
-  <div class="cards">
-    <div class="card"><h3>剑修 <span class="pill new">P1 唯一上线</span></h3><p>就是现在的游戏。「筑基选身份」由现成的<strong>觉醒分叉（雷/血/飞）</strong>承载——零新战斗引擎。</p></div>
-    <div class="card"><h3>丹 / 体 / 符 / 御兽 / 魔 <span class="pill">1.0 后</span></h3><p>体修无蓝条只血条、符修偏塔防、魔修更难但更快……<strong>验证后</strong>的重放放大器，重配掉落非新引擎。</p></div>
-  </div>
-  <div class="note"><strong>严格控 scope：</strong>小团队上线 5 套未验证战斗职业 = 发布不了的死法。卖点保持「一款剑修游戏」，「万剑」是主轴，流派是验证后纵向加宽。</div>
-</section>
-
-<section>
-  <h2>Story Moments · 可分享时刻清单</h2>
-  <p class="lead">玩家不会发「资源 A 流向 B」，会发「我第七道雷死了」。<strong>每个系统至少产出 1 个能截图 / 发 Discord / 讲给朋友的时刻，否则砍。</strong><span class="yes">✓ = P1 切片已能产出</span>　<span class="later">○ = 后续</span></p>
-  <div class="moments">
-    <div><span class="yes">✓</span> 第一次筑基，整个世界当场变了</div>
-    <div><span class="yes">✓</span> 第一次撞见偷 buff 的墨罗（「此增益，我笑纳了」）</div>
-    <div><span class="yes">✓</span> 第一次渡劫，第七道雷前一步死了——「就差一颗保命丹」</div>
-    <div><span class="yes">✓</span> 为了雷剑，放弃了这次金丹</div>
-    <div><span class="yes">✓</span> 木剑觉醒成雷剑那一下，清群方式全变</div>
-    <div><span class="yes">✓</span> 血剑吸血，残血反杀一屏</div>
-    <div><span class="yes">✓</span> 满屏剑气「一剑化万剑」的截图</div>
-    <div><span class="yes">✓</span> 渡劫失败后咬牙再刷两局，这次稳过九雷</div>
-    <div><span class="later">○</span> 连续突破三境</div>
-    <div><span class="later">○</span> 一剑（御剑穿刺）秒掉 Boss</div>
-    <div><span class="later">○</span> 练出一把「九霄雷剑」，别人问怎么弄的</div>
-    <div><span class="later">○</span> 剑冢天时，只掉剑，爆出红色法宝</div>
-    <div><span class="later">○</span> 剑仙 Boss 格挡我正面剑气，被迫绕后</div>
-    <div><span class="later">○</span> 古神残骸夺舍，抢走我一个技能</div>
-    <div><span class="later">○</span> 占卜燃香，硬改天时刷成血月 ×2</div>
-    <div><span class="later">○</span> 首杀某剑仙，洞府多了一幅壁画</div>
-    <div><span class="later">○</span> 保命丹囤一堆，赌一次超规格渡劫</div>
-    <div><span class="later">○</span> 两把剑分别走血 / 飞，对比 build</div>
-    <div><span class="later">○</span> 发现隐藏 Boss / 隐藏奇遇</div>
-    <div><span class="later">○</span> 化神后副本出现「禁疗区」，打法重构</div>
-    <div><span class="later">○</span>（1.0 后）换流派开局，同一游戏另一种人生</div>
-    <div><span class="later">○</span>（1.0 后）飞升进新纪元，世界规则变了</div>
-  </div>
-</section>
-
-<section>
-  <h2>同道 · 局外陪伴</h2>
-  <p class="lead">洞府里陪你精进的同门师姐——出关归来、境界突破、道成道陨时，她们会点评、会打气。局外美少女立绘是<strong>陪伴层</strong>，不是付费墙；游戏身份始终是「剑修割草 + 境界」。</p>
-  <div class="chargrid">
-    <div class="charcard">
-      <img src="site-img/char-baiyi.jpg" alt="白衣师姐">
-      <div class="body"><h3 style="color:var(--gold);margin:6px 0">白衣 · 师姐</h3><p class="small lead">「挑一样趁手的，为姐看好你。」温润稳重，稳扎稳打那一路。</p></div>
-    </div>
-    <div class="charcard">
-      <img src="site-img/char-qingshan.jpg" alt="青衫师妹">
-      <div class="body"><h3 style="color:var(--gold);margin:6px 0">青衫 · 师妹</h3><p class="small lead">「磨蹭啥呢，妖都要笑你啦！」跳脱促狭，专挑狠招那一路。</p></div>
-    </div>
-  </div>
-</section>
-
-<section>
-  <h2>现状 · 路线（Doc B）</h2>
-  <div class="fix">✅ <strong>已实现（地基）：</strong>剑气割草战斗 loop + 道行 Lv + 局内造化三选一 draft；多招弹幕妖王（环/扇/追命/十字/螺旋/雷爆 + 冲刺红色走廊预警 + 三阶段狂暴）；洞府壳 + 持久灵石 + 永久强化；<strong>W1 境界/修为脊柱 + 当场突破演出</strong>。技术栈 Godot 4.5.1，已可导出 Windows 单文件。</div>
-  <table>
-    <tr><th>周</th><th>交付（每周都可玩）</th><th>命中瞬间</th></tr>
-    <tr class="moment"><td><strong>W1</strong> <span class="pill new">已实装</span></td><td>境界脊柱：修为跨局累积 + 阈值 + 全屏墨笔突破 + 存档</td><td>①地基</td></tr>
-    <tr><td>W2</td><td>境界改世界 v1：筑基当场——炼丹房入口 + 刷魔修·墨罗（偷 buff + 姓名 + bark）</td><td><strong>①</strong></td></tr>
-    <tr><td>W3</td><td>炼丹房 + 竞争材料：灵木/妖骨掉落 + 保命丹/渡劫丹（抢同一批材料）</td><td>②地基</td></tr>
-    <tr><td>W4</td><td>炼器觉醒分叉：木剑 → 雷/血/飞 三选一 + 锁定</td><td><strong>②闭环</strong></td></tr>
-    <tr><td>W5</td><td>渡劫天劫战 + 风险/保底：九雷战 + 余量式成功 + 失败反噬 + 连败保底</td><td><strong>③</strong></td></tr>
-    <tr><td>W6</td><td>打磨 + GO/NO-GO：按时间线校准数值，把三瞬间磨到爽</td><td>三瞬间齐</td></tr>
-  </table>
-</section>
-
-<section>
-  <h2>设计铁律 · 明确不做</h2>
-  <div class="split">
-    <div>
-      <h3>铁律</h3>
-      <ul>
-        <li><strong>Loop &gt; Content</strong>：同一套内容反复产生新决策才耐玩。</li>
-        <li><strong>体验 &gt; 框架</strong>：不制造「时刻」的优雅系统 → 砍。</li>
-        <li><strong>扇入竞争</strong>：每种主材至少一处硬竞争。</li>
-        <li><strong>闸门 ↔ 经济分离</strong>：修为限速，材料被争夺。</li>
-        <li><strong>一条主线</strong>：主线只有境界；装备/伙伴/法宝从属它。</li>
-        <li><strong>境界改世界，不开菜单</strong>；<strong>敌人跟着长</strong>。</li>
-      </ul>
-    </div>
-    <div>
-      <h3>明确不做 / 暂缓</h3>
-      <ul>
-        <li><span class="pill hot">砍</span> 纪元 / 飞升 prestige → v1.5（是第二个游戏，先证明核心）</li>
-        <li><span class="pill hot">不做</span> Idle / 离线产出（会削弱战斗核心）</li>
-        <li><span class="pill hot">不做</span> 图鉴当 loop → 降只读；真收集 = 奇遇/称号绑壮举</li>
-        <li><span class="pill hot">砍</span> 种地 / 钓鱼 / 酒馆 / 后宫 / 家园装修</li>
-        <li><span class="pill hot">砍</span> 抽卡（单机买断，无抽卡）</li>
-      </ul>
-    </div>
-  </div>
-</section>
-
-</main>
-<footer>大雷问道 · Designer Bible v5（冻结版）· 一剑化万剑，世界随境界演变 · Godot 4.5.1</footer>
+  // gacha slot — cosmetics only, never power
+  const POOL=[
+    {g:'🎴',t:'新皮肤：青霜雪影'},{g:'💠',t:'特效：雷剑改配色'},{g:'🀄',t:'立绘解锁：赤芍·夏'},
+    {g:'🏮',t:'洞府装饰：灯笼一对'},{g:'🎐',t:'击杀动画：落樱'},{g:'🍶',t:'称号：赌坊常客'},
+    {g:'🌸',t:'隐藏语音一段'},{g:'⭐',t:'小便利：材料掉率 +3%'}
+  ];
+  const GLY=['🎴','💠','🀄','🏮','🎐','🍶','🌸','⭐','🔔','🎇'];
+  let spinning=false;
+  function rand(a){return a[Math.floor(Math.random()*a.length)]}
+  function pull(){
+    if(spinning)return;spinning=true;
+    const btn=document.getElementById('pullBtn'),res=document.getElementById('result');
+    res.textContent='';btn.style.opacity=.6;
+    const reels=[document.getElementById('r0'),document.getElementById('r1'),document.getElementById('r2')];
+    const iv=setInterval(()=>reels.forEach(r=>r.textContent=rand(GLY)),80);
+    setTimeout(()=>{
+      clearInterval(iv);spinning=false;btn.style.opacity=1;
+      const prize=rand(POOL);
+      reels[0].textContent=prize.g;reels[1].textContent=rand(GLY);reels[2].textContent=prize.g;
+      res.innerHTML='✦ 获得 <b style="color:#fff">'+prize.t+'</b> ✦';
+    },1300);
+  }
+</script>
 </body>
 </html>
