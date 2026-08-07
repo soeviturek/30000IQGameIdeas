@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>铸剑 · 炼器凌霜 — 大雷问道 原型</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Noto+Serif+SC:wght@400;600;800;900&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#070c10; --ink2:#0a1116; --panel:#0f1a20; --panel2:#12222a;
+    --line:rgba(120,170,155,.18); --line2:rgba(120,170,155,.34);
+    --jade:#47e0b0; --gold:#ecc873; --cyan:#5fd8f2; --flame:#ff6a4d; --rose:#ff9db2;
+    --steel:#c3ccd6; --text:#eaf3ef; --muted:#9fb6ad; --dim:#6d867d;
+    --acc:var(--cyan);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--ink);color:var(--text);min-height:100vh;
+    font-family:"Noto Serif SC","Microsoft YaHei","PingFang SC",serif;overflow-x:hidden}
+  /* cold forge aurora */
+  body::before{content:"";position:fixed;inset:-20% -10%;z-index:-2;
+    background:
+      radial-gradient(46% 42% at 26% 30%, rgba(95,216,242,.16), transparent 60%),
+      radial-gradient(40% 40% at 78% 20%, rgba(236,200,115,.12), transparent 62%),
+      radial-gradient(52% 50% at 30% 88%, rgba(71,224,176,.12), transparent 60%),
+      radial-gradient(40% 44% at 84% 82%, rgba(255,106,77,.10), transparent 60%);
+    filter:blur(34px);animation:drift 30s ease-in-out infinite alternate}
+  body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:
+      radial-gradient(120% 80% at 50% -12%, transparent 60%, rgba(0,0,0,.55)),
+      linear-gradient(rgba(120,170,155,.03) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(120,170,155,.03) 1px,transparent 1px);
+    background-size:100% 100%, 44px 44px, 44px 44px}
+  @keyframes drift{0%{transform:translate3d(0,0,0) scale(1)}
+    50%{transform:translate3d(-3%,2%,0) scale(1.07)}100%{transform:translate3d(3%,-2%,0) scale(1.03)}}
+  a{color:var(--gold);text-decoration:none}
+  .en{font-family:"Cinzel",serif;letter-spacing:.16em}
+
+  /* nav / screen switcher */
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);
+    background:linear-gradient(rgba(7,12,16,.82),rgba(7,12,16,.5));border-bottom:1px solid var(--line)}
+  nav .wrap{max-width:1280px;margin:0 auto;padding:0 22px;display:flex;align-items:center;gap:12px;height:60px}
+  .brand{font-family:"Ma Shan Zheng",cursive;font-size:1.7em;line-height:1;
+    background:linear-gradient(92deg,var(--gold),#fff6d8 40%,var(--cyan));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    text-shadow:0 0 24px rgba(95,216,242,.25);white-space:nowrap}
+  .brand span{font-family:"Cinzel",serif;font-size:.3em;letter-spacing:.3em;color:var(--dim);display:block;margin-top:-6px}
+  .switch{margin-left:auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .switch a{color:var(--muted);font-size:.9em;padding:7px 13px;border-radius:9px;
+    border:1px solid transparent;transition:.2s;font-weight:600}
+  .switch a:hover{color:var(--text);border-color:var(--line2);background:rgba(255,255,255,.03)}
+  .switch a.on{color:var(--ink);background:linear-gradient(180deg,#eafcff,var(--cyan));border-color:var(--cyan)}
+  .switch a.lock{opacity:.5}
+  .switch a.lock::after{content:" 🔒";font-size:.8em}
+
+  .wrap{max-width:1280px;margin:0 auto;padding:0 22px}
+
+  /* two-column visual-novel forge */
+  .forge{display:grid;grid-template-columns:minmax(360px,46%) 1fr;gap:22px;
+    align-items:stretch;padding:18px 0 40px;min-height:calc(100vh - 60px)}
+  @media(max-width:960px){.forge{grid-template-columns:1fr}}
+
+  /* ---- left: 凌霜 立绘 ---- */
+  .maiden{position:relative;border-radius:20px;overflow:hidden;
+    border:1px solid var(--line);background:
+      radial-gradient(70% 55% at 50% 78%, rgba(95,216,242,.14), transparent 60%),
+      linear-gradient(180deg,#0c161c,#070c10)}
+  .maiden .forgeglow{position:absolute;left:50%;bottom:-8%;width:120%;height:52%;transform:translateX(-50%);
+    background:radial-gradient(closest-side, rgba(255,150,80,.22), rgba(95,216,242,.10) 55%, transparent 72%);
+    filter:blur(10px);animation:ember 3.4s ease-in-out infinite alternate;pointer-events:none}
+  @keyframes ember{0%{opacity:.7;transform:translateX(-50%) scale(1)}100%{opacity:1;transform:translateX(-50%) scale(1.06)}}
+  .maiden img{position:absolute;left:50%;bottom:0;transform:translateX(-50%);
+    height:98%;width:auto;object-fit:contain;filter:drop-shadow(0 12px 30px rgba(0,0,0,.6));
+    -webkit-user-drag:none;transition:transform .4s}
+  .maiden .plate{position:absolute;left:18px;top:16px;z-index:3}
+  .plate .nm{font-family:"Ma Shan Zheng",cursive;font-size:2.1em;line-height:1;
+    background:linear-gradient(92deg,#fff,var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .plate .role{font-family:"Cinzel",serif;letter-spacing:.24em;font-size:.72em;color:var(--cyan);margin-top:3px}
+  .plate .role b{color:var(--gold)}
+  /* 好感（仅情绪·不加战力） */
+  .favor{position:absolute;left:18px;bottom:16px;z-index:3;display:flex;align-items:center;gap:8px;
+    background:rgba(7,12,16,.5);border:1px solid var(--line);border-radius:20px;padding:6px 12px;backdrop-filter:blur(6px)}
+  .favor .hearts{letter-spacing:2px;font-size:1.05em}
+  .favor small{color:var(--dim);font-size:.72em}
+  /* speech bubble */
+  .say{position:absolute;right:16px;bottom:22px;z-index:4;max-width:64%;
+    background:linear-gradient(180deg,rgba(18,34,42,.96),rgba(10,17,22,.96));
+    border:1px solid var(--line2);border-radius:14px 14px 4px 14px;padding:12px 15px;
+    box-shadow:0 14px 34px rgba(0,0,0,.5);opacity:0;transform:translateY(8px);transition:.35s}
+  .say.show{opacity:1;transform:translateY(0)}
+  .say b{color:var(--cyan);font-size:.8em;letter-spacing:.1em}
+  .say p{margin:4px 0 0;font-size:1.12em;color:#eaf6f2}
+
+  /* ---- right: 剑炉 panel ---- */
+  .forgepanel{background:linear-gradient(180deg,var(--panel),var(--ink2));
+    border:1px solid var(--line);border-radius:20px;padding:20px;display:flex;flex-direction:column;
+    box-shadow:0 20px 50px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.03)}
+  .fhead{display:flex;align-items:baseline;gap:12px;margin-bottom:6px}
+  .fhead h1{font-family:"Ma Shan Zheng",cursive;font-size:2em;margin:0;
+    background:linear-gradient(92deg,#fff6d8,var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .fhead .en{color:var(--dim);font-size:.8em}
+  .stones{margin-left:auto;font-size:1.15em;font-weight:800;color:var(--cyan);
+    font-variant-numeric:tabular-nums;white-space:nowrap}
+  .stones .dot{width:9px;height:9px;border-radius:50%;background:var(--gold);display:inline-block;margin-right:6px}
+  .sub{color:var(--dim);font-size:.9em;margin:0 0 10px}
+
+  /* sword display */
+  .swordstage{position:relative;display:flex;flex-direction:column;align-items:center;
+    padding:6px 0 10px;border-bottom:1px solid var(--line);margin-bottom:12px}
+  .flash{position:absolute;inset:0;background:radial-gradient(circle at 50% 42%,#fff,transparent 55%);
+    opacity:0;pointer-events:none;z-index:5}
+  .flash.go{animation:flash .5s ease-out}
+  @keyframes flash{0%{opacity:.85}100%{opacity:0}}
+  .tier-name{font-family:"Ma Shan Zheng",cursive;font-size:1.7em;color:var(--bl,#cfd6dd);
+    text-shadow:0 0 22px var(--bl,#cfd6dd);transition:.4s;margin:2px 0 0}
+  .tier-sub{color:var(--dim);font-family:"Cinzel",serif;letter-spacing:.2em;font-size:.72em}
+  .swordbox{position:relative;width:150px;height:250px;display:flex;align-items:center;justify-content:center}
+  .spin{position:absolute;inset:0;animation:spin 14s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .qi{position:absolute;top:50%;left:50%;width:9px;height:46px;margin:-23px 0 0 -4px;border-radius:5px;
+    background:linear-gradient(var(--ed,#fff),transparent);filter:drop-shadow(0 0 6px var(--bl,#fff))}
+  .sword{position:relative;transform-origin:50% 82%;transition:transform .35s cubic-bezier(.2,1.4,.4,1);
+    filter:drop-shadow(0 0 calc(2px + var(--gl,0)*4px) var(--bl,#9aa))
+           drop-shadow(0 0 calc(1px + var(--gl,0)*8px) var(--glow2,transparent));z-index:2}
+  .blade{width:26px;height:172px;margin:0 auto;position:relative;
+    clip-path:polygon(50% 0, 66% 7%, 66% 100%, 34% 100%, 34% 7%);
+    background:linear-gradient(90deg, color-mix(in srgb,var(--bl,#8b929c) 55%,#000) 0%,
+      var(--ed,#eef3f8) 46%, var(--ed,#eef3f8) 54%, color-mix(in srgb,var(--bl,#8b929c) 55%,#000) 100%);
+    box-shadow:inset 0 0 10px rgba(255,255,255,.35)}
+  .blade::after{content:"";position:absolute;left:49%;top:5%;width:2px;height:92%;
+    background:linear-gradient(var(--ed,#fff),transparent 85%);opacity:.7;transform:translateX(-50%)}
+  .guard{width:74px;height:13px;margin:-2px auto 0;border-radius:7px;
+    background:linear-gradient(180deg,#e9d8a6,#9a7b31);box-shadow:0 2px 8px rgba(0,0,0,.5);position:relative;z-index:3}
+  .guard::before,.guard::after{content:"";position:absolute;top:2px;width:9px;height:9px;border-radius:50%;
+    background:var(--bl,#cfd6dd);box-shadow:0 0 8px var(--bl,#fff)}
+  .guard::before{left:5px}.guard::after{right:5px}
+  .grip{width:13px;height:54px;margin:0 auto;border-radius:5px;
+    background:repeating-linear-gradient(45deg,#5a3d22 0 5px,#3c2916 5px 10px)}
+  .pommel{width:22px;height:22px;margin:-3px auto 0;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#f4e6b8,#9a7b31);box-shadow:0 4px 10px rgba(0,0,0,.5)}
+  .sword.t-dao .blade{background:linear-gradient(90deg,#ff6a4d,#ecc873,#47e0b0,#5fd8f2,#ff6a4d);
+    background-size:100% 400%;animation:daoflow 4s linear infinite}
+  @keyframes daoflow{to{background-position:0 400%}}
+  .sword.bump{transform:scale(1.16) translateY(-6px)}
+  .spark{position:absolute;top:42%;left:50%;width:6px;height:6px;border-radius:50%;
+    background:var(--ed,#fff);box-shadow:0 0 10px var(--bl,#fff);pointer-events:none;z-index:6}
+  .swordmeta{text-align:center;color:var(--muted);font-size:.92em;margin-top:2px}
+  .swordmeta b{color:var(--text)}
+  .swordmeta .atk{color:var(--flame)}
+
+  /* 炼器 shelf */
+  .shelf{display:flex;flex-direction:column;gap:9px;overflow:auto}
+  .item{display:flex;align-items:center;gap:14px;background:rgba(95,216,242,.05);
+    border:1px solid var(--line);border-radius:13px;padding:11px 13px}
+  .item .body{flex:1;min-width:0}
+  .item .nm{font-weight:800;display:flex;align-items:center;gap:8px}
+  .item .nm .lv{color:var(--cyan);font-size:.86em;font-variant-numeric:tabular-nums}
+  .item .nm .code{color:var(--dim);font-family:"Cinzel",serif;font-size:.62em;letter-spacing:.1em}
+  .item .eff{color:var(--muted);font-size:.82em;margin-top:2px}
+  .item .eff b{color:var(--text)}
+  .item .cost{color:var(--gold);font-size:.86em;white-space:nowrap;font-variant-numeric:tabular-nums;min-width:78px;text-align:right}
+  .buy{padding:9px 16px;border-radius:11px;border:1px solid rgba(95,216,242,.5);cursor:pointer;
+    background:linear-gradient(180deg,rgba(95,216,242,.2),rgba(95,216,242,.05));
+    color:var(--text);font-family:inherit;font-weight:800;transition:.15s;white-space:nowrap}
+  .buy:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 24px rgba(95,216,242,.22)}
+  .buy:disabled{opacity:.4;cursor:not-allowed}
+  .maxed{color:var(--dim);font-size:.82em;min-width:66px;text-align:center}
+
+  .frow{display:flex;gap:10px;margin-top:12px}
+  .btn{flex:1;padding:10px;border-radius:11px;border:1px solid var(--line2);cursor:pointer;
+    background:rgba(255,255,255,.03);color:var(--muted);font-family:inherit;font-weight:700;font-size:.9em;transition:.15s}
+  .btn:hover{color:var(--text);border-color:var(--cyan);background:rgba(95,216,242,.08)}
+  .btn.demo{border-color:rgba(236,200,115,.4);color:var(--gold)}
+  .btn.primary{border-color:rgba(95,216,242,.5);color:var(--text);
+    background:linear-gradient(180deg,rgba(95,216,242,.18),rgba(95,216,242,.04))}
+
+  .toast{position:fixed;left:50%;top:76px;transform:translateX(-50%) translateY(-20px);
+    background:linear-gradient(180deg,var(--panel2),var(--ink2));border:1px solid var(--line2);
+    border-radius:14px;padding:11px 20px;font-family:"Ma Shan Zheng",cursive;font-size:1.4em;color:var(--cyan);
+    box-shadow:0 16px 40px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:.4s;z-index:100;white-space:nowrap}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast small{display:block;font-family:"Cinzel",serif;font-size:.36em;letter-spacing:.2em;color:var(--gold);text-align:center;margin-top:2px}
+</style>
+</head>
+<body>
+<nav><div class="wrap">
+  <div class="brand">剑炉<span>THE FORGE</span></div>
+  <div class="switch">
+    <a href="dongfu.html">个人 · 洞府</a>
+    <a href="zhujian.html" class="on">铸剑 · 炼器凌霜</a>
+    <a href="#" class="lock" title="需 修为解锁">炼体 · 素心</a>
+    <a href="#" class="lock" title="需 修为解锁">身法 · 赤芍</a>
+    <a href="index.html">← 官网</a>
+  </div>
+</div></nav>
+
+<div class="wrap">
+  <div class="forge">
+    <!-- 凌霜 立绘 -->
+    <section class="maiden">
+      <div class="forgeglow"></div>
+      <img id="maidenImg" src="site-img/shizhe-lingshuang.png" alt="青衫·凌霜">
+      <div class="plate">
+        <div class="nm">青衫 · 凌霜</div>
+        <div class="role">炼器师姐 · <b>铸剑</b> · LING SHUANG</div>
+      </div>
+      <div class="favor">
+        <span class="hearts" id="hearts">♡♡♡♡♡</span>
+        <small id="favorNote">好感 · 仅情绪，不加战力</small>
+      </div>
+      <div class="say" id="say"><b>凌霜</b><p id="sayText">剑，是要贴着人养的。</p></div>
+    </section>
+
+    <!-- 剑炉 · 炼器 -->
+    <section class="forgepanel">
+      <div class="fhead">
+        <h1>剑炉 · 炼器</h1>
+        <span class="stones"><span class="dot"></span>灵石 <span id="stones">0</span></span>
+      </div>
+      <p class="sub">灵石只淬 <b style="color:var(--text)">纯数值</b>（攻/暴/长/速）· 剑之神姿随炼器之功自成 —— 越练越靓，非卖品</p>
+
+      <div class="swordstage">
+        <div class="flash" id="flash"></div>
+        <div class="tier-name" id="tierName">凡铁剑</div>
+        <div class="tier-sub en" id="tierSub">MORTAL IRON</div>
+        <div class="swordbox">
+          <div class="spin" id="qiRing"></div>
+          <div class="sword" id="sword">
+            <div class="blade"></div><div class="guard"></div><div class="grip"></div><div class="pommel"></div>
+          </div>
+        </div>
+        <div class="swordmeta">剑阶 <b id="swordTier">1</b> · 炼器总功 <b id="lqTotal">0</b> 　剑身伤害 <span class="atk" id="swordAtk">+10</span></div>
+      </div>
+
+      <div class="shelf" id="shelf"></div>
+
+      <div class="frow">
+        <button class="btn demo" id="cheat">+500 灵石（Demo）</button>
+        <a class="btn primary" href="dongfu.html" style="text-align:center">← 回个人 · 洞府</a>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- shared sword tiers (与 dongfu 一致) ---------- */
+const TIERS = [
+  {min:1, name:"凡铁剑", en:"MORTAL IRON",  bl:"#8b929c", ed:"#e6ebf1", gl:0, glow2:"transparent",        qi:0},
+  {min:4, name:"精钢剑", en:"TEMPERED STEEL",bl:"#c3ccd6", ed:"#ffffff", gl:1, glow2:"rgba(200,220,240,.5)", qi:0},
+  {min:8, name:"寒灵剑", en:"FROST SPIRIT",  bl:"#47e0b0", ed:"#d6fff2", gl:2, glow2:"rgba(71,224,176,.6)",  qi:2},
+  {min:13,name:"流金剑", en:"GILDED FLOW",   bl:"#ecc873", ed:"#fff4cf", gl:3, glow2:"rgba(236,200,115,.6)", qi:4},
+  {min:19,name:"仙锋剑", en:"IMMORTAL EDGE", bl:"#5fd8f2", ed:"#eafcff", gl:4, glow2:"rgba(95,216,242,.7)",  qi:6},
+  {min:26,name:"大道剑", en:"THE GREAT DAO", bl:"#ffffff", ed:"#ffffff", gl:5, glow2:"rgba(255,255,255,.7)", qi:8, dao:true},
+];
+const swordAtk = lv => Math.round(lv*lv*2 + lv*8);
+function tierOf(lv){ let t=TIERS[0]; for(const x of TIERS) if(lv>=x.min) t=x; return t; }
+
+/* ---------- 炼器 shelf (纯数值 · 无限成长 · 成本软上限) ---------- */
+const SHELF = [
+  {id:"atk",  nm:"攻击", code:"GANG QI · 罡气",  eff:v=>`攻击力 <b>+${v*6}</b>`,        base:40, growth:1.34, per:6,   unit:""},
+  {id:"crit", nm:"暴击", code:"SHEN SHI · 神识", eff:v=>`暴击率 <b>+${(v*1.5).toFixed(1)}%</b>`, base:80, growth:1.40, per:1.5, unit:"%", max:20},
+  {id:"len",  nm:"剑长", code:"JIAN FENG · 剑锋",eff:v=>`剑气长 <b>+${v*3}%</b>`,        base:30, growth:1.30, per:3,   unit:"%"},
+  {id:"spd",  nm:"攻速", code:"YU FENG · 御风",  eff:v=>`攻击速度 <b>+${v*2}%</b>`,      base:45, growth:1.32, per:2,   unit:"%"},
+];
+const SAY = ["手稳些。","再利三分。","锋芒，是喂出来的。","又快了一线。","贴着人，剑才认主。","别怕烫。","这一淬，值。"];
+
+/* ---------- shared state (localStorage 'dongfu') ---------- */
+const DEF = {daohao:"无名剑修", jing:0, lingshi:800, xiuwei:120, swordLv:1,
+             alloc:{atk:0,vit:0,agi:0}, lianqi:{atk:0,crit:0,len:0,spd:0}, favorLS:0};
+let S = load();
+function load(){ try{const s=JSON.parse(localStorage.getItem("dongfu"));
+  if(s){ const m=Object.assign({},DEF,s); m.lianqi=Object.assign({atk:0,crit:0,len:0,spd:0}, s.lianqi||{}); return m; }
+}catch(e){} return structuredClone(DEF); }
+function save(){ localStorage.setItem("dongfu", JSON.stringify(S)); }
+
+const lqTotal = () => S.lianqi.atk + S.lianqi.crit + S.lianqi.len + S.lianqi.spd;
+const swordLv = () => 1 + lqTotal();                 // 剑阶随炼器总功
+function spec(id){ return SHELF.find(x=>x.id===id); }
+function costOf(id){ const s=spec(id); return Math.round(s.base * Math.pow(s.growth, S.lianqi[id])); }
+function isMax(id){ const s=spec(id); return s.max && S.lianqi[id] >= s.max; }
+
+/* ---------- render ---------- */
+const $ = id => document.getElementById(id);
+function render(){
+  S.swordLv = swordLv(); save();
+  const lv = S.swordLv, t = tierOf(lv);
+  $("stones").textContent = S.lingshi.toLocaleString();
+
+  // sword
+  const sw = $("sword");
+  $("tierName").textContent = t.name; $("tierName").style.setProperty("--bl",t.bl);
+  $("tierSub").textContent = t.en;
+  sw.style.setProperty("--bl",t.bl); sw.style.setProperty("--ed",t.ed);
+  sw.style.setProperty("--gl",t.gl); sw.style.setProperty("--glow2",t.glow2);
+  sw.classList.toggle("t-dao", !!t.dao);
+  const ring=$("qiRing"); ring.innerHTML="";
+  for(let i=0;i<t.qi;i++){ const s=document.createElement("div"); s.className="qi";
+    s.style.transform=`rotate(${(360/t.qi)*i}deg) translateY(-86px)`;
+    s.style.setProperty("--bl",t.bl); s.style.setProperty("--ed",t.ed); ring.appendChild(s); }
+  $("swordTier").textContent = lv;
+  $("lqTotal").textContent = lqTotal();
+  $("swordAtk").textContent = "+"+swordAtk(lv);
+
+  // favor hearts
+  const hf = Math.min(5, Math.floor(S.favorLS/4));
+  $("hearts").textContent = "♥".repeat(hf) + "♡".repeat(5-hf);
+
+  // shelf
+  $("shelf").innerHTML = SHELF.map(s=>{
+    const v=S.lianqi[s.id], maxed=isMax(s.id), cost=costOf(s.id), can=!maxed && S.lingshi>=cost;
+    return `<div class="item">
+      <div class="body">
+        <div class="nm">${s.nm} <span class="lv">Lv.${v}</span> <span class="code">${s.code}</span></div>
+        <div class="eff">${s.eff(v)}${s.max?` · 硬顶 ${s.max}`:""}</div>
+      </div>
+      ${maxed ? `<span class="maxed">已圆满</span>`
+        : `<span class="cost">灵石 ${cost.toLocaleString()}</span>
+           <button class="buy" data-id="${s.id}" ${can?"":"disabled"}>淬 炼</button>`}
+    </div>`;
+  }).join("");
+  document.querySelectorAll(".buy").forEach(b=>b.onclick=()=>forge(b.dataset.id));
+}
+
+/* ---------- forge action ---------- */
+let sayT;
+function speak(line){ const s=$("say"); $("sayText").textContent=line; s.classList.add("show");
+  clearTimeout(sayT); sayT=setTimeout(()=>s.classList.remove("show"),2600); }
+let toastT;
+function toast(m,sub){ const t=$("toast"); t.innerHTML=m+(sub?`<small>${sub}</small>`:""); t.classList.add("show");
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),1500); }
+function burst(t){ const stage=$("sword").parentElement;
+  for(let i=0;i<16;i++){ const s=document.createElement("div"); s.className="spark";
+    s.style.setProperty("--bl",t.bl); s.style.setProperty("--ed",t.ed); stage.appendChild(s);
+    const a=Math.random()*Math.PI*2, d=70+Math.random()*120, dx=Math.cos(a)*d, dy=Math.sin(a)*d-30;
+    s.animate([{transform:"translate(0,0) scale(1)",opacity:1},{transform:`translate(${dx}px,${dy}px) scale(0)`,opacity:0}],
+      {duration:600+Math.random()*400,easing:"cubic-bezier(.2,.8,.3,1)"}).onfinish=()=>s.remove(); } }
+
+function forge(id){
+  if(isMax(id)) return;
+  const cost=costOf(id); if(S.lingshi<cost){ speak("灵石不够——先去换些来。"); return; }
+  const prevTier=tierOf(swordLv()).name;
+  S.lingshi-=cost; S.lianqi[id]++; S.favorLS++; save();
+  const t=tierOf(swordLv());
+  // juice
+  const sw=$("sword"), fl=$("flash");
+  sw.classList.add("bump"); fl.classList.remove("go"); void fl.offsetWidth; fl.classList.add("go"); burst(t);
+  const img=$("maidenImg"); img.style.transform="translateX(-50%) scale(1.015)";
+  setTimeout(()=>{sw.classList.remove("bump"); img.style.transform="translateX(-50%) scale(1)";},340);
+  render();
+  if(t.name!==prevTier){ toast("剑成 · "+t.name, t.en); speak("此剑…已非凡铁。"+t.name+"。"); }
+  else speak(SAY[Math.floor(Math.random()*SAY.length)]);
+}
+
+$("cheat").onclick = ()=>{ S.lingshi+=500; save(); render(); toast("灵石 +500","DEMO"); };
+render();
+setTimeout(()=>$("say").classList.add("show"),400);
+</script>
+</body>
+</html>

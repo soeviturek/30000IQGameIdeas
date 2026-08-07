@@ -273,6 +273,8 @@
   <div class="brand">洞府<span>GROTTO · HOME</span></div>
   <span class="proto">PROTOTYPE v0.1</span>
   <div class="navlinks">
+    <a href="dongfu.html" style="color:var(--text)">个人 · 洞府</a>
+    <a href="zhujian.html">铸剑 · 炼器凌霜</a>
     <a href="index.html">← 官网 Site</a>
     <a href="#" id="resetSave" title="清空本地存档">重置存档</a>
   </div>
@@ -337,7 +339,7 @@
       <div class="swordmeta">
         <div class="swordlv">本命剑 · <b id="swordLv">Lv 1</b> <span id="swordAtk" style="color:var(--flame)"></span></div>
       </div>
-      <button class="upbtn" id="upBtn">升 · 淬炼本命剑<small id="upCost">耗 灵石 80</small></button>
+      <a class="upbtn" id="upBtn" href="zhujian.html" style="text-decoration:none">往 · 凌霜处铸剑 →<small>灵石只淬纯数值 · 剑姿随炼器自成</small></a>
       <div class="cap" id="capNote" style="display:none"></div>
 
       <div class="power">
@@ -348,7 +350,7 @@
 
     <!-- ===== 三维加点 + 装备 ===== -->
     <section class="card">
-      <h2>三维加点 <span class="en">ATTRIBUTES</span></h2>
+      <h2>三维加点 <span class="en">IN-RUN · XP</span></h2>
       <div class="pool">剩余点数 · UNSPENT <span class="n" id="poolN">0</span></div>
       <div id="attrs"></div>
       <div class="miniact">
@@ -407,11 +409,12 @@ const ATTR = {
 };
 
 /* ---------- state ---------- */
-const DEF = {daohao:"无名剑修", jing:0, lingshi:600, xiuwei:120,
+const DEF = {daohao:"无名剑修", jing:0, lingshi:800, xiuwei:120,
              swordLv:1, alloc:{atk:0,vit:0,agi:0}};
 let S = load();
 function load(){ try{const s=JSON.parse(localStorage.getItem("dongfu"));
-  if(s&&s.alloc) return Object.assign({},DEF,s);}catch(e){} return structuredClone(DEF);}
+  if(s&&typeof s==='object'){ const m=Object.assign({},DEF,s); m.alloc=Object.assign({atk:0,vit:0,agi:0}, s.alloc||{}); return m; }
+}catch(e){} return structuredClone(DEF);}
 function save(){ localStorage.setItem("dongfu", JSON.stringify(S)); }
 
 /* points available scale with realm */
@@ -494,21 +497,8 @@ function render(prevPower){
   $("swordLv").textContent = "Lv "+S.swordLv;
   $("swordAtk").textContent = "（攻击 +"+swordAtk(S.swordLv)+"）";
 
-  // upgrade button / cap
-  const capped = S.swordLv >= SWORD_CAP;
-  const realmCap = S.swordLv >= j.cap;
-  const cost = upCost(S.swordLv);
-  const btn = $("upBtn");
-  if(capped){ btn.disabled=true; btn.firstChild.textContent="已臻至境 · 圆满";
-    $("upCost").textContent="剑道圆满"; }
-  else if(realmCap){ btn.disabled=true; btn.firstChild.textContent="境界压制 · 需突破";
-    $("upCost").textContent="修为不足以承载"; }
-  else{ btn.disabled = S.lingshi < cost; btn.firstChild.textContent="升 · 淬炼本命剑";
-    $("upCost").textContent = "耗 灵石 "+cost.toLocaleString(); }
-  const note=$("capNote");
-  if(realmCap && !capped){ note.style.display="block";
-    note.innerHTML=`本命剑受 <b>${j.nm}</b> 境界压制（≤Lv ${j.cap}）。<br>更高剑阶需靠 <b>修为</b> 渡劫突破境界 —— 此为设计中的第三条线。`; }
-  else note.style.display="none";
+  // 本命剑在个人界面为「展示」；铸剑（升级）在 凌霜 剑炉（zhujian.html）
+  $("capNote").style.display="none";
 
   // power count-up
   const target = d.power;
@@ -613,7 +603,7 @@ function upgrade(){
 }
 
 /* ---------- wire ---------- */
-$("upBtn").onclick = upgrade;
+// 铸剑已移至 凌霜 剑炉（zhujian.html）；此处本命剑仅展示
 $("cheatGold").onclick = ()=>{ S.lingshi+=500; save(); render(); toast("灵石 +500","DEMO"); };
 $("cheatPts").onclick  = ()=>{ S._bonusPts=(S._bonusPts||0)+3; save(); render(); toast("点数 +3","DEMO"); };
 $("hitBtn").onclick = ()=>{
@@ -628,7 +618,6 @@ $("healBtn").onclick = ()=>{ hpRatio=1; render(); toast("回气 · 满血","REST
 $("resetPts").onclick  = ()=>{ S.alloc={atk:0,vit:0,agi:0}; save(); render(); };
 $("renameBtn").onclick = ()=>{ const n=prompt("道号：",S.daohao); if(n){S.daohao=n.slice(0,12);save();render();} };
 $("resetSave").onclick = e=>{ e.preventDefault(); if(confirm("清空本地存档并重来？")){localStorage.removeItem("dongfu");S=structuredClone(DEF);render();} };
-document.addEventListener("keydown",e=>{ if(e.key.toLowerCase()==="u"){e.preventDefault();upgrade();} });
 
 render();
 </script>
