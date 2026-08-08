@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>合欢宫 · 仙缘玉抽卡 — 大雷问道 原型</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Noto+Serif+SC:wght@400;600;800;900&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0a0608; --ink2:#140a10; --panel:#1a0e16; --panel2:#241120;
+    --line:rgba(255,157,178,.18); --line2:rgba(255,157,178,.36);
+    --jade:#47e0b0; --gold:#ffd76a; --cyan:#5fd8f2; --flame:#ff6a4d; --rose:#ff6f9d; --violet:#c98bff;
+    --steel:#c3ccd6; --text:#fdeef3; --muted:#d3a6b6; --dim:#7d5a68;
+    --acc:var(--rose);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--ink);color:var(--text);min-height:100vh;
+    font-family:"Noto Serif SC","Microsoft YaHei","PingFang SC",serif;overflow-x:hidden}
+  /* red-light aurora */
+  body::before{content:"";position:fixed;inset:-20% -10%;z-index:-2;
+    background:
+      radial-gradient(46% 42% at 22% 26%, rgba(255,111,157,.22), transparent 60%),
+      radial-gradient(42% 40% at 80% 18%, rgba(201,139,255,.16), transparent 62%),
+      radial-gradient(52% 50% at 30% 90%, rgba(255,215,106,.14), transparent 60%),
+      radial-gradient(44% 46% at 84% 84%, rgba(255,106,77,.14), transparent 60%);
+    filter:blur(36px);animation:drift 24s ease-in-out infinite alternate}
+  body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:
+      radial-gradient(120% 80% at 50% -12%, transparent 58%, rgba(0,0,0,.6)),
+      linear-gradient(rgba(255,157,178,.03) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,157,178,.03) 1px,transparent 1px);
+    background-size:100% 100%, 44px 44px, 44px 44px}
+  @keyframes drift{0%{transform:translate3d(0,0,0) scale(1)}
+    50%{transform:translate3d(-3%,2%,0) scale(1.08)}100%{transform:translate3d(3%,-2%,0) scale(1.04)}}
+  a{color:var(--gold);text-decoration:none}
+  .en{font-family:"Cinzel",serif;letter-spacing:.16em}
+
+  /* nav */
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);
+    background:linear-gradient(rgba(10,6,8,.85),rgba(10,6,8,.5));border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;gap:12px;height:60px}
+  .brand{font-family:"Ma Shan Zheng",cursive;font-size:1.7em;line-height:1;
+    background:linear-gradient(92deg,var(--rose),#fff 42%,var(--violet));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    text-shadow:0 0 26px rgba(255,111,157,.4);white-space:nowrap}
+  .brand span{font-family:"Cinzel",serif;font-size:.3em;letter-spacing:.3em;color:var(--dim);display:block;margin-top:-6px}
+  .switch{margin-left:auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .switch a,.switch button{color:var(--muted);font-size:.9em;padding:7px 13px;border-radius:9px;
+    border:1px solid transparent;transition:.2s;font-weight:600;background:none;cursor:pointer;font-family:inherit}
+  .switch a:hover,.switch button:hover{color:var(--text);border-color:var(--line2);background:rgba(255,255,255,.03)}
+  .switch a.on{color:var(--ink);background:linear-gradient(180deg,#ffe6ee,var(--rose));border-color:var(--rose)}
+  .switch a.lock{opacity:.5}.switch a.lock::after{content:" 🔒";font-size:.8em}
+
+  .wrap{max-width:1320px;margin:0 auto;padding:0 22px}
+
+  .hall{display:grid;grid-template-columns:minmax(300px,38%) 1fr;gap:22px;
+    padding:18px 0 44px;align-items:stretch}
+  @media(max-width:980px){.hall{grid-template-columns:1fr}}
+
+  /* ---- hostess 立绘 ---- */
+  .hostess{position:relative;border-radius:20px;overflow:hidden;min-height:560px;
+    border:1px solid var(--line);background:
+      radial-gradient(70% 55% at 50% 76%, rgba(255,111,157,.2), transparent 60%),
+      linear-gradient(180deg,#1a0d15,#0a0608)}
+  .hostess .glow{position:absolute;left:50%;bottom:-8%;width:120%;height:54%;transform:translateX(-50%);
+    background:radial-gradient(closest-side, rgba(255,111,157,.3), rgba(201,139,255,.12) 55%, transparent 72%);
+    filter:blur(12px);animation:ember 3.2s ease-in-out infinite alternate;pointer-events:none}
+  @keyframes ember{0%{opacity:.7;transform:translateX(-50%) scale(1)}100%{opacity:1;transform:translateX(-50%) scale(1.07)}}
+  .hostess img{position:absolute;left:50%;bottom:0;transform:translateX(-50%);
+    height:98%;width:auto;object-fit:contain;filter:drop-shadow(0 12px 30px rgba(0,0,0,.6));
+    -webkit-user-drag:none;transition:transform .4s}
+  .plate{position:absolute;left:18px;top:16px;z-index:3}
+  .plate .nm{font-family:"Ma Shan Zheng",cursive;font-size:2.05em;line-height:1;
+    background:linear-gradient(92deg,#fff,var(--rose));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .plate .role{font-family:"Cinzel",serif;letter-spacing:.22em;font-size:.72em;color:var(--rose);margin-top:3px}
+  .plate .role b{color:var(--gold)}
+  .ph-tag{position:absolute;right:12px;top:14px;z-index:3;font-family:"Cinzel",serif;font-size:.62em;letter-spacing:.18em;
+    color:var(--dim);border:1px dashed var(--line2);border-radius:20px;padding:4px 10px;background:rgba(10,6,8,.4)}
+  .say{position:absolute;right:16px;bottom:20px;z-index:4;max-width:70%;
+    background:linear-gradient(180deg,rgba(36,17,32,.96),rgba(20,10,16,.96));
+    border:1px solid var(--line2);border-radius:14px 14px 4px 14px;padding:12px 15px;
+    box-shadow:0 12px 30px rgba(0,0,0,.5);opacity:0;transform:translateY(8px);transition:.3s}
+  .say.show{opacity:1;transform:translateY(0)}
+  .say b{color:var(--rose);font-size:.82em;letter-spacing:.05em}
+  .say p{margin:3px 0 0;font-size:1.02em;line-height:1.4}
+
+  /* ---- arcade ---- */
+  .arcade{display:flex;flex-direction:column;gap:16px}
+  .hall-head{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}
+  .hall-head h1{font-family:"Ma Shan Zheng",cursive;font-size:2.5em;margin:0;line-height:.9;
+    background:linear-gradient(92deg,var(--gold),#fff 45%,var(--rose));-webkit-background-clip:text;background-clip:text;color:transparent;
+    text-shadow:0 0 30px rgba(255,111,157,.3)}
+  .hall-head .tag{font-family:"Cinzel",serif;letter-spacing:.2em;color:var(--dim);font-size:.72em;margin-bottom:6px}
+  .purse{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  .chip{display:flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:12px;
+    padding:8px 13px;background:rgba(36,17,32,.5);font-weight:700}
+  .chip .k{font-size:.72em;color:var(--muted);font-weight:600}
+  .chip .v{font-size:1.15em}
+  .chip.jade .v{color:var(--rose)} .chip.sui .v{color:var(--cyan)} .chip.pity .v{color:var(--gold)}
+  .chip .dot{width:9px;height:9px;border-radius:50%}
+  .chip.jade .dot{background:var(--rose);box-shadow:0 0 10px var(--rose)}
+  .chip.sui .dot{background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+
+  /* slot cabinet */
+  .cabinet{position:relative;border-radius:20px;padding:18px 18px 20px;overflow:hidden;
+    border:1px solid var(--line2);
+    background:linear-gradient(180deg,#2a1220,#160a12);
+    box-shadow:0 24px 60px rgba(0,0,0,.5), inset 0 0 60px rgba(255,111,157,.06)}
+  /* neon running border */
+  .cabinet::before{content:"";position:absolute;inset:0;border-radius:20px;padding:1px;pointer-events:none;
+    background:linear-gradient(120deg,var(--rose),var(--gold),var(--violet),var(--cyan),var(--rose));
+    background-size:300% 300%;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;mask-composite:exclude;animation:neon 6s linear infinite;opacity:.8}
+  @keyframes neon{0%{background-position:0% 50%}100%{background-position:300% 50%}}
+  .marquee{display:flex;justify-content:center;gap:10px;margin-bottom:14px}
+  .marquee .bulb{width:9px;height:9px;border-radius:50%;background:var(--gold);
+    box-shadow:0 0 10px var(--gold);animation:blink 1s steps(2) infinite}
+  .marquee .bulb:nth-child(odd){background:var(--rose);box-shadow:0 0 10px var(--rose);animation-delay:.5s}
+  @keyframes blink{50%{opacity:.25}}
+  .cab-title{text-align:center;font-family:"Ma Shan Zheng",cursive;font-size:1.5em;margin:-4px 0 12px;
+    color:var(--gold);text-shadow:0 0 18px rgba(255,215,106,.5)}
+
+  .reels{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:420px;margin:0 auto 6px;
+    padding:14px;border-radius:14px;background:radial-gradient(120% 120% at 50% 0%,#3a1626,#120810);
+    border:1px solid var(--line2);box-shadow:inset 0 6px 20px rgba(0,0,0,.6)}
+  .reel{height:96px;border-radius:10px;overflow:hidden;position:relative;
+    background:linear-gradient(180deg,#0c0509,#1c0d16);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-size:3em;
+    box-shadow:inset 0 0 24px rgba(0,0,0,.7)}
+  .reel .sym{filter:drop-shadow(0 3px 6px rgba(0,0,0,.6));transition:transform .08s}
+  .reel.spin .sym{animation:reelblur .1s linear infinite}
+  @keyframes reelblur{0%{transform:translateY(-6px) scale(1.05)}100%{transform:translateY(6px) scale(.95)}}
+  .reel::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(180deg,rgba(0,0,0,.55),transparent 30%,transparent 70%,rgba(0,0,0,.55))}
+  .reel.win{border-color:var(--gold);box-shadow:inset 0 0 24px rgba(255,215,106,.4),0 0 18px rgba(255,215,106,.5)}
+
+  /* reveal */
+  .reveal{position:relative;min-height:220px;display:flex;align-items:center;justify-content:center;
+    gap:12px;flex-wrap:wrap;margin:8px auto 4px;max-width:640px}
+  .reveal .hint{color:var(--dim);font-size:.9em;text-align:center}
+  .card{position:relative;width:132px;border-radius:14px;overflow:hidden;
+    border:1.5px solid var(--rc,#c3ccd6);background:#120810;
+    box-shadow:0 10px 26px rgba(0,0,0,.5), 0 0 22px var(--rg,transparent);
+    opacity:0;transform:translateY(14px) scale(.9);animation:pop .5s cubic-bezier(.2,.9,.3,1.2) forwards}
+  @keyframes pop{to{opacity:1;transform:translateY(0) scale(1)}}
+  .card .pic{height:150px;background:#0a0608 center/cover no-repeat;position:relative}
+  .card .pic::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(10,6,8,.85))}
+  .card .rr{position:absolute;left:7px;top:7px;z-index:2;font-family:"Cinzel",serif;font-weight:800;font-size:.72em;
+    letter-spacing:.06em;padding:2px 8px;border-radius:20px;color:#0a0608;background:var(--rc,#c3ccd6);
+    box-shadow:0 0 12px var(--rg,transparent)}
+  .card .ph{position:absolute;right:6px;top:7px;z-index:2;font-family:"Cinzel",serif;font-size:.5em;letter-spacing:.12em;
+    color:var(--muted);border:1px dashed var(--line2);border-radius:10px;padding:1px 5px;background:rgba(10,6,8,.5)}
+  .card .meta{padding:8px 10px 10px}
+  .card .who{font-size:.72em;color:var(--muted)}
+  .card .nm{font-family:"Ma Shan Zheng",cursive;font-size:1.15em;line-height:1.1;margin-top:1px}
+  .card .flag{position:absolute;bottom:0;left:0;right:0;text-align:center;font-size:.68em;font-weight:700;
+    padding:3px;background:rgba(10,6,8,.7)}
+  .card .flag.new{color:var(--gold)} .card .flag.dupe{color:var(--cyan)}
+  .card.big{width:170px} .card.big .pic{height:200px}
+
+  .pull-row{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;max-width:560px;margin:6px auto 0}
+  @media(max-width:560px){.pull-row{grid-template-columns:1fr}}
+  .pbtn{border:none;cursor:pointer;font-family:inherit;font-weight:800;border-radius:13px;padding:15px 16px;
+    color:#1a0610;position:relative;overflow:hidden;transition:.15s;font-size:1.02em;
+    background:linear-gradient(180deg,#ffe1ea,var(--rose));box-shadow:0 8px 22px rgba(255,111,157,.4)}
+  .pbtn.ten{background:linear-gradient(180deg,#fff0c8,var(--gold));box-shadow:0 8px 22px rgba(255,215,106,.4)}
+  .pbtn small{display:block;font-weight:600;font-size:.66em;opacity:.85;margin-top:2px}
+  .pbtn:hover{transform:translateY(-2px);filter:brightness(1.05)}
+  .pbtn:active{transform:translateY(0)}
+  .pbtn:disabled{filter:grayscale(.7) brightness(.7);cursor:not-allowed;transform:none;box-shadow:none}
+  .pbtn.demo{background:linear-gradient(180deg,#2a1a24,#1a0f16);color:var(--muted);border:1px solid var(--line2);box-shadow:none}
+
+  /* 图鉴 */
+  .dexwrap{border:1px solid var(--line);border-radius:18px;padding:16px;background:rgba(26,13,21,.5)}
+  .dexhead{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+  .dexhead h2{font-family:"Ma Shan Zheng",cursive;font-size:1.5em;margin:0}
+  .dexhead .c{margin-left:auto;color:var(--muted);font-size:.85em}
+  .setnote{font-size:.82em;color:var(--dim);margin:0 0 12px;border-left:2px solid var(--line2);padding-left:9px}
+  .setnote b{color:var(--jade)}
+  .dex{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
+  .dc{position:relative;border-radius:11px;overflow:hidden;border:1px solid var(--rc,var(--line));
+    background:#120810;aspect-ratio:3/4}
+  .dc .pic{position:absolute;inset:0;background:#0a0608 center/cover no-repeat}
+  .dc .pic::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(10,6,8,.9))}
+  .dc .lbl{position:absolute;left:0;right:0;bottom:0;padding:5px 6px;z-index:2}
+  .dc .rr{font-family:"Cinzel",serif;font-size:.56em;font-weight:800;color:var(--rc)}
+  .dc .nm{font-size:.74em;line-height:1.05;margin-top:1px}
+  .dc .dupe{position:absolute;right:5px;top:5px;z-index:2;font-size:.64em;font-weight:800;color:var(--cyan);
+    background:rgba(10,6,8,.7);border-radius:20px;padding:1px 6px}
+  .dc.locked .pic{filter:grayscale(1) brightness(.32) blur(1px)}
+  .dc.locked .lbl .nm{color:var(--dim)}
+  .dc.locked::after{content:"？";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-size:2em;color:var(--dim);z-index:1;font-family:"Ma Shan Zheng",cursive}
+  .dc .glimmer{position:absolute;inset:0;z-index:3;pointer-events:none;
+    background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.35) 50%,transparent 60%);
+    transform:translateX(-120%)}
+  .dc.justgot .glimmer{animation:shine 1s ease}
+  @keyframes shine{to{transform:translateX(120%)}}
+
+  .backrow{display:flex;gap:10px;margin-top:4px}
+  .backrow a{flex:1;text-align:center;border:1px solid var(--line2);border-radius:12px;padding:12px;
+    color:var(--muted);font-weight:700;transition:.2s}
+  .backrow a:hover{color:var(--text);background:rgba(255,255,255,.03)}
+
+  /* jackpot flash overlay */
+  .jflash{position:fixed;inset:0;z-index:80;pointer-events:none;opacity:0;
+    background:radial-gradient(closest-side,rgba(255,215,106,.5),rgba(255,111,157,.2) 40%,transparent 70%)}
+  .jflash.go{animation:jf .9s ease}
+  @keyframes jf{0%{opacity:0}20%{opacity:1}100%{opacity:0}}
+  .spark{position:absolute;left:50%;top:50%;width:8px;height:8px;border-radius:50%;
+    background:var(--sc,#fff);box-shadow:0 0 8px var(--sc,#fff);pointer-events:none;z-index:6}
+
+  .toast{position:fixed;left:50%;bottom:38px;transform:translateX(-50%) translateY(20px);z-index:90;
+    background:linear-gradient(180deg,rgba(36,17,32,.98),rgba(20,10,16,.98));border:1px solid var(--line2);
+    border-radius:14px;padding:13px 22px;font-family:"Ma Shan Zheng",cursive;font-size:1.35em;
+    box-shadow:0 16px 40px rgba(0,0,0,.6);opacity:0;transition:.3s;text-align:center}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast small{display:block;font-family:"Cinzel",serif;font-size:.36em;letter-spacing:.2em;color:var(--gold);margin-top:2px}
+</style>
+</head>
+<body>
+<nav><div class="wrap">
+  <div class="brand">合欢宫<span>THE HALL</span></div>
+  <div class="switch">
+    <a href="dongfu.html">个人 · 洞府</a>
+    <a href="zhujian.html">铸剑 · 凌霜</a>
+    <a href="hehuangong.html" class="on">合欢宫 · 抽卡</a>
+    <button id="mute" title="音效开关">🔊</button>
+    <a href="index.html">← 官网</a>
+  </div>
+</div></nav>
+
+<div class="wrap">
+  <div class="hall">
+    <!-- 宫主 立绘 -->
+    <section class="hostess">
+      <div class="glow"></div>
+      <img id="hostImg" src="site-img/shizhe-danxiu.png" alt="合欢宫主">
+      <div class="ph-tag">PLACEHOLDER 立绘</div>
+      <div class="plate">
+        <div class="nm">合欢宫主 · 妙音</div>
+        <div class="role">掌 <b>仙缘玉</b> · 抽 · 收藏 · MIAO YIN</div>
+      </div>
+      <div class="say" id="say"><b>妙音</b><p id="sayText">仙缘一掷，看的是缘，不是力。</p></div>
+    </section>
+
+    <!-- 老虎机 + 图鉴 -->
+    <section class="arcade">
+      <div class="hall-head">
+        <div>
+          <div class="tag">仙缘玉 · 只换皮肤/CG/收藏 · 抽本体 0 战力</div>
+          <h1>合欢宫</h1>
+        </div>
+        <div class="purse">
+          <div class="chip jade"><span class="dot"></span><div><div class="k">仙缘玉</div><div class="v" id="xy">0</div></div></div>
+          <div class="chip sui"><span class="dot"></span><div><div class="k">合欢玉髓（重复）</div><div class="v" id="sui">0</div></div></div>
+          <div class="chip pity"><div><div class="k">保底 · 距飞升</div><div class="v" id="pity">0</div></div></div>
+        </div>
+      </div>
+
+      <div class="cabinet">
+        <div class="marquee"><i class="bulb"></i><i class="bulb"></i><i class="bulb"></i><i class="bulb"></i><i class="bulb"></i><i class="bulb"></i><i class="bulb"></i></div>
+        <div class="cab-title">姻 · 缘 · 一 · 掷</div>
+        <div class="reels">
+          <div class="reel" id="r0"><span class="sym">🎴</span></div>
+          <div class="reel" id="r1"><span class="sym">💮</span></div>
+          <div class="reel" id="r2"><span class="sym">🌸</span></div>
+        </div>
+        <div class="reveal" id="reveal"><div class="hint">投一枚仙缘玉，看今日缘分 —— 每掷<b style="color:var(--rose)">必有所得</b>，重复化玉髓。</div></div>
+        <div class="pull-row">
+          <button class="pbtn" id="pull1">抽 一 掷<small>耗 仙缘玉 1</small></button>
+          <button class="pbtn ten" id="pull10">合 缘 十 掷<small>耗 仙缘玉 10 · 保底 浴衣+</small></button>
+          <button class="pbtn demo" id="grant">＋10 仙缘玉<small>Demo · 模拟 Boss首杀掉落</small></button>
+        </div>
+      </div>
+
+      <div class="dexwrap">
+        <div class="dexhead">
+          <h2>合欢录 · 图鉴</h2>
+          <span class="c"><b id="owned">0</b> / <span id="total">0</span> 收集</span>
+        </div>
+        <p class="setnote">集齐某位师姐<b>整套皮肤</b> → 解锁一条 <b>≤5% 便利</b>（例：凌霜全套 → +1% 修为获取）。<b>确定性奖励</b>，非抽卡本体 —— 抽到的永远只是收藏，战力永不靠赌。</p>
+        <div class="dex" id="dex"></div>
+      </div>
+
+      <div class="backrow">
+        <a href="dongfu.html">← 回个人 · 洞府</a>
+        <a href="zhujian.html">去铸剑 · 凌霜 →</a>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="jflash" id="jflash"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- rarity ---------- */
+const RA = {
+  N:  {nm:"常服",     cls:"N",  col:"#c3ccd6", rg:"transparent",           w:600, sui:1,  sym:"🎴", rank:0},
+  R:  {nm:"泳装",     cls:"R",  col:"#ff6f9d", rg:"rgba(255,111,157,.5)",  w:250, sui:3,  sym:"🌸", rank:1},
+  SR: {nm:"浴衣",     cls:"SR", col:"#5fd8f2", rg:"rgba(95,216,242,.55)",  w:110, sui:8,  sym:"💮", rank:2},
+  SSR:{nm:"飞升形态", cls:"SSR",col:"#ffd76a", rg:"rgba(255,215,106,.6)",  w:36,  sui:20, sym:"💎", rank:3},
+  UR: {nm:"婚礼CG",   cls:"UR", col:"#ff6a4d", rg:"rgba(255,106,77,.7)",   w:4,   sui:60, sym:"👑", rank:4, jackpot:true},
+};
+const RANKS=["N","R","SR","SSR","UR"];
+const IMG = f => "site-img/"+f+".png";
+
+/* ---------- collection pool (placeholder art) ---------- */
+const POOL = [
+  // 凌霜
+  {id:"ls_N",  who:"青衫·凌霜", ra:"N",  nm:"炼器常服", img:"shizhe-lingshuang"},
+  {id:"ls_R",  who:"青衫·凌霜", ra:"R",  nm:"寒潭·泳装", img:"gal-1"},
+  {id:"ls_SR", who:"青衫·凌霜", ra:"SR", nm:"月华·浴衣", img:"av-lingshuang"},
+  {id:"ls_SSR",who:"青衫·凌霜", ra:"SSR",nm:"飞升·剑仙姿", img:"sword-maiden"},
+  {id:"ls_UR", who:"青衫·凌霜", ra:"UR", nm:"合卺·凌霜", img:"gal-1"},
+  // 素心
+  {id:"sx_N",  who:"白衣·素心", ra:"N",  nm:"炼体常服", img:"shizhe-suxin"},
+  {id:"sx_R",  who:"白衣·素心", ra:"R",  nm:"温泉·泳装", img:"gal-2"},
+  {id:"sx_SR", who:"白衣·素心", ra:"SR", nm:"素雪·浴衣", img:"av-suxin"},
+  {id:"sx_SSR",who:"白衣·素心", ra:"SSR",nm:"飞升·药王姿", img:"shizhe-suxin"},
+  // 赤芍
+  {id:"cs_N",  who:"丹鼎·赤芍", ra:"N",  nm:"身法常服", img:"shizhe-chishao"},
+  {id:"cs_R",  who:"丹鼎·赤芍", ra:"R",  nm:"火榴·泳装", img:"gal-3"},
+  {id:"cs_SR", who:"丹鼎·赤芍", ra:"SR", nm:"丹霞·浴衣", img:"shizhe-chishao"},
+  {id:"cs_SSR",who:"丹鼎·赤芍", ra:"SSR",nm:"飞升·丹尊姿", img:"gal-3"},
+  // 宫主
+  {id:"my_N",  who:"宫主·妙音", ra:"N",  nm:"合欢常服", img:"shizhe-danxiu"},
+  {id:"my_SR", who:"宫主·妙音", ra:"SR", nm:"琵琶·浴衣", img:"dujie"},
+  {id:"my_UR", who:"宫主·妙音", ra:"UR", nm:"合卺·妙音", img:"shizhe-danxiu"},
+];
+const SETS = {"青衫·凌霜":"+1% 修为获取","白衣·素心":"+2% 灵石掉落","丹鼎·赤芍":"+1% 幸运"};
+
+/* ---------- state (shared localStorage 'dongfu') ---------- */
+const DEF = {daohao:"无名剑修", lingshi:800, swordLv:1, alloc:{atk:0,vit:0,agi:0},
+  lianqi:{atk:0,crit:0,len:0,spd:0}, favorLS:0,
+  xianyu:8, yusui:0, pity:0, dex:{}};
+let S = load();
+function load(){ try{const s=JSON.parse(localStorage.getItem("dongfu"));
+  if(s&&typeof s==='object'){ const m=Object.assign({},DEF,s);
+    m.dex=Object.assign({}, s.dex||{}); m.alloc=Object.assign({atk:0,vit:0,agi:0},s.alloc||{});
+    if(typeof m.xianyu!=='number') m.xianyu=DEF.xianyu; if(typeof m.yusui!=='number') m.yusui=0;
+    if(typeof m.pity!=='number') m.pity=0; return m; }
+}catch(e){} return structuredClone(DEF); }
+function save(){ localStorage.setItem("dongfu", JSON.stringify(S)); }
+
+/* ---------- audio (爽) ---------- */
+let AC, audioOn=true;
+function ac(){ if(!AC){ try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){} } return AC; }
+function beep(freq,dur=0.06,type="square",vol=0.05,when=0){ if(!audioOn)return; const c=ac(); if(!c)return;
+  const o=c.createOscillator(),g=c.createGain(); o.type=type; o.frequency.value=freq;
+  o.connect(g); g.connect(c.destination); const t=c.currentTime+when;
+  g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(0.0001,t+dur); o.start(t); o.stop(t+dur); }
+function tick(){ beep(150+Math.random()*120,0.03,"square",0.025); }
+function lever(){ if(!audioOn)return; for(let i=0;i<8;i++) beep(220+i*40,0.04,"sawtooth",0.03,i*0.03); }
+function chime(rank){ const sc=[523,659,784,1047,1319,1568]; sc.slice(0,3+rank).forEach((f,i)=>beep(f,0.14,"triangle",0.06,i*0.09));
+  if(rank>=3){ beep(1568,0.5,"triangle",0.05,0.4); beep(2093,0.5,"sine",0.04,0.5); } }
+
+/* ---------- render ---------- */
+const $ = id => document.getElementById(id);
+const $$ = s => document.querySelectorAll(s);
+function ownedCount(){ return POOL.filter(p=>S.dex[p.id]).length; }
+function render(){
+  S.xianyu=Math.max(0,S.xianyu); save();
+  $("xy").textContent=S.xianyu; $("sui").textContent=S.yusui.toLocaleString();
+  $("pity").textContent=Math.max(0,10-S.pity);
+  $("owned").textContent=ownedCount(); $("total").textContent=POOL.length;
+  $("pull1").disabled = S.xianyu<1; $("pull10").disabled = S.xianyu<10;
+  // 图鉴
+  $("dex").innerHTML = POOL.map(p=>{
+    const c=S.dex[p.id]||0, r=RA[p.ra];
+    return `<div class="dc ${c?'':'locked'}" id="dc_${p.id}" style="--rc:${r.col}">
+      <div class="pic" style="background-image:url('${IMG(p.img)}')"></div>
+      ${c>1?`<span class="dupe">×${c}</span>`:""}
+      <div class="glimmer"></div>
+      <div class="lbl"><div class="rr">${r.cls} · ${r.nm}</div><div class="nm">${c?p.nm:'？？？'}</div></div>
+    </div>`;
+  }).join("");
+}
+
+/* ---------- draw logic (no-whiff + pity) ---------- */
+function weightedRarity(){ let tot=0; for(const k of RANKS) tot+=RA[k].w; let x=Math.random()*tot;
+  for(const k of RANKS){ x-=RA[k].w; if(x<0) return k; } return "N"; }
+function rollRarity(guaranteeSR){
+  let r=weightedRarity();
+  if(S.pity>=9 && RA[r].rank<RA.SSR.rank) r="SSR";      // 10 掷保底飞升
+  if(guaranteeSR && RA[r].rank<RA.SR.rank) r="SR";       // 十连保底浴衣+
+  return r;
+}
+function grantItem(ra){
+  const pool=POOL.filter(p=>p.ra===ra);
+  const unowned=pool.filter(p=>!S.dex[p.id]);
+  if(unowned.length){ const it=unowned[Math.floor(Math.random()*unowned.length)];
+    S.dex[it.id]=1; return {it,dupe:false}; }
+  const it=pool[Math.floor(Math.random()*pool.length)];
+  S.dex[it.id]=(S.dex[it.id]||1)+1; const g=RA[ra].sui; S.yusui+=g; return {it,dupe:true,sui:g};
+}
+function drawOne(guaranteeSR){
+  const ra=rollRarity(guaranteeSR);
+  if(RA[ra].rank>=RA.SSR.rank) S.pity=0; else S.pity++;
+  const res=grantItem(ra); res.ra=ra; return res;
+}
+
+/* ---------- reels theater ---------- */
+function spinReels(finalSym, cb){
+  const reels=[$("r0"),$("r1"),$("r2")]; const syms=["🎴","🌸","💮","💎","👑"];
+  reels.forEach(r=>{r.classList.add("spin");r.classList.remove("win")});
+  const iv=setInterval(()=>{ reels.forEach(r=>{ r.querySelector(".sym").textContent=syms[Math.floor(Math.random()*syms.length)]; }); tick(); },70);
+  const stops=[520,760,1020];
+  reels.forEach((r,i)=>setTimeout(()=>{ r.classList.remove("spin");
+    r.querySelector(".sym").textContent=finalSym[i]; beep(320+i*120,0.08,"square",0.05);
+    if(i===2){ clearInterval(iv);
+      if(finalSym[0]===finalSym[1]&&finalSym[1]===finalSym[2]) reels.forEach(x=>x.classList.add("win"));
+      cb&&cb(); } },stops[i]));
+}
+
+/* ---------- juice ---------- */
+function burst(col,n=18){ const host=$("reveal");
+  for(let i=0;i<n;i++){ const s=document.createElement("div"); s.className="spark"; s.style.setProperty("--sc",col);
+    host.appendChild(s); const a=Math.random()*Math.PI*2, d=80+Math.random()*160, dx=Math.cos(a)*d, dy=Math.sin(a)*d;
+    s.animate([{transform:"translate(-50%,-50%) scale(1)",opacity:1},{transform:`translate(${dx-50}%,${dy-50}%) scale(0)`,opacity:0}],
+      {duration:700+Math.random()*500,easing:"cubic-bezier(.2,.8,.3,1)"}).onfinish=()=>s.remove(); } }
+let toastT; function toast(m,sub){ const t=$("toast"); t.innerHTML=m+(sub?`<small>${sub}</small>`:""); t.classList.add("show");
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),1800); }
+let sayT; function speak(line){ const s=$("say"); $("sayText").textContent=line; s.classList.add("show");
+  clearTimeout(sayT); sayT=setTimeout(()=>s.classList.remove("show"),3000); }
+function jackpot(){ const j=$("jflash"); j.classList.remove("go"); void j.offsetWidth; j.classList.add("go"); }
+
+const SAY_NEW={N:["缘浅，也是缘。","且收着。"],R:["咦，有点意思。","这身…好看。"],
+  SR:["好缘。留住了。","啧，教人移不开眼。"],SSR:["大缘！恭喜道友。","飞升之姿，难得一见。"],
+  UR:["天作之合！！","合卺良缘，百年难遇——"]};
+const SAY_DUP=["这张，你已有了 —— 化作玉髓。","重了，玉髓拿好。","缘分重叠，玉髓补你。"];
+
+function cardHTML(res, big){
+  const p=res.it, r=RA[res.ra];
+  return `<div class="card ${big?'big':''}" style="--rc:${r.col};--rg:${r.rg}">
+    <div class="pic" style="background-image:url('${IMG(p.img)}')"></div>
+    <span class="rr">${r.cls}</span><span class="ph">PLACEHOLDER</span>
+    <div class="meta"><div class="who">${p.who}</div><div class="nm">${p.nm}</div></div>
+    <div class="flag ${res.dupe?'dupe':'new'}">${res.dupe?`重复 · 玉髓+${res.sui}`:'NEW · 入图鉴'}</div>
+  </div>`;
+}
+function afterReveal(best){
+  const r=RA[best.ra]; burst(r.col, r.rank>=3?30:18); chime(r.rank);
+  if(r.rank>=3) jackpot();
+  toast((best.dupe?"缘·重逢 · ":"缘·成 · ")+r.nm, RANKS[r.rank]==="UR"?"JACKPOT":"合欢宫");
+  speak((best.dupe?SAY_DUP[Math.floor(Math.random()*SAY_DUP.length)]
+       :SAY_NEW[best.ra][Math.floor(Math.random()*SAY_NEW[best.ra].length)]));
+  render();
+  const dc=$("dc_"+best.it.id); if(dc){ dc.classList.add("justgot"); setTimeout(()=>dc.classList.remove("justgot"),1000); }
+}
+let busy=false;
+function pull(n){
+  if(busy) return; if(S.xianyu<n){ speak("仙缘玉不够 —— 去打 Boss、渡个劫再来。"); return; }
+  busy=true; S.xianyu-=n; lever(); save(); render();
+  const results=[]; for(let i=0;i<n;i++) results.push(drawOne(n>=10 && i===n-1));
+  let best=results[0]; for(const r of results) if(RA[r.ra].rank>RA[best.ra].rank) best=r;
+  const finalSym=(n>=10)?[RA[best.ra].sym,RA[best.ra].sym,RA[best.ra].sym]
+    :[RA[best.ra].sym, RA[results[0].ra].sym, RA[best.ra].sym];
+  $("reveal").innerHTML=`<div class="hint">缘分正在显形…</div>`;
+  spinReels(finalSym, ()=>{
+    if(n>=10){ $("reveal").innerHTML=results.map(r=>cardHTML(r,false)).join("");
+      $$("#reveal .card").forEach((c,i)=>c.style.animationDelay=(i*0.07)+"s"); }
+    else $("reveal").innerHTML=cardHTML(results[0],true);
+    afterReveal(best); busy=false; save();
+  });
+}
+
+/* ---------- wire ---------- */
+$("pull1").onclick=()=>pull(1);
+$("pull10").onclick=()=>pull(10);
+$("grant").onclick=()=>{ S.xianyu+=10; save(); render(); toast("仙缘玉 +10","BOSS 首杀"); speak("又得了缘玉？来，掷一把。"); };
+$("mute").onclick=()=>{ audioOn=!audioOn; $("mute").textContent=audioOn?"🔊":"🔇"; if(audioOn){ac(); beep(880,0.08,"triangle",0.05);} };
+render();
+setTimeout(()=>$("say").classList.add("show"),400);
+</script>
+</body>
+</html>
