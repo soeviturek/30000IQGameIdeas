@@ -3,7 +3,9 @@
 
 # Exported game builds (large binaries — rebuild via --export-release)
 build/
-daleiwendao/build/
+
+# 游戏源码已拆分为独立 git 仓库（daleiwendao/ 目录自带 .git，网站仓库不再追踪）
+daleiwendao/
 
 # Smoke-test logs
 _smoke_log*.txt
