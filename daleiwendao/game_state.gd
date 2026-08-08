@@ -25,6 +25,7 @@ var victory: bool = false:
 		victory_changed.emit(value)
 
 var spirit_stones: int = 0
+var run_xianyu: int = 0   # 本局到手仙缘玉（通关妖王首杀 → 合欢宫货币，供结算展示）
 
 # 险地难度：玩家手动 +/- 的挑战偏移（0=寻常，正=更凶更肥，负=手下留情）。
 # 敌人有效强度 = 境界基线（自动）× 险地系数。可在战斗中随时按 [ / ] 调整，
@@ -95,6 +96,7 @@ func win_stage() -> void:
 	var reward := int((300 + run_loot * 0.5 + level * 20) * _stone_mult())
 	spirit_stones = reward
 	_bank(reward)
+	_award_xianyu()
 	_flush_meta()
 	victory = true
 	stage_cleared.emit(spirit_stones)
@@ -114,6 +116,13 @@ func _stone_mult() -> float:
 func _bank(amount: int) -> void:
 	if has_node("/root/Meta"):
 		get_node("/root/Meta").add_stones(amount)
+
+# 剿灭妖王（通关）→ 掉仙缘玉：稀有货币，只能去合欢宫抽（Boss 首杀语义）。
+func _award_xianyu() -> void:
+	if has_node("/root/Meta"):
+		var m = get_node("/root/Meta")
+		run_xianyu = int(m.WIN_XIANYU)
+		m.add_xianyu(run_xianyu)
 
 # 修为脊柱：每次斩妖累积「修为」（跨局永久，推进境界）。
 # 只按怪种基础值 + 险地温和放大，不吃自身境界 → 杜绝"境界越高修为越快、瞬间封顶"的失控。
@@ -163,5 +172,6 @@ func reset() -> void:
 	game_over = false
 	victory = false
 	spirit_stones = 0
+	run_xianyu = 0
 	xp_changed.emit(xp, xp_to_next, level)
 	kills_changed.emit(kills)

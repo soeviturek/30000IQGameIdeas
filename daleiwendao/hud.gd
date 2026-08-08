@@ -521,7 +521,7 @@ func _on_stage_cleared(reward: int) -> void:
 	Sfx.play("victory")
 	var total := int(GameState.elapsed)
 	var summary: Label = _victory_root.get_meta("summary")
-	summary.text = "剿灭妖王 · 用时 %02d:%02d\n斩妖 %d · 道行 Lv.%d · 获得灵石 ×%d" % [total / 60, total % 60, GameState.kills, GameState.level, reward]
+	summary.text = "剿灭妖王 · 用时 %02d:%02d\n斩妖 %d · 道行 Lv.%d · 灵石 ×%d · 仙缘玉 ×%d" % [total / 60, total % 60, GameState.kills, GameState.level, reward, GameState.run_xianyu]
 	_levelup_root.visible = false
 	_victory_root.visible = true
 	get_tree().paused = true

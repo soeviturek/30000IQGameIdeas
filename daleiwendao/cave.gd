@@ -10,6 +10,7 @@ const COL_STONE := Color("bfe8ff")
 
 var _meta: Node
 var _stone_lbl: Label
+var _xianyu_lbl: Label
 var _realm_lbl: Label
 var _cult_bar: ProgressBar
 var _cult_lbl: Label
@@ -63,6 +64,8 @@ func _build() -> void:
 	header.add_child(spacer)
 	_stone_lbl = _label("", 30, COL_STONE, HORIZONTAL_ALIGNMENT_RIGHT)
 	header.add_child(_stone_lbl)
+	_xianyu_lbl = _label("", 24, Color("ff8fb0"), HORIZONTAL_ALIGNMENT_RIGHT)
+	header.add_child(_xianyu_lbl)
 
 	col.add_child(_label("消耗灵石永久精进 · 每次出关归来皆有所得 · 道行无止境", 16, COL_DIM, HORIZONTAL_ALIGNMENT_LEFT))
 
@@ -88,6 +91,9 @@ func _build() -> void:
 	var go := _menu_button("出 关 挑 战", 260)
 	go.pressed.connect(_on_challenge)
 	footer.add_child(go)
+	var hhg := _menu_button("合 欢 宫", 200)
+	hhg.pressed.connect(_on_hehuangong)
+	footer.add_child(hhg)
 	var back := _menu_button("返 回 菜 单", 220)
 	back.pressed.connect(_on_menu)
 	footer.add_child(back)
@@ -247,6 +253,8 @@ func _refresh() -> void:
 	if _meta == null:
 		return
 	_stone_lbl.text = "灵石 ×%d" % int(_meta.stones)
+	if _xianyu_lbl:
+		_xianyu_lbl.text = "· 仙缘玉 ×%d" % int(_meta.xianyu)
 	_refresh_realm()
 	_refresh_danger()
 	for r in _rows:
@@ -273,6 +281,9 @@ func _on_challenge() -> void:
 
 func _on_menu() -> void:
 	get_tree().change_scene_to_file("res://main_menu.tscn")
+
+func _on_hehuangong() -> void:
+	get_tree().change_scene_to_file("res://hehuangong.tscn")
 
 func _input(event: InputEvent) -> void:
 	var key := event as InputEventKey
